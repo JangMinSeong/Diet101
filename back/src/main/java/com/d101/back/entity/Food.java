@@ -19,20 +19,20 @@ public class Food extends BaseTimeEntity {
 	private String name;
 	
 	private int calorie;
-	private int carbohydrate;
-	private int protein;
-	private int fat;
-	private int transFat;
-	private int saturatedFat;
-	private int cholesterol;
-	private int natrium;
-	private int sugar;
+	private double carbohydrate;
+	private double protein;
+	private double fat;
+	private double transFat;
+	private double saturatedFat;
+	private double cholesterol;
+	private double natrium;
+	private double sugar;
 	
 	@OneToMany(mappedBy = "food")
 	private List<Preference> preferences;
 	
 	@Builder
-	public Food(String name, int calorie, int carbohydrate, int protein, int fat, int transFat, int saturatedFat, int cholesterol, int natrium, int sugar) {
+	public Food(String name, int calorie, double carbohydrate, double protein, double fat, double transFat, double saturatedFat, double cholesterol, double natrium, double sugar) {
 		this.name = name;
 		this.calorie = calorie;
 		this.carbohydrate = carbohydrate;
