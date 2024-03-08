@@ -5,6 +5,8 @@ import com.d101.back.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -36,18 +38,19 @@ public class User extends BaseTimeEntity {
 
     private String oauthId;
 
+
+    @OneToMany(mappedBy="user")
+    private List<Meal> meals;
+
+
     @Builder
-    public User(String email, String username,String image,  Role role, Provider provider, String oauthId, int calorie, int height, int weight, String gender) {
+    public User(String email, String username,String image,  Role role, Provider provider, String oauthId) {
         this.email = email;
         this.username = username;
         this.image = image;
         this.role = role;
         this.provider = provider;
         this.oauthId = oauthId;
-        this.calorie = calorie;
-        this.height = height;
-        this.weight = weight;
-        this.gender = gender;
     }
 
 }
