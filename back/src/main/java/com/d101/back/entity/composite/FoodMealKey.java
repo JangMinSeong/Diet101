@@ -10,7 +10,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserFoodKey implements Serializable {
-	private Long user_id;
+public class FoodMealKey implements Serializable {
 	private Long food_id;
+	private Long meal_id;
 }

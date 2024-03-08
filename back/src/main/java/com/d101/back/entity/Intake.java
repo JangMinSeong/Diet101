@@ -1,6 +1,6 @@
 package com.d101.back.entity;
 
-import com.d101.back.entity.composite.UserFoodKey;
+import com.d101.back.entity.composite.FoodMealKey;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,20 +8,21 @@ import lombok.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Getter 
+@Getter
 @Setter
 @Entity
-public class Preference {
+public class Intake {
 	@EmbeddedId
-	private UserFoodKey key;
+	private FoodMealKey key;
 	
-	private int weight;
-	
-	@ManyToOne
-	@JoinColumn(name = "user_id")
-	private User user;
+	private int amount;
 	
 	@ManyToOne
 	@JoinColumn(name = "food_id")
 	private Food food;
+	
+	@ManyToOne
+	@JoinColumn(name = "meal_id")
+	private Meal meal;
+	
 }

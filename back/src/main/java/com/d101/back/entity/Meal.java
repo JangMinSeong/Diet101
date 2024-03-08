@@ -1,5 +1,7 @@
 package com.d101.back.entity;
 
+import java.util.List;
+
 import com.d101.back.entity.enums.Dunchfast;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,6 +29,9 @@ public class Meal extends  BaseTimeEntity{
     @ManyToOne
     @JoinColumn(name="user_id")
     private User user;
+    
+    @OneToMany(mappedBy = "meal")
+    private List<Intake> intakes;
 
     @Builder
     public Meal(String image, Dunchfast type, int totalCalorie, double totalCarbohydrate, double totalProtein, double totalFat)  {
