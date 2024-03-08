@@ -41,7 +41,9 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy="user")
     private List<Meal> meals;
-
+    
+    @OneToMany(mappedBy="user")
+    private List<Preference> preferences;
 
     @Builder
     public User(String email, String username,String image,  Role role, Provider provider, String oauthId) {

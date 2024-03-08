@@ -1,5 +1,7 @@
 package com.d101.back.entity;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,6 +27,9 @@ public class Food extends BaseTimeEntity {
 	private int cholesterol;
 	private int natrium;
 	private int sugar;
+	
+	@OneToMany(mappedBy = "food")
+	private List<Preference> preferences;
 	
 	@Builder
 	public Food(String name, int calorie, int carbohydrate, int protein, int fat, int transFat, int saturatedFat, int cholesterol, int natrium, int sugar) {
