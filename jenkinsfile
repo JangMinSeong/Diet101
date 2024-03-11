@@ -39,7 +39,7 @@ pipeline {
         AI_SERVER_URL = "${env.AI_SERVER_URL}"
         DOCKER_COMPOSE_FILE = "docker-compose.yml"
         
-        */
+        *///
     }
     
     stages {
