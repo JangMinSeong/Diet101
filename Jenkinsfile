@@ -57,61 +57,40 @@ pipeline {
                 }
             }
         } 
-        //sdfsdfsdfsdf
-        // tesetsteats
-        //asdfasdfasdf
 
+        stage('Build and Push the Back-end Docker Image') {
+            steps {
+                script {
+                    sh 'echo "Starting Build Back Docker Image"'
+                    dir('back') {
+                        withDockerRegistry(credentialsId: 'docker', url: 'https://registry.hub.docker.com') {
+                            backendImage = docker.build("${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}", 
+                                "--build-arg DATABASE_PASSWORD=${env.DATABASE_PASSWORD} " +
+                                "--build-arg DATABASE_URL=${env.DATABASE_URL} " +
+                                "--build-arg DATABASE_USERNAME=${env.DATABASE_USERNAME} " +
+                                "--build-arg JWT_SECRET=${env.JWT_SECRET} " +
+                                "--build-arg KAKAO_CLIENT_ID=${env.KAKAO_CLIENT_ID} " +
+                                "--build-arg KAKAO_CLIENT_SECRET=${env.KAKAO_CLIENT_SECRET} " +
+                                "--build-arg KAKAO_REDIRECT_URI=${env.KAKAO_REDIRECT_URI} " +
+                                "--build-arg S3_ACCESS_KEY=${env.S3_ACCESS_KEY} " +
+                                "--build-arg S3_BUCKET=${env.S3_BUCKET} " +
+                                "--build-arg S3_SECRET_KEY=${env.S3_SECRET_KEY} .")
 
-        // stage('Build and Push the Back-end Docker Image') {
-        //     steps {
-        //         script {
-        //             sh 'echo "Starting Build Back Docker Image"'
-        //             dir('back') {
-        //                 withDockerRegistry(credentialsId: 'docker', url: 'https://registry.hub.docker.com') {
-
-        //                     withCredentials([file(credentialsId: 'GCP_SERVICE_ACCOUNT_JSON', variable: 'GCP_SERVICE_ACCOUNT_JSON')]) {
-        //                         sh 'cp $GCP_SERVICE_ACCOUNT_JSON ./google_service_key.json'
-                               
-        //                         backendImage = docker.build("${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}", 
-        //                             "--build-arg DATABASE_URL=${env.DATABASE_URL} " +
-        //                             "--build-arg HTTPS=${env.HTTPS} " +
-        //                             "--build-arg NAVER_CLIENT_ID=${env.NAVER_CLIENT_ID} " +
-        //                             "--build-arg NAVER_CLIENT_SECRET=${env.NAVER_CLIENT_SECRET} " +
-        //                             "--build-arg KAKAO_CLIENT_ID=${env.KAKAO_CLIENT_ID} " +
-        //                             "--build-arg KAKAO_CLIENT_SECRET=${env.KAKAO_CLIENT_SECRET} " +
-        //                             "--build-arg GOOGLE_CLIENT_ID=${env.GOOGLE_CLIENT_ID} " +
-        //                             "--build-arg GOOGLE_CLIENT_SECRET=${env.GOOGLE_CLIENT_SECRET} " +
-        //                             "--build-arg SMTP_PASSWORD=${env.SMTP_PASSWORD} " +
-        //                             "--build-arg SMTP_PORT=${env.SMTP_PORT} " +
-        //                             "--build-arg SMTP_SERVER=${env.SMTP_SERVER} " +
-        //                             "--build-arg AI_SERVER_URL=${env.AI_SERVER_URL} " +
-        //                             "--build-arg SMTP_USERNAME=${env.SMTP_USERNAME} " +
-        //                             "--build-arg SSL_CRT_FILE=${env.SSL_CRT_FILE} " +
-        //                             "--build-arg SSL_KEY_FILE=${env.SSL_KEY_FILE} .")
-
-        //                         sh 'rm -f ./google_service_key.json' // 빌드 후 파일 삭제
-                                
-
-        //                         // Docker 빌드 결과 출력
-        //                         if (backendImage != 0) {
-        //                             echo "Docker build succeeded: ${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}"
-        //                             docker.withRegistry('https://registry.hub.docker.com', 'docker') {
-        //                                 backendImage.push()
-        //                         }
-        //                         // sh "docker run -p 8000:8000 ${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}"
-        //                         } else {
-        //                             error "Docker build failed"
-        //                         }
-                                
-        //                     }
-                            
-                             
-        //                 }
-        //             }
-        //         }
-        //     }
+                            // Docker 빌드 결과 출력
+                            if (backendImage != 0) {
+                                echo "Docker build succeeded: ${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}"
+                                docker.withRegistry('https://registry.hub.docker.com', 'docker') {
+                                    backendImage.push()
+                                }
+                            } else {
+                                error "Docker build failed"
+                            }
+                        }
+                    }
+                }
+            }
             
-        // }    
+        }    
         // stage('Build and Push the Front-end Docker Image') {
         //     steps {
         //         script {
