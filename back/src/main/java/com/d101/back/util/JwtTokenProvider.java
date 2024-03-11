@@ -7,12 +7,11 @@ import com.d101.back.exception.response.ExceptionStatus;
 import com.d101.back.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,6 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider {
@@ -37,7 +37,6 @@ public class JwtTokenProvider {
     private long accessExpirationTime;
     @Value("${jwt.token.refresh-expiration-time}")
     private long refreshExpirationTime;
-    private UserService userService;
 
     public long getRefreshTokenValidityTime() {
         return refreshExpirationTime;
@@ -92,12 +91,22 @@ public class JwtTokenProvider {
     public Claims validateAndGetClaims(String token) {
         try {
             return Jwts.parserBuilder().setSigningKey(createKey()).build().parseClaimsJws(token).getBody();
-        } catch (RuntimeException e) {
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+            log.info("Invalid JWT Token", e);
             throw new UnAuthorizedException(ExceptionStatus.JWT_TOKEN_INVALID);
+        } catch (ExpiredJwtException e) {
+            log.info("Expired JWT Token", e);
+            throw new UnAuthorizedException(ExceptionStatus.JWT_TOKEN_EXPIRED);
+        } catch (UnsupportedJwtException e) {
+            log.info("Unsupported JWT Token", e);
+            throw new UnAuthorizedException(ExceptionStatus.UNSUPPORTED_JWT_TOKEN);
+        } catch (IllegalArgumentException e) {
+            log.info("JWT claims string is empty.", e);
+            throw new UnAuthorizedException(ExceptionStatus.JWT_CLAIMS_STRING_IS_EMPTY);
         }
     }
     // 토큰의 정보로 Authentication 가져옴
-    public Authentication getAuthentication(String accessToken) {
+    public Authentication getAuthentication(String accessToken, UserService userService) {
         Claims claims = validateAndGetClaims(accessToken);
         UserDetails principal = userService.loadUserByUsername(claims.getSubject());
         return new UsernamePasswordAuthenticationToken(principal, accessToken, principal.getAuthorities());
