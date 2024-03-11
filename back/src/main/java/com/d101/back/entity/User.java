@@ -15,6 +15,7 @@ import java.util.List;
 public class User extends BaseTimeEntity {
 
     @Id
+    @Column(name="user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -37,13 +38,6 @@ public class User extends BaseTimeEntity {
     private Provider provider;
 
     private String oauthId;
-
-
-    @OneToMany(mappedBy="user")
-    private List<Meal> meals;
-    
-    @OneToMany(mappedBy="user")
-    private List<Preference> preferences;
 
     @Builder
     public User(String email, String username,String image,  Role role, Provider provider, String oauthId) {
