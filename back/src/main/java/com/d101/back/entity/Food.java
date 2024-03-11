@@ -11,8 +11,9 @@ import lombok.*;
 @Getter @Setter
 @Entity
 public class Food extends BaseTimeEntity {
-	
+
 	@Id
+	@Column(name="food_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
@@ -27,13 +28,7 @@ public class Food extends BaseTimeEntity {
 	private double cholesterol;
 	private double natrium;
 	private double sugar;
-	
-	@OneToMany(mappedBy = "food")
-	private List<Preference> preferences;
-	
-	@OneToMany(mappedBy = "food")
-	private List<Intake> intakes;
-	
+
 	@Builder
 	public Food(String name, int calorie, double carbohydrate, double protein, double fat, double transFat, double saturatedFat, double cholesterol, double natrium, double sugar) {
 		this.name = name;

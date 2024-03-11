@@ -17,12 +17,4 @@ public class Intake {
 	
 	private int amount;
 	
-	@ManyToOne
-	@JoinColumn(name = "food_id")
-	private Food food;
-	
-	@ManyToOne
-	@JoinColumn(name = "meal_id")
-	private Meal meal;
-	
 }

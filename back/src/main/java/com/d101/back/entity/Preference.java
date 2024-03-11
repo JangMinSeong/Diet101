@@ -16,12 +16,5 @@ public class Preference {
 	private UserFoodKey key;
 	
 	private int weight;
-	
-	@ManyToOne
-	@JoinColumn(name = "user_id")
-	private User user;
-	
-	@ManyToOne
-	@JoinColumn(name = "food_id")
-	private Food food;
+
 }
