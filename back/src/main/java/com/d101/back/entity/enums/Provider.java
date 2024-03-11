@@ -1,4 +1,4 @@
-package com.d101.back.entity;
+package com.d101.back.entity.enums;
 
 public enum Provider {
     KAKAO, NAVER, GOOGLE;

@@ -1,5 +1,6 @@
 package com.d101.back.entity;
 
+import com.d101.back.entity.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
