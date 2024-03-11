@@ -5,6 +5,7 @@ import com.d101.back.api.OAuthApi;
 import com.d101.back.dto.LoginTokenDto;
 import com.d101.back.dto.oauth.OAuth2UserInfo;
 import com.d101.back.dto.oauth.OAuthLoginReq;
+import com.d101.back.dto.request.ModifyUserReq;
 import com.d101.back.entity.CustomUserDetails;
 import com.d101.back.entity.User;
 import com.d101.back.entity.enums.Role;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -62,4 +64,16 @@ public class UserService {
                 .build();
         return userRepository.save(user);
     }
+
+    @Transactional
+    public void updateUserInfo(String email, ModifyUserReq req) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND));
+        user.setUsername(req.getUsername());
+        user.setGender(req.getGender());
+        user.setCalorie(req.getCalorie());
+        user.setHeight(req.getHeight());
+        user.setWeight(req.getWeight());
+    }
+
 }
