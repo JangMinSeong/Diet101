@@ -1,7 +1,11 @@
 package com.d101.back.entity;
 
+import com.d101.back.entity.enums.Provider;
+import com.d101.back.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,6 +24,12 @@ public class User extends BaseTimeEntity {
 
     private String image;
 
+    private int calorie;
+    private int height;
+    private int weight;
+
+    private String gender;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -27,6 +37,13 @@ public class User extends BaseTimeEntity {
     private Provider provider;
 
     private String oauthId;
+
+
+    @OneToMany(mappedBy="user")
+    private List<Meal> meals;
+    
+    @OneToMany(mappedBy="user")
+    private List<Preference> preferences;
 
     @Builder
     public User(String email, String username,String image,  Role role, Provider provider, String oauthId) {
