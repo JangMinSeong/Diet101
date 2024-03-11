@@ -61,16 +61,15 @@ public class UserService {
             OAuth2UserInfo oAuth2UserInfo = oAuthApi.loginProcess();
             User user = userRepository.findByEmail(oAuth2UserInfo.getEmail())
                     .orElseGet(() -> createNewUser(oAuth2UserInfo));
-
             LoginTokenDto loginTokenDto = jwtProvider.getLoginResponse(user);
             user.setRefresh_token(loginTokenDto.getRefreshToken()); // ⭐ 리프레시토큰 저장
+            userRepository.save(user);
             return loginTokenDto;
         } catch (Exception e) {
             throw new UnAuthorizedException(ExceptionStatus.OAUTH_LOGIN_FAIL);
         }
     }
 
-    @Transactional
     public User createNewUser(OAuth2UserInfo oAuth2UserInfo) {
         User user = User.builder()
                 .email(oAuth2UserInfo.getEmail())
@@ -80,7 +79,7 @@ public class UserService {
                 .oauthId(oAuth2UserInfo.getId())
                 .provider(oAuth2UserInfo.getProvider())
                 .build();
-        return userRepository.save(user);
+        return user;
     }
 
     @Transactional
