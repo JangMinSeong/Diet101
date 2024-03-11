@@ -3,6 +3,7 @@ package com.d101.back.controller;
 import com.d101.back.dto.LoginTokenDto;
 import com.d101.back.dto.oauth.KakaoLoginReq;
 import com.d101.back.dto.request.ModifyUserReq;
+import com.d101.back.dto.request.UpdateAllergyReq;
 import com.d101.back.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,12 @@ public class UserController {
     @PostMapping("/info/profile")
     public ResponseEntity<?> updateUserInfo(@RequestBody ModifyUserReq req, Authentication authentication) {
         userService.updateUserInfo(authentication.getName(),req);
+        return ResponseEntity.ok("Success");
+    }
+
+    @PostMapping("/info/allergy")
+    public ResponseEntity<?> updateAllergy(@RequestBody UpdateAllergyReq req, Authentication authentication) {
+        userService.updateAllergy(authentication.getName(), req.getAllergies());
         return ResponseEntity.ok("Success");
     }
 
