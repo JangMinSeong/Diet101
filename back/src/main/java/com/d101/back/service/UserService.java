@@ -13,6 +13,7 @@ import com.d101.back.entity.User;
 import com.d101.back.entity.composite.UserAllergyKey;
 import com.d101.back.entity.enums.AllergyType;
 import com.d101.back.entity.enums.Role;
+import com.d101.back.exception.BadRequestException;
 import com.d101.back.exception.NoSuchDataException;
 import com.d101.back.exception.UnAuthorizedException;
 import com.d101.back.exception.response.ExceptionStatus;
@@ -20,14 +21,22 @@ import com.d101.back.repository.AllergyRepository;
 import com.d101.back.repository.UserRepository;
 import com.d101.back.util.JwtTokenProvider;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -54,9 +63,7 @@ public class UserService {
                     .orElseGet(() -> createNewUser(oAuth2UserInfo));
 
             LoginTokenDto loginTokenDto = jwtProvider.getLoginResponse(user);
-//            redisTemplate.opsForValue()
-//                    .set("RTK:"+loginTokenDTO.getUserId(),loginTokenDTO.getRefreshToken(),
-//                            Duration.ofDays(jwtProvider.getRefreshTokenValidityTime()));
+            user.setRefresh_token(loginTokenDto.getRefreshToken()); // ⭐ 리프레시토큰 저장
             return loginTokenDto;
         } catch (Exception e) {
             throw new UnAuthorizedException(ExceptionStatus.OAUTH_LOGIN_FAIL);
@@ -74,6 +81,37 @@ public class UserService {
                 .provider(oAuth2UserInfo.getProvider())
                 .build();
         return userRepository.save(user);
+    }
+
+    @Transactional
+    public LoginTokenDto reissue(LoginTokenDto loginTokenDto) {
+        String accessToken = loginTokenDto.getAccessToken();
+        String refreshToken = loginTokenDto.getRefreshToken();
+        HashMap<Object, String> claims = jwtProvider.parseClaimsByExpiredToken(accessToken); //만료된 atk를 검증하고 claim정보를 가져옴
+        // atk가 만료되지 않은 상황은 재발급하지 않음
+        if(claims == null){
+            throw new BadRequestException(ExceptionStatus.JWT_TOKEN_ALIVE);
+        }
+        Claims refreshClaims = jwtProvider.validateAndGetClaims(refreshToken);
+        String userName = claims.get("sub");
+        User user = userRepository.findByEmail(userName).orElseThrow(()->new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND));
+        if (!Objects.equals(user.getRefresh_token(), refreshToken)){  // atk의 userName으로 db에 저장된 rtk와 전달받은 rtk를 비교
+            throw new BadRequestException(ExceptionStatus.REFRESH_TOKEN_INVALID);
+        }
+
+        Date exp = refreshClaims.getExpiration();
+        Date current = Date.from(OffsetDateTime.now().toInstant());
+
+        //만료 시간과 현재 시간의 간격 계산
+        //만일 1일 미만인 경우에는 Refresh Token도 다시 생성
+        long gapTime = (exp.getTime() - current.getTime());
+        if(gapTime < (1000 * 60 * 60 * 24  ) ){
+            log.info("new Refresh Token required...  ");
+            refreshToken = jwtProvider.generateRefreshToken(user.getEmail());
+            user.setRefresh_token(refreshToken);
+        }
+        accessToken = jwtProvider.generateAccessToken(user.getEmail(),user.getRole().name());
+        return new LoginTokenDto(user.getEmail(),accessToken,refreshToken);
     }
 
     @Transactional

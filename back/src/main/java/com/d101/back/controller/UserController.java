@@ -25,6 +25,11 @@ public class UserController {
         return ResponseEntity.ok(userService.loginOauth(kakaoLoginReq));
     }
 
+    @PostMapping("/reissue")
+    public ResponseEntity<LoginTokenDto> reissue(@RequestBody LoginTokenDto loginTokenDto) {
+        return ResponseEntity.ok(userService.reissue(loginTokenDto));
+    }
+
     @PostMapping("/info/profile")
     public ResponseEntity<?> updateUserInfo(@RequestBody ModifyUserReq req, Authentication authentication) {
         userService.updateUserInfo(authentication.getName(),req);

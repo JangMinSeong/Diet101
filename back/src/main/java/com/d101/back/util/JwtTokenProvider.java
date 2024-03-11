@@ -42,11 +42,11 @@ public class JwtTokenProvider {
         return refreshExpirationTime;
     }
     public LoginTokenDto getLoginResponse(User user){
-        return new LoginTokenDto(user.getEmail(), generateAccessToken(user.getId(), user.getEmail(), user.getRole().name())
-                ,generateRefreshToken(user.getId(), user.getEmail()));
+        return new LoginTokenDto(user.getEmail(), generateAccessToken(user.getEmail(), user.getRole().name())
+                ,generateRefreshToken(user.getEmail()));
     }
     public LoginTokenDto getLoginResponse(Long id, String email, Authentication authentication){
-        return new LoginTokenDto(email, generateAccessToken(id, email,getAuthorities(authentication)),generateRefreshToken(id, email));
+        return new LoginTokenDto(email, generateAccessToken(email,getAuthorities(authentication)),generateRefreshToken(email));
     }
 
     public String getAuthorities(Authentication authentication){
@@ -56,20 +56,20 @@ public class JwtTokenProvider {
     }
 
     //사용자 정보를 기반으로 토큰을 생성하여 반환 해주는 메서드
-    public String generateAccessToken(Long id, String email,String authorities) {
+    public String generateAccessToken(String email,String authorities) {
         return Jwts.builder()
                 .signWith(createKey())   // 서명
                 .setSubject(email)  // JWT 토큰 제목
-                .setId(String.valueOf(id))
+                .setId("ATK")
                 .claim("auth",authorities)  //권한정보 저장
                 .setExpiration(Date.from(ZonedDateTime.now().plusDays(accessExpirationTime).toInstant()))    // JWT 토큰 만료 시간
                 .compact();
     }
-    public String generateRefreshToken(Long id,String email) {
+    public String generateRefreshToken(String email) {
         return Jwts.builder()
                 .signWith(createKey())   // 서명
                 .setSubject(email)  // JWT 토큰 제목
-                .setId(String.valueOf(id))
+                .setId("RTK")
                 .setExpiration(Date.from(ZonedDateTime.now().plusDays(refreshExpirationTime).toInstant()))    // JWT 토큰 만료 시간
                 .compact();
     }
