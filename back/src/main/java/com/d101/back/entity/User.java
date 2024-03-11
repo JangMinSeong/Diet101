@@ -39,6 +39,10 @@ public class User extends BaseTimeEntity {
 
     private String oauthId;
 
+
+    @OneToMany(mappedBy = "user")
+    private List<Meal> meals;
+
     @Builder
     public User(String email, String username,String image,  Role role, Provider provider, String oauthId) {
         this.email = email;
