@@ -1,6 +1,7 @@
 package com.d101.back.config;
 
 import com.d101.back.filter.JwtTokenFilter;
+import com.d101.back.service.UserService;
 import com.d101.back.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,7 @@ public class SecurityConfig {
     @Value("${auth.white-list}")
     private String[] whiteList;
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -58,7 +60,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtTokenFilter jwtTokenFilter() {
-        return new JwtTokenFilter(jwtTokenProvider);
+        return new JwtTokenFilter(jwtTokenProvider, userService);
     }
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
