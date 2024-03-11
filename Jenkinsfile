@@ -54,11 +54,13 @@ pipeline {
                             credentialsId: 'gitlab'
                         ]]
                     ])
-                    //asdfasdfadsfasdf
-                    // git credentialsId: 'gitlab', url: 'https://lab.ssafy.com/s10-ai-image-sub2/S10P22D101.git'
                 }
             }
-        }
+        } 
+        //sdfsdfsdfsdf
+        // tesetsteats
+        //asdfasdfasdf
+
 
         // stage('Build and Push the Back-end Docker Image') {
         //     steps {
