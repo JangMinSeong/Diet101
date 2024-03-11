@@ -47,7 +47,14 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    git credentialsId: 'gitlab', url: 'https://lab.ssafy.com/s10-ai-image-sub2/S10P22D101.git'
+                    checkout([$class: 'GitSCM', 
+                        branches: [[name: '*/deploy']], 
+                        userRemoteConfigs: [[
+                            url: 'https://lab.ssafy.com/s10-ai-image-sub2/S10P22D101.git',
+                            credentialsId: 'gitlab'
+                        ]]
+                    ])
+                    // git credentialsId: 'gitlab', url: 'https://lab.ssafy.com/s10-ai-image-sub2/S10P22D101.git'
                 }
             }
         }
