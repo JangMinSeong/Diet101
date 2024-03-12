@@ -30,6 +30,9 @@ public class User extends BaseTimeEntity {
     private int weight;
 
     private String gender;
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+	private List<Meal> mealList;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -40,7 +43,7 @@ public class User extends BaseTimeEntity {
     private String oauthId;
 
     @Builder
-    public User(String email, String username,String image,  Role role, Provider provider, String oauthId) {
+    public User(String email, String username, String image, Role role, Provider provider, String oauthId) {
         this.email = email;
         this.username = username;
         this.image = image;
