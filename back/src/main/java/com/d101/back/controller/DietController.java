@@ -3,6 +3,7 @@ package com.d101.back.controller;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.d101.back.dto.MealDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -24,13 +25,13 @@ public class DietController {
 	
 	@GetMapping("/info")
 	public ResponseEntity<?> getTodayDietInfo(Authentication authentication) {
-		List<Meal> meals = dietService.getMealsForSpecificDate(authentication.getName(), LocalDate.now().toString());
+		List<MealDto> meals = dietService.getMealsForSpecificDate(authentication.getName(), LocalDate.now().toString());
 		return new ResponseEntity<>(meals, HttpStatus.OK);
 	}
 	
 	@GetMapping("/info/date")
 	public ResponseEntity<?> getDietInfoForDate(@RequestParam(value = "date") String date, Authentication authentication) {
-		List<Meal> meals = dietService.getMealsForSpecificDate(authentication.getName(), date);
+		List<MealDto> meals = dietService.getMealsForSpecificDate(authentication.getName(), date);
 		return new ResponseEntity<>(meals, HttpStatus.OK);
 	}
 	

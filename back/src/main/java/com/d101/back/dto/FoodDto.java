@@ -1,5 +1,6 @@
 package com.d101.back.dto;
 
+import com.d101.back.entity.Food;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,4 +23,19 @@ public class FoodDto {
     private double natrium;
     private double sugar;
 
+    public static FoodDto fromEntity (Food food) {
+        return new FoodDto(
+                food.getId(),
+                food.getName(),
+                food.getCalorie(),
+                food.getCarbohydrate(),
+                food.getProtein(),
+                food.getFat(),
+                food.getTransFat(),
+                food.getSaturatedFat(),
+                food.getCholesterol(),
+                food.getNatrium(),
+                food.getSugar()
+        );
+    }
 }
