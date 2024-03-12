@@ -141,4 +141,16 @@ public class UserService {
         allergyRepository.saveAll(allergiesToSave);
     }
 
+    public List<String> getAllergy(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND));
+        QAllergy allergy = QAllergy.allergy;
+        List<AllergyType> allergies = jpaQueryFactory
+                .select(allergy.key.allergy)
+                .from(allergy)
+                .where(allergy.key.user_id.eq(user.getId()))
+                .fetch();
+        return  allergies.stream().map(AllergyType::name).toList();
+    }
+
 }
