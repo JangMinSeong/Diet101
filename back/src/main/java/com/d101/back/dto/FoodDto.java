@@ -1,4 +1,4 @@
-package com.d101.back.dto.response;
+package com.d101.back.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class SearchFoodRes {
+public class FoodDto {
     private Long id;
 
     private String name;

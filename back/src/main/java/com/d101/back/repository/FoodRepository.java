@@ -11,10 +11,6 @@ import java.util.List;
 public interface FoodRepository extends JpaRepository<Food, Long> {
     List<Food> findByNameContainingOrderByNameAsc(String name, Pageable pageable);
 
-    @Query("select f from Food f " +
-            "where f.id = (select i.key.food_id from Intake i " +
-            "where i.key.meal_id = (select m.id from Meal m where m.user.id = (select u.id from User u where u.email = :email) ) " +
-            "group by i.key.meal_id " +
-            "order by count(i.key.food_id) desc)")
+    @Query("select f from Food f where f.id in (select p.key.food_id from Preference p, User u where (u.email = :email and p.key.user_id = u.id) order by p.weight desc)")
     List<Food> rankingByEmail(@Param("email") String email, Pageable pageable);
 }
