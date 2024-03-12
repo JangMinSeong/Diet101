@@ -43,10 +43,9 @@ public class DietController {
 		return new ResponseEntity<>(meals, HttpStatus.OK);
 	}
 	
-	@GetMapping("/info/date")
+	@GetMapping("/info/id")
 	public ResponseEntity<?> getDietDetail(@RequestParam(value = "id") Long id, Authentication authentication) {
 		Meal meal = dietService.getMealOfUserById(authentication.getName(), id);
 		return new ResponseEntity<>(meal, HttpStatus.OK);
 	}
-	
 }
