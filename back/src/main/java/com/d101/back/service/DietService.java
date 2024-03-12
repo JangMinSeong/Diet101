@@ -5,11 +5,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.d101.back.entity.Meal;
 import com.d101.back.entity.User;
 import com.d101.back.exception.NoSuchDataException;
+import com.d101.back.exception.UnAuthorizedException;
 import com.d101.back.exception.response.ExceptionStatus;
 import com.d101.back.repository.DietRepository;
 import com.d101.back.repository.UserRepository;
@@ -43,6 +46,37 @@ public class DietService {
 			return dietRepository.findByUserAndCreateDateBetween(user.get(), startDate, endDate);
 		} else {
 			throw new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND);
+		}
+	}
+	
+	public Meal getMealById(Long id) {
+		Optional<Meal> meal = dietRepository.findById(id);
+		if (meal.isPresent()) {
+			return meal.get();
+		} else {
+			throw new NoSuchDataException(ExceptionStatus.MEAL_NOT_FOUND);
+		}
+	}
+	
+	public Boolean isUserHaveMeal(String email, Meal meal) {
+		Optional<User> user = userRepository.findByEmail(email);
+		if (user.isPresent()) {
+			if (user.get().getMeals().contains(meal)) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			throw new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND);
+		}
+	}
+	
+	public Meal getMealOfUserById(String email, Long id) {
+		Meal meal = getMealById(id);
+		if (isUserHaveMeal(email, meal)) {
+			return meal;
+		} else {
+			throw new UnAuthorizedException(ExceptionStatus.UNAUTHORIZED);
 		}
 	}
 }

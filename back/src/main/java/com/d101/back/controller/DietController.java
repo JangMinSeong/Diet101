@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.d101.back.entity.Meal;
+import com.d101.back.exception.NoSuchDataException;
+import com.d101.back.exception.UnAuthorizedException;
+import com.d101.back.exception.response.ExceptionStatus;
 import com.d101.back.service.DietService;
 
 import lombok.RequiredArgsConstructor;
@@ -39,4 +42,11 @@ public class DietController {
 		List<Meal> meals = dietService.getMealsForSpecificTerm(authentication.getName(), dateFrom, dateTo);
 		return new ResponseEntity<>(meals, HttpStatus.OK);
 	}
+	
+	@GetMapping("/info/date")
+	public ResponseEntity<?> getDietDetail(@RequestParam(value = "id") Long id, Authentication authentication) {
+		Meal meal = dietService.getMealOfUserById(authentication.getName(), id);
+		return new ResponseEntity<>(meal, HttpStatus.OK);
+	}
+	
 }
