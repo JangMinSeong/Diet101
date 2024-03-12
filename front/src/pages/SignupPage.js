@@ -1,24 +1,14 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, Image} from 'react-native';
 import {Text} from '@ui-kitten/components';
+import SignaturePicture from '../components/SignaturePicture';
 
 function SignupPage() {
   return (
     <View style={{flex: 1}}>
-      <View style={styles.container}>
-        <Text category="h6" style={{marginBottom: 30}}>
-          Singup
-        </Text>
-      </View>
+      <SignaturePicture />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
 
 export default SignupPage;
