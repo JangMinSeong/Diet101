@@ -11,6 +11,8 @@ public enum ExceptionStatus implements ExceptionInfo {
 
     // BAD_REQUEST
     DUPLICATE_USER(2000, HttpStatus.BAD_REQUEST.value(), "사용자가 이미 존재합니다."),
+    JWT_TOKEN_ALIVE(2001, HttpStatus.BAD_REQUEST.value(), "JWT 토큰이 만료되지 않아 재발급이 불가능합니다."),
+    REFRESH_TOKEN_INVALID(2002, HttpStatus.BAD_REQUEST.value(), "Refresh 토큰이 유효하지 않습니다."),
 
     // UNAUTHORIZED
     UNAUTHORIZED(3000, HttpStatus.UNAUTHORIZED.value(), "사용자가 인증되지 않았습니다."),

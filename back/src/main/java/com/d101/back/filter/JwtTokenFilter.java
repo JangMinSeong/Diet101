@@ -50,16 +50,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         try {
             // Request Header 에서 JWT 토큰 추출
             String token = parseBearerToken(auth);
-            if (path.equals("/members/reissue")) {
+            if (path.equals("/api/user/reissue")) { // ⭐ RTK 재발급
                 filterChain.doFilter(request, response);
                 return;
             }
-
             //토큰 유효성 검사
             if (jwtTokenProvider.validateAndGetClaims(token) != null) {
-//                if (redisTemplate.opsForValue().get(token) != null) {
-//                    throw new TokenException(BLACK_TOKEN);
-//                }
                 // 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext 에 저장
                 Authentication authentication = jwtTokenProvider.getAuthentication(token, userService);
                 SecurityContextHolder.getContext().setAuthentication(authentication);

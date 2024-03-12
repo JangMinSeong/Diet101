@@ -28,8 +28,8 @@ public class User extends BaseTimeEntity {
     private int calorie;
     private int height;
     private int weight;
-
     private String gender;
+    private String refresh_token;
 
     @Enumerated(EnumType.STRING)
     private Role role;
