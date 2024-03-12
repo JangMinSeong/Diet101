@@ -9,6 +9,6 @@ import com.d101.back.entity.Meal;
 import com.d101.back.entity.User;
 
 public interface DietRepository extends JpaRepository<Meal, Long> {
-	List<Meal> findByUserAndCreateDate(User user, LocalDate date);
-	List<Meal> findByUserAndCreateDateBetween(User user, LocalDate startDate, LocalDate endDate);
+	List<Meal> findByUserAndTime(User user, LocalDate date);
+	List<Meal> findByUserAndTimeBetween(User user, LocalDate startDate, LocalDate endDate);
 }

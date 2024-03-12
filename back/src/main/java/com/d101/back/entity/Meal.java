@@ -40,16 +40,18 @@ public class Meal extends  BaseTimeEntity{
     private double totalProtein;
     private double totalFat;
     
-    private LocalDate createDate;
+    private LocalDate time;
 
     @ManyToOne
     @JoinColumn(name="user_id")
     private User user;
 
     @Builder
-    public Meal(String image, Dunchfast type, int totalCalorie, double totalCarbohydrate, double totalProtein, double totalFat)  {
+    public Meal(User user, String image, Dunchfast type, LocalDate time, int totalCalorie, double totalCarbohydrate, double totalProtein, double totalFat)  {
+        this.user = user;
         this.image = image;
         this.type = type;
+        this.time = time;
         this.totalCalorie = totalCalorie;
         this.totalCarbohydrate = totalCarbohydrate;
         this.totalProtein = totalProtein;
