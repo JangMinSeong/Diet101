@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import com.d101.back.entity.Meal;
 import com.d101.back.service.DietService;
 
 import lombok.RequiredArgsConstructor;

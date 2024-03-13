@@ -5,16 +5,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
+import com.d101.back.dto.QIntakeDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.d101.back.dto.IntakeDto;
 import com.d101.back.dto.MealDto;
-import com.d101.back.dto.QIntakeDto;
 import com.d101.back.dto.request.CreateMealReq;
 import com.d101.back.entity.Intake;
 import com.d101.back.entity.Meal;
 import com.d101.back.entity.User;
+import com.d101.back.entity.QIntake;
+import com.d101.back.entity.QMeal;
+import com.d101.back.entity.QFood;
 import com.d101.back.entity.composite.FoodMealKey;
 import com.d101.back.entity.enums.Dunchfast;
 import com.d101.back.exception.NoSuchDataException;
@@ -112,15 +115,15 @@ public class DietService {
 		Meal meal = getMealById(id);
 		
 		if (isUserHaveMeal(email, meal)) {
-			QMeal meal = QMeal.meal;
+			QMeal qMeal = QMeal.meal;
 			QIntake intake = QIntake.intake;
 			QFood food = QFood.food;
 			List<IntakeDto> intakeData = jpaQueryFactory
 					.select(new QIntakeDto(food, intake.amount)).distinct()
-					.from(meal, intake, food)
+					.from(qMeal, intake, food)
 					.where(intake.key.meal_id.eq(meal.getId()), intake.key.food_id.eq(food.id))
 					.fetch(); 
-			return new MealDto(meal.getId(), meal.getImage(), meal.getTime().toString(), meal.getType(), meal.getTotalCalorie(), intakeData);;
+			return new MealDto(meal.getId(), meal.getImage(), meal.getTime().toString(), meal.getType(), meal.getTotalCalorie(), intakeData);
 		}
 		throw new UnAuthorizedException(ExceptionStatus.UNAUTHORIZED);
 	}
