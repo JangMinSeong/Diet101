@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import com.d101.back.entity.*;
+import com.d101.back.entity.composite.UserFoodKey;
+import com.d101.back.repository.PreferenceRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,7 @@ public class DietService {
 	private final DietRepository dietRepository;
 	private final UserRepository userRepository;
 	private final IntakeRepository intakeRepository;
+	private final PreferenceRepository preferenceRepository;
 	private final JPAQueryFactory jpaQueryFactory;
 	private final S3Service s3Service;
 		
@@ -87,6 +90,14 @@ public class DietService {
 				.map(intake -> new Intake(new FoodMealKey(intake.getFood_id(), meal.getId()), intake.getAmount()))
 				.toList();
 		intakeRepository.saveAll(intakes);
+
+		// 선호도 증가
+		intakes.forEach(intake -> {
+			UserFoodKey key = new UserFoodKey(user.getId(), intake.getKey().getFood_id());
+			Preference preference = preferenceRepository.findById(key)
+					.orElseGet(() -> preferenceRepository.save(new Preference(key, 0)));
+			preference.plusWeight();
+		});
 	}
 
 	public Meal getMealById(Long id) {
