@@ -2,7 +2,6 @@ package com.d101.back.service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,13 +9,10 @@ import com.d101.back.dto.IntakeDto;
 import com.d101.back.dto.MealDto;
 import com.d101.back.dto.QIntakeDto;
 import com.d101.back.dto.request.CreateMealReq;
-import com.d101.back.dto.request.IntakeReq;
 import com.d101.back.entity.*;
 import com.d101.back.entity.composite.FoodMealKey;
 import com.d101.back.entity.enums.Dunchfast;
 import com.d101.back.repository.IntakeRepository;
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Service;
 
