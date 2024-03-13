@@ -49,7 +49,7 @@ public class DietService {
 		List<Meal> meals = dietRepository.findByUserAndTime(user, localDate);
 		return meals.stream().map(m -> {
 			List<IntakeDto> intakeData = jpaQueryFactory
-					.select(new QIntakeDto(food, intake.amount))
+					.select(new QIntakeDto(food, intake.amount)).distinct()
 					.from(meal, intake, food)
 					.where(intake.key.meal_id.eq(m.getId()), intake.key.food_id.eq(food.id))
 					.fetch();
