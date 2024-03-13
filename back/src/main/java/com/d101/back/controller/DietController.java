@@ -5,15 +5,16 @@ import java.util.List;
 
 import com.d101.back.dto.MealDto;
 import com.d101.back.dto.request.CreateMealReq;
+import com.d101.back.service.DietService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import com.d101.back.entity.Meal;
-import com.d101.back.service.DietService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/diet")
@@ -40,8 +41,8 @@ public class DietController {
 	}
 
 	@PostMapping("/meal")
-	public ResponseEntity<?> saveMeal(Authentication authentication, @RequestBody CreateMealReq req) {
-		dietService.saveMeal(authentication.getName(),  req);
+	public ResponseEntity<?> saveMeal(Authentication authentication, @RequestPart MultipartFile file, @RequestPart CreateMealReq req) {
+		dietService.saveMeal(authentication.getName(), file, req);
 		return ResponseEntity.ok("Success");
 	}
 

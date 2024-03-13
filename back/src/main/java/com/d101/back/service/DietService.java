@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
+import com.d101.back.entity.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,11 +13,9 @@ import com.d101.back.dto.IntakeDto;
 import com.d101.back.dto.MealDto;
 import com.d101.back.dto.QIntakeDto;
 import com.d101.back.dto.request.CreateMealReq;
-import com.d101.back.entity.Intake;
-import com.d101.back.entity.Meal;
-import com.d101.back.entity.User;
 import com.d101.back.entity.composite.FoodMealKey;
 import com.d101.back.entity.enums.Dunchfast;
+
 import com.d101.back.exception.NoSuchDataException;
 import com.d101.back.exception.UnAuthorizedException;
 import com.d101.back.exception.response.ExceptionStatus;
@@ -26,6 +25,8 @@ import com.d101.back.repository.UserRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
+
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +36,7 @@ public class DietService {
 	private final UserRepository userRepository;
 	private final IntakeRepository intakeRepository;
 	private final JPAQueryFactory jpaQueryFactory;
+	private final S3Service s3Service;
 		
 	public List<MealDto> getMealsForSpecificDate(String email, String date) {
 		User user = userRepository.findByEmail(email)
@@ -69,11 +71,14 @@ public class DietService {
 	}
 
 	@Transactional
-	public void saveMeal(String email, CreateMealReq req) {
+	public void saveMeal(String email, MultipartFile file, CreateMealReq req) {
 		User user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND));
 
-		Meal meal = new Meal(user, req.getImage(), Dunchfast.valueOf(req.getType()), req.getTime(),
+		// 이미지 저장
+		String img = s3Service.saveFile(file, "diet");
+
+		Meal meal = new Meal(user, img, Dunchfast.valueOf(req.getType()), req.getTime(),
 				req.getTotalKcal(), req.getTotalCarbohydrate(),
 				req.getTotalProtein(), req.getTotalFat());
 		dietRepository.save(meal);

@@ -13,7 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 public class CreateMealReq {
 
-    private String image;
     private String type;
     private String time;
     private List<IntakeReq> intakes;
