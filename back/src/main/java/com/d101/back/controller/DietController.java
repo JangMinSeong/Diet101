@@ -35,7 +35,7 @@ public class DietController {
 	
 	@GetMapping("/info/term")
 	public ResponseEntity<?> getDietInfoForTerm(@RequestParam(value = "dateFrom") String dateFrom, @RequestParam(value = "dateTo") String dateTo, Authentication authentication) {
-		List<Meal> meals = dietService.getMealsForSpecificTerm(authentication.getName(), dateFrom, dateTo);
+		List<MealDto> meals = dietService.getMealsForSpecificTerm(authentication.getName(), dateFrom, dateTo);
 		return new ResponseEntity<>(meals, HttpStatus.OK);
 	}
 
@@ -47,8 +47,7 @@ public class DietController {
 
 	@GetMapping("/info/id")
 	public ResponseEntity<?> getDietDetail(@RequestParam(value = "id") Long id, Authentication authentication) {
-		Meal meal = dietService.getMealOfUserById(authentication.getName(), id);
+		MealDto meal = dietService.getMealOfUserById(authentication.getName(), id);
 		return new ResponseEntity<>(meal, HttpStatus.OK);
 	}
-
 }

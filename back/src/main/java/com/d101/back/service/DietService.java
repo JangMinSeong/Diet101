@@ -56,16 +56,25 @@ public class DietService {
 		}).toList();
 	}
 	
-	public List<Meal> getMealsForSpecificTerm(String email, String start, String end) {
-		Optional<User> user = userRepository.findByEmail(email);
-		if (user.isPresent()) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-			LocalDate startDate = LocalDate.parse(start, formatter);
-			LocalDate endDate = LocalDate.parse(end, formatter);
-			return dietRepository.findByUserAndTimeBetween(user.get(), startDate, endDate);
-		} else {
-			throw new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND);
-		}
+	public List<MealDto> getMealsForSpecificTerm(String email, String start, String end) {
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND));
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDate startDate = LocalDate.parse(start, formatter);
+		LocalDate endDate = LocalDate.parse(end, formatter);
+		List<Meal> meals = dietRepository.findByUserAndTimeBetween(user, startDate, endDate);
+		
+		QMeal meal = QMeal.meal;
+		QIntake intake = QIntake.intake;
+		QFood food = QFood.food;
+		return meals.stream().map(m -> {
+			List<IntakeDto> intakeData = jpaQueryFactory
+					.select(new QIntakeDto(food, intake.amount)).distinct()
+					.from(meal, intake, food)
+					.where(intake.key.meal_id.eq(m.getId()), intake.key.food_id.eq(food.id))
+					.fetch();
+			return new MealDto(m.getId(), m.getImage(), m.getTime().toString(), m.getType(), m.getTotalCalorie(), intakeData);
+		}).toList();
 	}
 
 	@Transactional
@@ -85,33 +94,34 @@ public class DietService {
 	}
 
 	public Meal getMealById(Long id) {
-		Optional<Meal> meal = dietRepository.findById(id);
-		if (meal.isPresent()) {
-			return meal.get();
-		} else {
-			throw new NoSuchDataException(ExceptionStatus.MEAL_NOT_FOUND);
-		}
+		Meal meal = dietRepository.findById(id)
+				.orElseThrow(() -> new NoSuchDataException(ExceptionStatus.MEAL_NOT_FOUND));
+		return meal;
 	}
 	
 	public Boolean isUserHaveMeal(String email, Meal meal) {
-		Optional<User> user = userRepository.findByEmail(email);
-		if (user.isPresent()) {
-			if (user.get().getMeals().contains(meal)) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			throw new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND);
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND));
+		if (user.getMeals().contains(meal)) {
+			return true;
 		}
+		return false;
 	}
 	
-	public Meal getMealOfUserById(String email, Long id) {
+	public MealDto getMealOfUserById(String email, Long id) {
 		Meal meal = getMealById(id);
+		
 		if (isUserHaveMeal(email, meal)) {
-			return meal;
-		} else {
-			throw new UnAuthorizedException(ExceptionStatus.UNAUTHORIZED);
+			QMeal meal = QMeal.meal;
+			QIntake intake = QIntake.intake;
+			QFood food = QFood.food;
+			List<IntakeDto> intakeData = jpaQueryFactory
+					.select(new QIntakeDto(food, intake.amount)).distinct()
+					.from(meal, intake, food)
+					.where(intake.key.meal_id.eq(meal.getId()), intake.key.food_id.eq(food.id))
+					.fetch(); 
+			return new MealDto(meal.getId(), meal.getImage(), meal.getTime().toString(), meal.getType(), meal.getTotalCalorie(), intakeData);;
 		}
+		throw new UnAuthorizedException(ExceptionStatus.UNAUTHORIZED);
 	}
 }
