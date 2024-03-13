@@ -5,24 +5,27 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.d101.back.dto.IntakeDto;
 import com.d101.back.dto.MealDto;
 import com.d101.back.dto.QIntakeDto;
 import com.d101.back.dto.request.CreateMealReq;
-import com.d101.back.entity.*;
+import com.d101.back.entity.Intake;
+import com.d101.back.entity.Meal;
+import com.d101.back.entity.User;
 import com.d101.back.entity.composite.FoodMealKey;
 import com.d101.back.entity.enums.Dunchfast;
-import com.d101.back.repository.IntakeRepository;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.springframework.stereotype.Service;
-
 import com.d101.back.exception.NoSuchDataException;
+import com.d101.back.exception.UnAuthorizedException;
 import com.d101.back.exception.response.ExceptionStatus;
 import com.d101.back.repository.DietRepository;
+import com.d101.back.repository.IntakeRepository;
 import com.d101.back.repository.UserRepository;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -81,4 +84,34 @@ public class DietService {
 		intakeRepository.saveAll(intakes);
 	}
 
+	public Meal getMealById(Long id) {
+		Optional<Meal> meal = dietRepository.findById(id);
+		if (meal.isPresent()) {
+			return meal.get();
+		} else {
+			throw new NoSuchDataException(ExceptionStatus.MEAL_NOT_FOUND);
+		}
+	}
+	
+	public Boolean isUserHaveMeal(String email, Meal meal) {
+		Optional<User> user = userRepository.findByEmail(email);
+		if (user.isPresent()) {
+			if (user.get().getMeals().contains(meal)) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			throw new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND);
+		}
+	}
+	
+	public Meal getMealOfUserById(String email, Long id) {
+		Meal meal = getMealById(id);
+		if (isUserHaveMeal(email, meal)) {
+			return meal;
+		} else {
+			throw new UnAuthorizedException(ExceptionStatus.UNAUTHORIZED);
+		}
+	}
 }
