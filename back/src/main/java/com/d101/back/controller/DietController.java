@@ -3,6 +3,7 @@ package com.d101.back.controller;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.d101.back.dto.IntakeDto;
 import com.d101.back.dto.MealDto;
 import com.d101.back.dto.request.CreateMealReq;
 import org.springframework.http.HttpStatus;
@@ -44,9 +45,16 @@ public class DietController {
 		return ResponseEntity.ok("Success");
 	}
 
-	@GetMapping("/info/id")
-	public ResponseEntity<?> getDietDetail(@RequestParam(value = "id") Long id, Authentication authentication) {
+	@GetMapping("/info/{id}")
+	public ResponseEntity<?> getDietDetail(@PathVariable(value = "id") Long id, Authentication authentication) {
 		MealDto meal = dietService.getMealOfUserById(authentication.getName(), id);
 		return new ResponseEntity<>(meal, HttpStatus.OK);
+	}
+
+	@GetMapping("/info/{meal_id}/{food_id}")
+	public ResponseEntity<?> getFoodFromDiet(@PathVariable(value = "meal_id") Long meal_id, @PathVariable(value = "food_id") Long food_id, Authentication authentication) {
+		MealDto meal = dietService.getMealOfUserById(authentication.getName(), meal_id);
+		IntakeDto intake = dietService.getFoodDto(meal, food_id);
+		return new ResponseEntity<>(intake, HttpStatus.OK);
 	}
 }

@@ -3,7 +3,6 @@ package com.d101.back.service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 import com.d101.back.dto.QIntakeDto;
 import org.springframework.stereotype.Service;
@@ -97,19 +96,15 @@ public class DietService {
 	}
 
 	public Meal getMealById(Long id) {
-		Meal meal = dietRepository.findById(id)
+        return dietRepository.findById(id)
 				.orElseThrow(() -> new NoSuchDataException(ExceptionStatus.MEAL_NOT_FOUND));
-		return meal;
 	}
 	
 	public Boolean isUserHaveMeal(String email, Meal meal) {
 		User user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND));
-		if (user.getMeals().contains(meal)) {
-			return true;
-		}
-		return false;
-	}
+        return user.getMeals().contains(meal);
+    }
 	
 	public MealDto getMealOfUserById(String email, Long id) {
 		Meal meal = getMealById(id);
@@ -126,5 +121,14 @@ public class DietService {
 			return new MealDto(meal.getId(), meal.getImage(), meal.getTime().toString(), meal.getType(), meal.getTotalCalorie(), intakeData);
 		}
 		throw new UnAuthorizedException(ExceptionStatus.UNAUTHORIZED);
+	}
+
+	public IntakeDto getFoodDto(MealDto meal, Long food_id) {
+		List<IntakeDto> intake = meal.getIntake().stream()
+				.filter(i -> i.getFood().getId().equals(food_id)).toList();
+		if (!intake.isEmpty()) {
+			return intake.getFirst();
+		}
+		throw new NoSuchDataException(ExceptionStatus.Food_NOT_FOUND);
 	}
 }
