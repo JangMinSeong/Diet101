@@ -138,12 +138,16 @@ public class DietService {
 		throw new UnAuthorizedException(ExceptionStatus.UNAUTHORIZED);
 	}
 
-	public IntakeDto getFoodDto(Long meal_id, Long food_id) {
-		Food food = this.foodRepository.findById(food_id)
-				.orElseThrow(() -> new NoSuchDataException(ExceptionStatus.FOOD_NOT_FOUND));
-		Intake intake = this.intakeRepository.findById(new FoodMealKey(food_id, meal_id))
-				.orElseThrow(() -> new NoSuchDataException(ExceptionStatus.INTAKE_NOT_FOUND));
-		return new IntakeDto(food, intake.getAmount());
+	public IntakeDto getFoodDto(Long meal_id, Long food_id, String email) {
+		Meal meal = getMealById(meal_id);
+		if (isUserHaveMeal(email, meal)) {
+			Food food = this.foodRepository.findById(food_id)
+					.orElseThrow(() -> new NoSuchDataException(ExceptionStatus.FOOD_NOT_FOUND));
+			Intake intake = this.intakeRepository.findById(new FoodMealKey(food_id, meal_id))
+					.orElseThrow(() -> new NoSuchDataException(ExceptionStatus.INTAKE_NOT_FOUND));
+			return new IntakeDto(food, intake.getAmount());
+		}
+		throw new UnAuthorizedException(ExceptionStatus.UNAUTHORIZED);
 	}
 
 //	public IntakeDto getFoodDto(MealDto meal, Long food_id) {
