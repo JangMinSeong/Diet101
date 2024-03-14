@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import com.d101.back.entity.*;
 import com.d101.back.entity.composite.UserFoodKey;
-import com.d101.back.repository.PreferenceRepository;
+import com.d101.back.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,9 +24,6 @@ import com.d101.back.entity.enums.Dunchfast;
 import com.d101.back.exception.NoSuchDataException;
 import com.d101.back.exception.UnAuthorizedException;
 import com.d101.back.exception.response.ExceptionStatus;
-import com.d101.back.repository.DietRepository;
-import com.d101.back.repository.IntakeRepository;
-import com.d101.back.repository.UserRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -39,6 +36,7 @@ public class DietService {
 	
 	private final DietRepository dietRepository;
 	private final UserRepository userRepository;
+	private final FoodRepository foodRepository;
 	private final IntakeRepository intakeRepository;
 	private final PreferenceRepository preferenceRepository;
 	private final JPAQueryFactory jpaQueryFactory;
@@ -140,12 +138,20 @@ public class DietService {
 		throw new UnAuthorizedException(ExceptionStatus.UNAUTHORIZED);
 	}
 
-	public IntakeDto getFoodDto(MealDto meal, Long food_id) {
-		List<IntakeDto> intake = meal.getIntake().stream()
-				.filter(i -> i.getFood().getId().equals(food_id)).toList();
-		if (!intake.isEmpty()) {
-			return intake.getFirst();
-		}
-		throw new NoSuchDataException(ExceptionStatus.Food_NOT_FOUND);
+	public IntakeDto getFoodDto(Long meal_id, Long food_id) {
+		Food food = this.foodRepository.findById(food_id)
+				.orElseThrow(() -> new NoSuchDataException(ExceptionStatus.FOOD_NOT_FOUND));
+		Intake intake = this.intakeRepository.findById(new FoodMealKey(food_id, meal_id))
+				.orElseThrow(() -> new NoSuchDataException(ExceptionStatus.INTAKE_NOT_FOUND));
+		return new IntakeDto(food, intake.getAmount());
 	}
+
+//	public IntakeDto getFoodDto(MealDto meal, Long food_id) {
+//		List<IntakeDto> intake = meal.getIntake().stream()
+//				.filter(i -> i.getFood().getId().equals(food_id)).toList();
+//		if (!intake.isEmpty()) {
+//			return intake.getFirst();
+//		}
+//		throw new NoSuchDataException(ExceptionStatus.FOOD_NOT_FOUND);
+//	}
 }

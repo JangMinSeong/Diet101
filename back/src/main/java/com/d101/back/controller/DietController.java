@@ -55,8 +55,7 @@ public class DietController {
 
 	@GetMapping("/info/{meal_id}/{food_id}")
 	public ResponseEntity<?> getFoodFromDiet(@PathVariable(value = "meal_id") Long meal_id, @PathVariable(value = "food_id") Long food_id, Authentication authentication) {
-		MealDto meal = dietService.getMealOfUserById(authentication.getName(), meal_id);
-		IntakeDto intake = dietService.getFoodDto(meal, food_id);
+		IntakeDto intake = dietService.getFoodDto(meal_id, food_id);
 		return new ResponseEntity<>(intake, HttpStatus.OK);
 	}
 }

@@ -9,7 +9,8 @@ public enum ExceptionStatus implements ExceptionInfo {
     // NOT FOUND
     USER_NOT_FOUND(1000, HttpStatus.NOT_FOUND.value(), "사용자가 존재하지 않습니다."),
     MEAL_NOT_FOUND(1001, HttpStatus.NOT_FOUND.value(), "식단이 존재하지 않습니다."),
-    Food_NOT_FOUND(1002, HttpStatus.NOT_FOUND.value(), "음식이 존재하지 않습니다."),
+    FOOD_NOT_FOUND(1002, HttpStatus.NOT_FOUND.value(), "음식이 존재하지 않습니다."),
+    INTAKE_NOT_FOUND(1003, HttpStatus.NOT_FOUND.value(), "존재하지 않는 intake 입니다."),
 
     // BAD_REQUEST
     DUPLICATE_USER(2000, HttpStatus.BAD_REQUEST.value(), "사용자가 이미 존재합니다."),
