@@ -1,6 +1,7 @@
 package com.ssafy.d101.ui.view.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,9 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Divider
@@ -30,14 +33,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
 
 @Composable
-fun MyPageScreen() {
+fun MyPageScreen(navController: NavController) {
 
     Column( modifier = Modifier // 백그라운드
         .fillMaxSize()
@@ -45,38 +50,33 @@ fun MyPageScreen() {
     ) {
         MyPageHeader()
         MyProfile()
-        MyMenu()
+        MyMenu(navController)
     }
 
 }
 @Composable
 fun MyPageHeader() {
-    Row ( modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 16.dp, vertical = 20.dp),
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) { // 헤더 박스
-        Box(
+        Spacer(modifier = Modifier.width(48.dp))
+        Text(
+            text = "마이페이지",
             modifier = Modifier
-                .weight(1f),
-            contentAlignment = Alignment.Center // Box 내부의 내용을 시작 지점에 맞춤
-        ) {
-            Text(
-                text = "마이페이지",
-                style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp)
+                .weight(1f)
+                .align(Alignment.CenterVertically),
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
+            textAlign = TextAlign.Center // 텍스트를 가운데 정렬함
+        )
+        IconButton(onClick = { /* 할 일 */ }) {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = "MyPage Button"
             )
         }
-        Box(
-            contentAlignment = Alignment.CenterEnd // Box 내부의 내용을 끝 지점에 맞춤
-        ) {
-            IconButton(onClick = { /* 할 일 */ }) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "User Page"
-                )
-            }
-        }
-
     }
 }
 
@@ -156,7 +156,7 @@ fun MyProfile() {
 }
 
 @Composable
-fun MyMenu() {
+fun MyMenu(navController: NavController) {
     // 메뉴 박스
     Row( modifier = Modifier
         .fillMaxWidth()
@@ -177,8 +177,8 @@ fun MyMenu() {
                     )
                 )
             )
-            SettingItem("BMI 측정하기")
-            SettingItem("알레르기 등록")
+            SettingItem("BMI 측정하기", navController, "bmi")
+            SettingItem("알레르기 등록", navController, "")
             Divider(modifier = Modifier.padding(20.dp,10.dp,20.dp,0.dp), color = Color.Gray, thickness = 1.dp)
             Text("식단 관리", modifier = Modifier.padding(20.dp,10.dp,0.dp,10.dp),
                 style = TextStyle(
@@ -191,20 +191,21 @@ fun MyMenu() {
                     )
                 )
             )
-            SettingItem("음식 추천")
-            SettingItem("하루 섭취 정보")
-            SettingItem("식단 분석")
+            SettingItem("음식 추천", navController, "")
+            SettingItem("하루 섭취 정보", navController, "")
+            SettingItem("식단 분석", navController, "")
         }
     }
 
 }
 
 @Composable
-fun SettingItem(text: String) {
+fun SettingItem(text: String, navController: NavController, path: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(20.dp,8.dp, 0.dp,5.dp),
+            .padding(20.dp,8.dp, 0.dp,5.dp)
+            .clickable { navController.navigate(path) },
         verticalAlignment = Alignment.CenterVertically
     ) { // > 아이콘
         Text(text)

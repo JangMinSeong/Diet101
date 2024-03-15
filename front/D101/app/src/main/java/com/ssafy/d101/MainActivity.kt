@@ -19,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ssafy.d101.model.BottomNavItem
 import com.ssafy.d101.ui.theme.D101Theme
 import com.ssafy.d101.ui.view.components.BottomNavigationBar
+import com.ssafy.d101.ui.view.screens.BMIScreen
 import com.ssafy.d101.ui.view.screens.HomeScreen
 import com.ssafy.d101.ui.view.screens.MyPageScreen
 
@@ -50,9 +51,10 @@ fun MyApp() {
         }
     ) { innerPadding ->
         NavHost(navController = navController, startDestination = if (isLoggedIn) "home" else "mypage", modifier = Modifier.padding(innerPadding)) {
-            composable("myPage") { MyPageScreen() }
+            composable("myPage") { MyPageScreen(navController) }
             composable("home") { HomeScreen() }
             // 필요에 따라 다른 화면 추가
+            composable("bmi") { BMIScreen() }
         }
     }
 }
