@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -23,8 +24,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -40,6 +45,7 @@ fun MyPageScreen() {
     ) {
         MyPageHeader()
         MyProfile()
+        MyMenu()
     }
 
 }
@@ -78,7 +84,8 @@ fun MyPageHeader() {
 fun MyProfile() {
     Row( modifier = Modifier
         .fillMaxWidth()
-        .padding(horizontal = 30.dp, vertical = 5.dp)
+        .padding(30.dp,0.dp,30.dp,30.dp)
+        .shadow(15.dp, RoundedCornerShape(12.dp))
         .background(White, shape = RoundedCornerShape(12.dp))
     ) { // 프로필 칸 @!
         Column () {
@@ -150,16 +157,46 @@ fun MyProfile() {
 
 @Composable
 fun MyMenu() {
-    // 설정 목록을 나열하는 부분
-    Column {
-        SettingItem("BMI 계산하기")
-        SettingItem("알림설정")
-        Divider(color = Color.Gray, thickness = 1.dp)
-        Text("시타 관리", modifier = Modifier.padding(8.dp))
-        SettingItem("옷 사이즈")
-        SettingItem("해외 사이즈 비교")
-        SettingItem("사이즈 측정")
+    // 메뉴 박스
+    Row( modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 30.dp, vertical = 5.dp)
+        .shadow(15.dp, RoundedCornerShape(12.dp))
+        .background(White, shape = RoundedCornerShape(12.dp))
+    ) {
+        Column() {
+            Text(text = "정보 등록",
+                modifier = Modifier.padding(20.dp,10.dp,0.dp,10.dp),
+                style = TextStyle(
+                    color = Color.Black,
+                    fontSize = 15.sp,
+                    shadow = Shadow(
+                        color = Color.Gray,
+                        offset = Offset(10f,10f),
+                        blurRadius = 8f
+                    )
+                )
+            )
+            SettingItem("BMI 측정하기")
+            SettingItem("알레르기 등록")
+            Divider(modifier = Modifier.padding(20.dp,10.dp,20.dp,0.dp), color = Color.Gray, thickness = 1.dp)
+            Text("식단 관리", modifier = Modifier.padding(20.dp,10.dp,0.dp,10.dp),
+                style = TextStyle(
+                    color = Color.Black,
+                    fontSize = 15.sp,
+                    shadow = Shadow(
+                        color = Color.Gray,
+                        offset = Offset(10f,10f),
+                        blurRadius = 8f
+                    )
+                )
+            )
+            SettingItem("음식 추천")
+            SettingItem("하루 섭취 정보")
+            SettingItem("식단 분석")
+        }
     }
+
 }
 
 @Composable
@@ -167,11 +204,11 @@ fun SettingItem(text: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(20.dp,8.dp, 0.dp,5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) { // > 아이콘
         Text(text)
         Spacer(modifier = Modifier.weight(1f))
-        Icon(Icons.Default.ArrowForward, contentDescription = null)
+        Icon(Icons.Default.KeyboardArrowRight, contentDescription = null, Modifier.padding(20.dp,0.dp))
     }
 }
