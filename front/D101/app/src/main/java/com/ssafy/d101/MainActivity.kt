@@ -54,7 +54,7 @@ fun MyApp() {
             composable("myPage") { MyPageScreen(navController) }
             composable("home") { HomeScreen() }
             // 필요에 따라 다른 화면 추가
-            composable("bmi") { BMIScreen() }
+            composable("bmi") { BMIScreen(navController) }
         }
     }
 }
