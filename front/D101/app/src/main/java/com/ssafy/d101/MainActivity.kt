@@ -21,6 +21,7 @@ import com.ssafy.d101.ui.theme.D101Theme
 import com.ssafy.d101.ui.view.components.BottomNavigationBar
 import com.ssafy.d101.ui.view.screens.BMIScreen
 import com.ssafy.d101.ui.view.screens.HomeScreen
+import com.ssafy.d101.ui.view.screens.LandingScreen
 import com.ssafy.d101.ui.view.screens.MyPageScreen
 
 class MainActivity : ComponentActivity() {
@@ -32,49 +33,23 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Preview(showBackground = true)
 @Composable
 fun MyApp() {
     val navController = rememberNavController()
-    val items = listOf(
-        BottomNavItem("home", Icons.Default.Home, "Home"),
-        BottomNavItem("addFood", Icons.Default.Add, "AddFood"),
-        BottomNavItem("myPage", Icons.Default.Person, "MyPage")
-    )
-    val isLoggedIn = checkUserLoggedIn() // 로그인 상태를 확인하는 함수 (예시)
+    val isLoggedIn = checkUserLoggedIn()
 
-    Scaffold(
-        bottomBar = {
-            if (isLoggedIn) {
-                BottomNavigationBar(navController = navController, items = items)
-            }
-        }
-    ) { innerPadding ->
-        NavHost(navController = navController, startDestination = if (isLoggedIn) "home" else "mypage", modifier = Modifier.padding(innerPadding)) {
-            composable("myPage") { MyPageScreen(navController) }
-            composable("home") { HomeScreen() }
-            // 필요에 따라 다른 화면 추가
-            composable("bmi") { BMIScreen(navController) }
-        }
+    val startDestination = if (isLoggedIn) "home" else "landing"
+
+    NavHost(navController = navController, startDestination = startDestination) {
+        composable("myPage") { MyPageScreen(navController) }
+        composable("home") { HomeScreen(navController) }
     }
 }
 
 // 사용자 로그인 상태를 확인하는 함수 (예시 구현)
 fun checkUserLoggedIn(): Boolean {
-    // 실제 앱에서는 여기에 사용자 로그인 상태를 체크하는 로직 구현
-    return true // 또는 false
-}
-
-// 랜딩 페이지 화면
-@Composable
-fun LandingPage(navController: androidx.navigation.NavHostController) {
-    // 랜딩 페이지 UI 구현
-}
-
-// 메인 페이지 화면
-@Composable
-fun MainPage(navController: androidx.navigation.NavHostController) {
-    // 메인 페이지 UI 구현
+    // Todo: 사용자 로그인 상태 확인 로직 구현
+    return true
 }
 
 @Composable
