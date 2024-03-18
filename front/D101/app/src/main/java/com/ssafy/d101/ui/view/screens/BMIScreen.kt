@@ -26,11 +26,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ssafy.d101.ui.theme.Green
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
 import com.ssafy.d101.ui.view.components.BackHeader
@@ -46,6 +52,7 @@ fun BMIScreen(navController: NavController) {
     }
 }
 
+@Preview(showBackground = true)
 @Composable
 fun CheckBMI() {
 
@@ -58,7 +65,9 @@ fun CheckBMI() {
         .background(White, shape = RoundedCornerShape(12.dp))
     ){
         Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) { // 키
-            Box(modifier = Modifier.padding(30.dp,10.dp,0.dp,0.dp).size(100.dp,30.dp)) {
+            Box(modifier = Modifier
+                .padding(30.dp, 10.dp, 0.dp, 0.dp)
+                .size(100.dp, 30.dp)) {
                 Text(text = "키",style = textStyle
                 )}
             OutlinedTextField(
@@ -72,19 +81,23 @@ fun CheckBMI() {
             Box(modifier = Modifier.padding(20.dp,0.dp,0.dp,0.dp)){Text(text = "cm",style = textStyle)}
         }
         Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) { // 키
-            Box(modifier = Modifier.padding(30.dp,10.dp,0.dp,0.dp).size(100.dp,30.dp)){Text(text = "몸무게",style = textStyle)}
+            Box(modifier = Modifier
+                .padding(30.dp, 10.dp, 0.dp, 0.dp)
+                .size(100.dp, 30.dp)){Text(text = "몸무게",style = textStyle)}
             OutlinedTextField(
                 modifier = Modifier.size(130.dp,30.dp),
                 value = "",
                 onValueChange = {},
                 shape = MaterialTheme.shapes.small.copy(
-                    CornerSize(percent = 50),
+                    CornerSize(percent = 50)
                 )
             )
             Box(modifier = Modifier.padding(20.dp,0.dp,0.dp,0.dp)){Text(text = "kg",style = textStyle)}
         }
         Row(modifier = Modifier.padding(10.dp,0.dp), verticalAlignment = Alignment.CenterVertically) { // 성별
-            Box(modifier = Modifier.padding(30.dp,8.dp,0.dp,0.dp).size(100.dp,30.dp)){Text(text = "성별",style = textStyle)}
+            Box(modifier = Modifier
+                .padding(30.dp, 8.dp, 0.dp, 0.dp)
+                .size(100.dp, 30.dp)){Text(text = "성별",style = textStyle)}
             Text(text = "남",style = textStyle)
             RadioButton(selected = selectedGender =="male", onClick = { /*TODO*/ })
             Text(text = "여",style = textStyle)
@@ -92,7 +105,8 @@ fun CheckBMI() {
         }
         Row(
             modifier = Modifier
-                .fillMaxWidth().padding(0.dp,0.dp,0.dp,20.dp), // Row가 부모의 최대 너비를 채우도록 설정
+                .fillMaxWidth()
+                .padding(0.dp, 0.dp, 0.dp, 20.dp), // Row가 부모의 최대 너비를 채우도록 설정
             horizontalArrangement = Arrangement.Center // 버튼을 중앙에 배치
         ) {
             Button(
@@ -105,6 +119,25 @@ fun CheckBMI() {
                 modifier = Modifier.size(width = 100.dp, height = 35.dp)
             ) {
                 Text(text = "측정하기")
+            }
+        }
+        Row(modifier = Modifier.padding(20.dp,0.dp,20.dp,20.dp)) {// 측정 결과
+            Box(modifier = Modifier
+                .background(Green, shape = RoundedCornerShape(12.dp))
+                .padding(10.dp,20.dp)
+            ) {
+                var text = buildAnnotatedString {
+                    append("보근 님의 신체 질량 지수(BMI)는")
+                    withStyle(style = SpanStyle(color = Color.Red, fontSize = 18.sp)) {
+                        append("19.2")
+                    }
+                    append("(으)로 ")
+                    withStyle(style = SpanStyle(color = Color(0xFFEEFF29), fontSize = 18.sp)) {
+                        append("정상")
+                    }
+                    append("입니다.")
+                }
+                Text(text = text, fontSize = 16.sp, color = Color.White, textAlign = TextAlign.Center)
             }
         }
     }
