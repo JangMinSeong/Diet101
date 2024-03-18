@@ -1,5 +1,6 @@
 package com.ssafy.d101.ui.view.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,10 +8,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +34,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,7 +61,28 @@ fun BMIScreen(navController: NavController) {
 @Composable
 fun CheckBMI() {
 
-    var selectedGender by remember { mutableStateOf("male") }
+    var gender by remember { mutableStateOf("male") }
+    var height by remember { mutableStateOf("") }
+    var weight by remember { mutableStateOf("") }
+    var bmiResult by remember { mutableStateOf<String?>(null) }
+    var bmiCategory by remember { mutableStateOf<String?>(null) }
+
+    fun calculateBMI(): Pair<Double, String> {
+        val heightInMeters = height.toDouble() / 100.0
+        val weightInKg = weight.toDouble()
+        if(heightInMeters<=0.0||weightInKg<=0.0) {
+            // 예외처리
+            return Pair(0.0, "유효한 값이 아님")
+        }
+        val bmi = weightInKg / (heightInMeters * heightInMeters)
+        val category = when {
+            bmi < 18.5 -> "저체중"
+            bmi < 25 -> "정상"
+            bmi < 30 -> "과체중"
+            else -> "비만"
+        }
+        return Pair(bmi, category)
+    }
 
     Column ( modifier = Modifier
         .fillMaxWidth()
@@ -71,11 +97,16 @@ fun CheckBMI() {
                 Text(text = "키",style = textStyle
                 )}
             OutlinedTextField(
-                modifier = Modifier.size(130.dp,30.dp),
-                value = "",
-                onValueChange = {},
+                modifier = Modifier
+                    .width(130.dp)
+                    .height(50.dp),
+                value = height,
+                onValueChange = { height = it },
                 shape = MaterialTheme.shapes.small.copy(
                     CornerSize(percent = 50),
+                ),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number // 키보드 타입을 Number로 설정
                 )
             )
             Box(modifier = Modifier.padding(20.dp,0.dp,0.dp,0.dp)){Text(text = "cm",style = textStyle)}
@@ -85,12 +116,18 @@ fun CheckBMI() {
                 .padding(30.dp, 10.dp, 0.dp, 0.dp)
                 .size(100.dp, 30.dp)){Text(text = "몸무게",style = textStyle)}
             OutlinedTextField(
-                modifier = Modifier.size(130.dp,30.dp),
-                value = "",
-                onValueChange = {},
+                modifier = Modifier
+                    .width(130.dp)
+                    .height(50.dp),
+                value = weight,
+                onValueChange = { weight = it },
                 shape = MaterialTheme.shapes.small.copy(
                     CornerSize(percent = 50)
+                ),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number // 키보드 타입을 Number로 설정
                 )
+
             )
             Box(modifier = Modifier.padding(20.dp,0.dp,0.dp,0.dp)){Text(text = "kg",style = textStyle)}
         }
@@ -99,9 +136,9 @@ fun CheckBMI() {
                 .padding(30.dp, 8.dp, 0.dp, 0.dp)
                 .size(100.dp, 30.dp)){Text(text = "성별",style = textStyle)}
             Text(text = "남",style = textStyle)
-            RadioButton(selected = selectedGender =="male", onClick = { /*TODO*/ })
+            RadioButton(selected = gender =="male", onClick = { gender = "male" })
             Text(text = "여",style = textStyle)
-            RadioButton(selected = selectedGender =="female", onClick = { /*TODO*/ })
+            RadioButton(selected = gender =="female", onClick = { gender = "female"  })
         }
         Row(
             modifier = Modifier
@@ -110,7 +147,12 @@ fun CheckBMI() {
             horizontalArrangement = Arrangement.Center // 버튼을 중앙에 배치
         ) {
             Button(
-                onClick = { /* TODO: BMI 계산 및 결과 처리 */ },
+                onClick = {
+                    val (bmi, category) = calculateBMI()
+                    bmiResult = if (bmi > 0) String.format("%.1f", bmi) else null
+                    bmiCategory = category
+                    Log.d("bmi",bmiResult.toString())
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Black, // 버튼 배경색
                     contentColor = Color.White // 버튼 텍스트색
@@ -121,23 +163,31 @@ fun CheckBMI() {
                 Text(text = "측정하기")
             }
         }
-        Row(modifier = Modifier.padding(20.dp,0.dp,20.dp,20.dp)) {// 측정 결과
-            Box(modifier = Modifier
-                .background(Green, shape = RoundedCornerShape(12.dp))
-                .padding(10.dp,20.dp)
-            ) {
-                var text = buildAnnotatedString {
-                    append("보근 님의 신체 질량 지수(BMI)는")
-                    withStyle(style = SpanStyle(color = Color.Red, fontSize = 18.sp)) {
-                        append("19.2")
+        if (bmiResult != null && bmiCategory != null) {
+            Row(modifier = Modifier.padding(20.dp, 0.dp, 20.dp, 20.dp)) {// 측정 결과
+                Box(
+                    modifier = Modifier
+                        .background(Green, shape = RoundedCornerShape(12.dp))
+                        .padding(10.dp, 20.dp)
+                ) {
+                    var text = buildAnnotatedString {
+                        append("보근 님의 신체 질량 지수(BMI)는")
+                        withStyle(style = SpanStyle(color = Color.Red, fontSize = 18.sp)) {
+                            append(bmiResult!!)
+                        }
+                        append(" (으)로 ")
+                        withStyle(style = SpanStyle(color = Color(0xFFEEFF29), fontSize = 18.sp)) {
+                            append(bmiCategory)
+                        }
+                        append("입니다.")
                     }
-                    append("(으)로 ")
-                    withStyle(style = SpanStyle(color = Color(0xFFEEFF29), fontSize = 18.sp)) {
-                        append("정상")
-                    }
-                    append("입니다.")
+                    Text(
+                        text = text,
+                        fontSize = 16.sp,
+                        color = Color.White,
+                        textAlign = TextAlign.Center
+                    )
                 }
-                Text(text = text, fontSize = 16.sp, color = Color.White, textAlign = TextAlign.Center)
             }
         }
     }
