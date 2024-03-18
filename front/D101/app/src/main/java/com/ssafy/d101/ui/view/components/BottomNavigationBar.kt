@@ -7,6 +7,9 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.material.icons.*
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -23,14 +26,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
-fun BottomNavigationBar(
-    navController: NavHostController,
-    items: List<BottomNavItem> // BottomNavItem은 아래에서 설명
-) {
-    var selectedItem by remember { mutableIntStateOf(0) }
+fun BottomNavigationBar(navController: NavHostController) {
+    var items = listOf(
+        BottomNavItem("home", Icons.Default.Home, "Home"),
+        BottomNavItem("addFood", Icons.Default.AddCircle, "AddFood"),
+        BottomNavItem("myPage", Icons.Default.Person, "MyPage")
+    )
+//    var selectedItem by remember { mutableIntStateOf(0) }
     var showDialog by remember { mutableStateOf(false) }
+
+    // NavController의 현재 목적지를 관찰
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    // 현재 라우트에 따라 selectedItem 업데이트
+    var selectedItem by remember { mutableIntStateOf(0) }
+    selectedItem = items.indexOfFirst { it.route == currentRoute }.coerceAtLeast(0)
 
     if (showDialog) {
         Dialog(onDismissRequest = { showDialog = false }) {
@@ -53,7 +67,7 @@ fun BottomNavigationBar(
                         println("AddFood")
                         showDialog = true
                     } else {
-                        println("Other")
+                        println(item.route)
                         selectedItem = index
                         navController.navigate(item.route)
                     }
