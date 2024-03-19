@@ -88,6 +88,8 @@ pipeline {
                             }
                         }
                     }
+                    sh 'echo ${JWT_SECRET}'
+
                 }
             }
             
