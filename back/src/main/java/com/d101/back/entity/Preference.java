@@ -14,7 +14,10 @@ import lombok.*;
 public class Preference {
 	@EmbeddedId
 	private UserFoodKey key;
-	
 	private int weight;
+
+	public void plusWeight(){
+		this.weight+=1;
+	}
 
 }
