@@ -24,9 +24,5 @@ import com.ssafy.d101.ui.view.components.CalendarApp
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(navController: NavHostController) {
-    Scaffold (
-        bottomBar = {BottomNavigationBar(navController)}
-    ) { innerPadding ->
-        CalendarApp(modifier = Modifier.padding(16.dp))
-    }
+    CalendarApp(modifier = Modifier.padding(16.dp))
 }
