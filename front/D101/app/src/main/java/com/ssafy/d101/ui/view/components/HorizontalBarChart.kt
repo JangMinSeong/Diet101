@@ -46,15 +46,17 @@ fun HorizontalBarChart(
 
             weeklyData.days.forEachIndexed { index, day ->
                 val barY = barHeight * index + spaceBetweenBars * index
+                var startX = 0.dp.toPx()
                 weeklyData.data[index].forEachIndexed { valueIndex, value ->
                     val barWidth = (value / weeklyData.maxValue) * chartWidth
 
                     drawRoundRect(
                         color = weeklyData.colors[valueIndex],
-                        topLeft = Offset(x = 200f, y = barY),
+                        topLeft = Offset(x = startX + 70.dp.toPx(), y = barY),
                         size = Size(barWidth, barHeight - spaceBetweenBars),
                         cornerRadius = CornerRadius(4.dp.toPx())
                     )
+                    startX += barWidth
                 }
 
                 // 바에 해당하는 라벨 그리기
