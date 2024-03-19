@@ -65,7 +65,7 @@ pipeline {
                     sh 'echo "Starting Build Back Docker Image"'
                     dir('back') {
                         withDockerRegistry(credentialsId: 'docker', url: 'https://registry.hub.docker.com') {
-                            backendImage = docker.build("${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}", 
+                            backendImage = docker.build("${BACK_IMAGE_NAME}:${env.BUILD_NUMBER} ",
                                 "--build-arg DATABASE_PASSWORD=${env.DATABASE_PASSWORD} " +
                                 "--build-arg DATABASE_URL=${env.DATABASE_URL} " +
                                 "--build-arg DATABASE_USERNAME=${env.DATABASE_USERNAME} " +
