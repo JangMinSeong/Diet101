@@ -148,7 +148,9 @@ pipeline {
                 // }
                 script {
                     sh 'docker rm -f Back || true'
-                    sh "docker run -d --name ${CONTAINER_NAME} -p 8000:8000 ${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}"
+                    // sh "docker run -d --name ${CONTAINER_NAME} -p 8000:8000 ${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}"
+                    sh "docker run -d --name ${CONTAINER_NAME} -p 8000:8000 -e SPRING_PROFILES_ACTIVE=deploy ${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}"
+
                 }
             }
         }

@@ -44,4 +44,6 @@ WORKDIR /app
 COPY --from=build /workspace/app/build/libs/*.jar app.jar
 
 # 애플리케이션 실행
-ENTRYPOINT ["java","-jar","app.jar"]
+# ENTRYPOINT ["java","-jar","app.jar"]
+# ENTRYPOINT ["java","-Dspring.profiles.active=deploy","-jar","app.jar"]
+ENTRYPOINT ["sh", "-c", "java -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -jar app.jar"]
