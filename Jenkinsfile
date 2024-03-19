@@ -5,42 +5,43 @@ def modelImage
 pipeline {
     agent any
 
-    // environment {
-    //     /*
-    //     // 환경 변수 설정
-    //     GIT_REGISTRY_CREDENTIALS = credentials('gitlab')
-    //     DOCKER_REGISTRY_CREDENTIALS = credentials('docker')
-    //     // GCP_SERVICE_ACCOUNT_JSON = credentials('GCP_SERVICE_ACCOUNT_JSON')
-    //     BACK_IMAGE_NAME = "${env.BACK_IMAGE_NAME}"
-    //     FRONT_IMAGE_NAME = "${env.FRONT_IMAGE_NAME}"
-    //     MODEL_IMAGE_NAME = "${env.MODEL_IMAGE_NAME}"
+    environment {
+        
+        // // 환경 변수 설정
+        // GIT_REGISTRY_CREDENTIALS = credentials('gitlab')
+        // DOCKER_REGISTRY_CREDENTIALS = credentials('docker')
+        // // GCP_SERVICE_ACCOUNT_JSON = credentials('GCP_SERVICE_ACCOUNT_JSON')
+        BACK_IMAGE_NAME = "${env.BACK_IMAGE_NAME}"
+        CONTAINER_NAME = 'Back'
+        // FRONT_IMAGE_NAME = "${env.FRONT_IMAGE_NAME}"
+        // MODEL_IMAGE_NAME = "${env.MODEL_IMAGE_NAME}"
 
-    //     DATABASE_URL = "${env.DATABASE_URL}"
-    //     HTTPS = "${env.HTTPS}"
+        // DATABASE_URL = "${env.DATABASE_URL}"
+        // HTTPS = "${env.HTTPS}"
 
         
-    //     GOOGLE_CLIENT_ID = "${env.GOOGLE_CLIENT_ID}"
-    //     GOOGLE_CLIENT_SECRET = "${env.GOOGLE_CLIENT_SECRET}"
-    //     NAVER_CLIENT_ID = "${env.NAVER_CLIENT_ID}"
-    //     NAVER_CLIENT_SECRET = "${env.NAVER_CLIENT_SECRET}"
-    //     KAKAO_CLIENT_ID = "${env.KAKAO_CLIENT_ID}"
-    //     KAKAO_CLIENT_SECRET = "${env.KAKAO_CLIENT_SECRET}"
+        // GOOGLE_CLIENT_ID = "${env.GOOGLE_CLIENT_ID}"
+        // GOOGLE_CLIENT_SECRET = "${env.GOOGLE_CLIENT_SECRET}"
+        // NAVER_CLIENT_ID = "${env.NAVER_CLIENT_ID}"
+        // NAVER_CLIENT_SECRET = "${env.NAVER_CLIENT_SECRET}"
+        // KAKAO_CLIENT_ID = "${env.KAKAO_CLIENT_ID}"
+        // KAKAO_CLIENT_SECRET = "${env.KAKAO_CLIENT_SECRET}"
 
-    //     SECRET_KEY = "${env.SECRET_KEY}"
-    //     SESSION_SECRET_KEY = "${env.SESSION_SECRET_KEY}"
-    //     SMTP_PASSWORD = "${env.SMTP_PASSWORD}"
-    //     SMTP_PORT = "${env.SMTP_PORT}"
-    //     SMTP_SERVER = "${env.SMTP_SERVER}"
-    //     SMTP_USERNAME = "${env.SMTP_USERNAME}"
-    //     SSL_CRT_FILE = "${env.SSL_CRT_FILE}"
-    //     SSL_KEY_FILE = "${env.SSL_KEY_FILE}"
+        // SECRET_KEY = "${env.SECRET_KEY}"
+        // SESSION_SECRET_KEY = "${env.SESSION_SECRET_KEY}"
+        // SMTP_PASSWORD = "${env.SMTP_PASSWORD}"
+        // SMTP_PORT = "${env.SMTP_PORT}"
+        // SMTP_SERVER = "${env.SMTP_SERVER}"
+        // SMTP_USERNAME = "${env.SMTP_USERNAME}"
+        // SSL_CRT_FILE = "${env.SSL_CRT_FILE}"
+        // SSL_KEY_FILE = "${env.SSL_KEY_FILE}"
         
-    //     REACT_APP_API_BASE_URL = "${env.REACT_APP_API_BASE_URL}"
-    //     AI_SERVER_URL = "${env.AI_SERVER_URL}"
-    //     DOCKER_COMPOSE_FILE = "docker-compose.yml"
+        // REACT_APP_API_BASE_URL = "${env.REACT_APP_API_BASE_URL}"
+        // AI_SERVER_URL = "${env.AI_SERVER_URL}"
+        // DOCKER_COMPOSE_FILE = "docker-compose.yml"
         
-    //     *///
-    // }
+
+    }
     
     stages {
         
@@ -139,13 +140,16 @@ pipeline {
             
         // }     
     
-        // stage('Deploy') {
-        //     steps {
-        //         script {
-        //             sh "docker-compose -f ${DOCKER_COMPOSE_FILE} pull"
-        //             sh "docker-compose -f ${DOCKER_COMPOSE_FILE} up -d"
-        //         }
-        //     }
-        // }
+        stage('Deploy') {
+            steps {
+                // script {
+                //     sh "docker-compose -f ${DOCKER_COMPOSE_FILE} pull"
+                //     sh "docker-compose -f ${DOCKER_COMPOSE_FILE} up -d"
+                // }
+                script {
+                    sh "docker run -d --name ${CONTAINER_NAME} -p 8000:8000 ${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}"
+                }
+            }
+        }
     }
 }
