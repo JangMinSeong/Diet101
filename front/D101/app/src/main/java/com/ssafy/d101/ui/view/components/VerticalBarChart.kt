@@ -47,7 +47,7 @@ fun VerticalBarChartWithGuidelineNumbers(
 
             // y축 가이드라인 및 숫자 라벨 그리기
             val maxValue = weeklyData.maxValue
-            val guideLineSteps = listOf(500, 1000, 1500, 2000)
+            val guideLineSteps = listOf((maxValue / 4).toInt(), (maxValue / 2).toInt(), (maxValue * 3 / 4).toInt(), maxValue.toInt())
 
             guideLineSteps.forEach { step ->
                 val yPosition = chartHeight - (step / maxValue) * chartHeight
@@ -126,7 +126,7 @@ fun WeeklyNutritionChart(
     weeklyData: StackedBarItem,
     title: String,
     colors: List<Color> = listOf(Color(0xFFA62D2D), Color(0xFFF28888), Color(0xFFF2C9C9)),
-    nutritionNames: List<String> = listOf("지", "당", "탄")
+    nutritionNames: List<String> = listOf("탄수화물", "단백질", "지방")
 ) {
     Column(
         modifier = Modifier
@@ -142,7 +142,7 @@ fun WeeklyNutritionChart(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Spacer(Modifier.weight(1.3f))
+            Spacer(Modifier.weight(1.4f))
             Text(
                 text = title,
                 fontSize = 25.sp,
@@ -152,11 +152,11 @@ fun WeeklyNutritionChart(
                     .weight(1f)
                     .wrapContentWidth(Alignment.CenterHorizontally)
             )
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.weight(0.6f))
 
             Column(
                 modifier = Modifier,
-                horizontalAlignment = Alignment.End
+                horizontalAlignment = Alignment.Start
             ) {
                 colors.zip(nutritionNames).forEach { (color, name) ->
                     Row(modifier = Modifier.padding(end = 8.dp)) {
@@ -193,14 +193,15 @@ fun PreviewWeeklyStackedBarChart() {
     WeeklyNutritionChart(
         weeklyData = StackedBarItem(
             data = listOf(
-                listOf(600f, 400f, 200f),
-                listOf(500f, 300f, 200f),
+                listOf(600f, 400f, 200f), // MON
+                listOf(500f, 300f, 200f), // TUE
                 listOf(700f, 300f, 300f), // WED
                 listOf(800f, 200f, 400f), // THU
                 listOf(450f, 550f, 250f), // FRI
                 listOf(400f, 600f, 400f), // SAT
                 listOf(500f, 500f, 500f)  // SUN
-            )
+            ),
+            maxValue = 2000f
         ),
         title = "WEEKLY"
     )

@@ -34,15 +34,47 @@ fun HorizontalBarChart(
     Box(
         modifier = modifier
             .padding(16.dp)
-            .clip(RoundedCornerShape(20.dp))
             .background(Color(0xFF547D75))
             .fillMaxWidth()
             .fillMaxHeight()
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val chartWidth = size.width // 가로 길이 조정
+            val chartWidth = size.width - 90.dp.toPx() // 가로 길이 조정
             val barHeight = (size.height - 110.dp.toPx()) / weeklyData.days.size.toFloat() // 바의 높이 계산
             val spaceBetweenBars = 8.dp.toPx() // 바 사이 간격
+            val guideLineColor = Color.LightGray // 가이드라인 및 축 색상
+
+            val offsetBars = spaceBetweenBars * 2
+
+            // y축 가이드라인 및 숫자 라벨 그리기
+            val maxValue = weeklyData.maxValue
+            val guideLineSteps = listOf((maxValue / 4).toInt(), (maxValue * 2 / 4).toInt(), (maxValue * 3 / 4).toInt(), (maxValue * 4 / 4).toInt())
+
+            guideLineSteps.forEach { step ->
+                val xPosition = (step / maxValue) * chartWidth
+                drawLine(
+                    color = Color.LightGray,
+                    start = Offset(x = xPosition + 160f, y = offsetBars - 40f),
+                    end = Offset(x = xPosition + 160f, y = size.height - 80f),
+                    strokeWidth = 1.dp.toPx()
+                )
+
+                // x축 숫자 라벨 그리기
+                val textWidth = android.graphics.Paint().apply {
+                    textSize = 20.sp.toPx()
+                }.measureText(step.toString())
+                drawContext.canvas.nativeCanvas.drawText(
+                    step.toString(),
+                    xPosition + 200f,
+                    size.height - 30f,
+                    android.graphics.Paint().apply {
+                        color = android.graphics.Color.WHITE
+                        textSize = 15.sp.toPx()
+                        textAlign = android.graphics.Paint.Align.RIGHT
+                    }
+                )
+            }
+
 
             weeklyData.days.forEachIndexed { index, day ->
                 val barY = barHeight * index + spaceBetweenBars * index
@@ -52,8 +84,8 @@ fun HorizontalBarChart(
 
                     drawRoundRect(
                         color = weeklyData.colors[valueIndex],
-                        topLeft = Offset(x = startX + 70.dp.toPx(), y = barY),
-                        size = Size(barWidth, barHeight - spaceBetweenBars),
+                        topLeft = Offset(x = startX + 60.dp.toPx(), y = barY),
+                        size = Size(barWidth, barHeight - spaceBetweenBars - 30),
                         cornerRadius = CornerRadius(4.dp.toPx())
                     )
                     startX += barWidth
@@ -62,15 +94,29 @@ fun HorizontalBarChart(
                 // 바에 해당하는 라벨 그리기
                 drawContext.canvas.nativeCanvas.drawText(
                     day,
-                    50.dp.toPx(), // 텍스트 위치 조정
-                    barY + barHeight / 2 + 5.dp.toPx(),
+                    45.dp.toPx(), // 텍스트 위치 조정
+                    barY + barHeight / 2- 5.dp.toPx(),
                     android.graphics.Paint().apply {
                         color = android.graphics.Color.WHITE
-                        textSize = 14.sp.toPx()
+                        textSize = 20.sp.toPx()
                         textAlign = android.graphics.Paint.Align.RIGHT
                     }
                 )
             }
+
+            // x축과 y축 그리기
+            drawLine(
+                color = guideLineColor,
+                start = Offset(x = 0f, y = size.height - 80),
+                end = Offset(x = size.width, y = size.height - 80),
+                strokeWidth = 2.dp.toPx() // x축 선의 굵기
+            )
+            drawLine(
+                color = Color.LightGray,
+                start = Offset(x = 160f, y = 0f),
+                end = Offset(x = 160f, y = size.height),
+                strokeWidth = 2.dp.toPx()  //y축
+            )
         }
     }
 }
@@ -107,11 +153,11 @@ fun WeeklyNutritionChartHorizontal(
                     .weight(1f)
                     .wrapContentWidth(Alignment.CenterHorizontally)
             )
-            Spacer(Modifier.weight(0.7f))
+            Spacer(Modifier.weight(0.4f))
 
             Column(
                 modifier = Modifier,
-                horizontalAlignment = Alignment.End
+                horizontalAlignment = Alignment.Start
             ) {
                 colors.zip(nutritionNames).forEach { (color, name) ->
                     Row(modifier = Modifier.padding(end = 8.dp)) {
@@ -136,6 +182,7 @@ fun WeeklyNutritionChartHorizontal(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
+                .padding(16.dp)
         )
     }
 }
@@ -158,10 +205,11 @@ fun PreviewWeeklyHorizontalBarChart() {
                 listOf(450f, 550f, 250f),
                 listOf(400f, 600f, 400f),
                 listOf(500f, 500f, 500f)
-            )
+            ),
+            maxValue = 2000f
         ),
         title = "MONTHLY",
         colors = listOf(Color(0xFFA62D2D), Color(0xFFF28888), Color(0xFFF2C9C9)),
-        nutritionNames = listOf("지", "당", "탄")
+        nutritionNames = listOf("탄수화물", "단백질", "지방")
     )
 }
