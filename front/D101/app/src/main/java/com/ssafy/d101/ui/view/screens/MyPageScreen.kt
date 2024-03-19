@@ -178,7 +178,7 @@ fun MyMenu(navController: NavController) {
                 )
             )
             SettingItem("BMI 측정하기", navController, "bmi")
-            SettingItem("알레르기 등록", navController, "")
+            SettingItem("알레르기 등록", navController, "allergy")
             Divider(modifier = Modifier.padding(20.dp,10.dp,20.dp,0.dp), color = Color.Gray, thickness = 1.dp)
             Text("식단 관리", modifier = Modifier.padding(20.dp,10.dp,0.dp,10.dp),
                 style = TextStyle(
