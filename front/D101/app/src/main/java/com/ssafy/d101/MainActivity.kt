@@ -25,6 +25,7 @@ import com.ssafy.d101.navigation.Screens
 import com.ssafy.d101.navigation.SetUpNavGraph
 import com.ssafy.d101.ui.theme.D101Theme
 import com.ssafy.d101.ui.view.components.BottomNavigationBar
+import com.ssafy.d101.ui.view.screens.AllergyScreen
 import com.ssafy.d101.ui.view.screens.BMIScreen
 import com.ssafy.d101.ui.view.screens.HomeScreen
 import com.ssafy.d101.ui.view.screens.LandingScreen
@@ -57,18 +58,6 @@ fun MyApp() {
             SetUpNavGraph(navController = navController)
         }
     }
-//    val navController = rememberNavController()
-//    SetUpNavGraph(navController = navController)
-//    val isLoggedIn = checkUserLoggedIn()
-//
-//    val startDestination = if (isLoggedIn) "home" else "landing"
-
-    //AppScaffold()
-
-//    NavHost(navController = navController, startDestination = startDestination) {
-//        composable("myPage") { MyPageScreen(navController) }
-//        composable("home") { HomeScreen(navController) }
-//    }
 }
 
 // 사용자 로그인 상태를 확인하는 함수 (예시 구현)
