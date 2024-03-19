@@ -147,6 +147,7 @@ pipeline {
                 //     sh "docker-compose -f ${DOCKER_COMPOSE_FILE} up -d"
                 // }
                 script {
+                    sh 'docker rm -f Back || true'
                     sh "docker run -d --name ${CONTAINER_NAME} -p 8000:8000 ${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}"
                 }
             }
