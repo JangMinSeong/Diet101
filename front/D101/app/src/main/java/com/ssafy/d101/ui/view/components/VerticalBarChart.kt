@@ -3,10 +3,12 @@ package com.ssafy.d101.ui.view.components
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -125,36 +127,36 @@ fun WeeklyNutritionChart(
     title: String,
     colors: List<Color> = listOf(Color(0xFFA62D2D), Color(0xFFF28888), Color(0xFFF2C9C9)),
     nutritionNames: List<String> = listOf("지", "당", "탄")
-
 ) {
-    Column(modifier = Modifier
-        .padding(0.dp)
-        .background(Color(0xFF547D75))) {
-
+    Column(
+        modifier = Modifier
+            .padding(0.dp) // 전체 컴포넌트 주변의 패딩 조정
+            .clip(RoundedCornerShape(20.dp)) // 여기에서 모서리를 둥글게 함
+            .background(Color(0xFF547D75))
+            .fillMaxWidth()
+    ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth() // Row를 최대 너비로 확장
-                .padding(top=8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween, // 내용을 양 끝으로 분산
-            verticalAlignment = Alignment.CenterVertically // 세로 중앙 정렬
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // 제목 (가운데 정렬을 위한 Spacer 사용)
             Spacer(Modifier.weight(1.3f))
             Text(
                 text = title,
-                fontSize = 25.sp, // 제목 크기 조정
+                fontSize = 25.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 modifier = Modifier
-                    .weight(1f) // 가용 공간에서 1의 비율을 차지
-                    .wrapContentWidth(Alignment.CenterHorizontally) // 텍스트를 가운데 정렬
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.CenterHorizontally)
             )
             Spacer(Modifier.weight(1f))
 
-            // 색상 레전드 (우측 정렬을 위해 가중치 사용하지 않음)
             Column(
                 modifier = Modifier,
-                horizontalAlignment = Alignment.End // Column 내용을 우측 정렬
+                horizontalAlignment = Alignment.End
             ) {
                 colors.zip(nutritionNames).forEach { (color, name) ->
                     Row(modifier = Modifier.padding(end = 8.dp)) {
@@ -172,14 +174,14 @@ fun WeeklyNutritionChart(
                 }
             }
         }
+
         // 차트
         VerticalBarChartWithGuidelineNumbers(
             weeklyData = weeklyData,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(250.dp)
-                .padding(18.dp)
-                .background(Color(0xFF547D75))
+                .padding(16.dp)
         )
     }
 }
