@@ -11,11 +11,8 @@ import com.ssafy.d101.ui.view.screens.BMIScreen
 import com.ssafy.d101.ui.view.screens.HomeScreen
 import com.ssafy.d101.ui.view.screens.LandingScreen
 import com.ssafy.d101.ui.view.screens.MyPageScreen
-<<<<<<< HEAD
 import com.ssafy.d101.ui.view.screens.StartScreen
-=======
 import com.ssafy.d101.ui.view.screens.UserInfoScreen
->>>>>>> master
 
 @Composable
 fun SetUpNavGraph(
