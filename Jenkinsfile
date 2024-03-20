@@ -57,39 +57,50 @@ pipeline {
                     ])
                 }
             }
-        } 
+        }
+        stage('Add Env') {
+            steps {
+                dir('J10D101/back/src/resources') {
+                    withCredentials([file(credentialsId: 'application', variable: 'application')]) {
+                        sh 'cp ${application} application.yml'
+                    }
+                }
+
+            }
+        }
+         
 
         stage('Build and Push the Back-end Docker Image') {
             steps {
                 script {
                     sh 'echo "Starting Build Back Docker Image"'
                     dir('back') {
-                        withDockerRegistry(credentialsId: 'docker', url: 'https://registry.hub.docker.com') {
-                            backendImage = docker.build("${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}",
-                                "--build-arg DATABASE_PASSWORD=${env.DATABASE_PASSWORD} " +
-                                "--build-arg DATABASE_URL=${env.DATABASE_URL} " +
-                                "--build-arg DATABASE_USERNAME=${env.DATABASE_USERNAME} " +
-                                "--build-arg JWT_SECRET=${env.JWT_SECRET} " +
-                                "--build-arg KAKAO_CLIENT_ID=${env.KAKAO_CLIENT_ID} " +
-                                "--build-arg KAKAO_CLIENT_SECRET=${env.KAKAO_CLIENT_SECRET} " +
-                                "--build-arg KAKAO_REDIRECT_URI=${env.KAKAO_REDIRECT_URI} " +
-                                "--build-arg S3_ACCESS_KEY=${env.S3_ACCESS_KEY} " +
-                                "--build-arg S3_BUCKET=${env.S3_BUCKET} " +
-                                "--build-arg S3_SECRET_KEY=${env.S3_SECRET_KEY} .")
+                        // withDockerRegistry(credentialsId: 'docker', url: 'https://registry.hub.docker.com') {
+                        //     backendImage = docker.build("${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}",
+                        //         "--build-arg DATABASE_PASSWORD=${env.DATABASE_PASSWORD} " +
+                        //         "--build-arg DATABASE_URL=${env.DATABASE_URL} " +
+                        //         "--build-arg DATABASE_USERNAME=${env.DATABASE_USERNAME} " +
+                        //         "--build-arg JWT_SECRET=${env.JWT_SECRET} " +
+                        //         "--build-arg KAKAO_CLIENT_ID=${env.KAKAO_CLIENT_ID} " +
+                        //         "--build-arg KAKAO_CLIENT_SECRET=${env.KAKAO_CLIENT_SECRET} " +
+                        //         "--build-arg KAKAO_REDIRECT_URI=${env.KAKAO_REDIRECT_URI} " +
+                        //         "--build-arg S3_ACCESS_KEY=${env.S3_ACCESS_KEY} " +
+                        //         "--build-arg S3_BUCKET=${env.S3_BUCKET} " +
+                        //         "--build-arg S3_SECRET_KEY=${env.S3_SECRET_KEY} .")
+                            withDockerRegistry(credentialsId: 'docker', url: 'https://registry.hub.docker.com') {
+                                backendImage = docker.build("${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}", ".")
 
-                            // Docker 빌드 결과 출력
-                            if (backendImage != 0) {
-                                echo "Docker build succeeded: ${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}"
-                                docker.withRegistry('https://registry.hub.docker.com', 'docker') {
-                                    backendImage.push()
+                                // Docker 빌드 결과 출력
+                                if (backendImage != 0) {
+                                    echo "Docker build succeeded: ${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}"
+                                    docker.withRegistry('https://registry.hub.docker.com', 'docker') {
+                                        backendImage.push()
+                                    }
+                                } else {
+                                    error "Docker build failed"
                                 }
-                            } else {
-                                error "Docker build failed"
-                            }
                         }
                     }
-                    sh 'echo ${JWT_SECRET}'
-
                 }
             }
             
@@ -150,8 +161,10 @@ pipeline {
                 // }
                 script {
                     sh 'docker rm -f Back || true'
+                    sh "docker run -d --name ${CONTAINER_NAME} -p 8000:8000 ${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}"
                     // sh "docker run -d --name ${CONTAINER_NAME} -p 8000:8000 ${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}"
-                    sh "docker run -d --name ${CONTAINER_NAME} -p 8000:8000 -e SPRING_PROFILES_ACTIVE=deploy ${BACK_IMAGE_NAME}:${env.BUILD_NUMBER} tail -f /dev/null"
+                    // sh "docker run -d --name ${CONTAINER_NAME} -p 8000:8000 -e SPRING_PROFILES_ACTIVE=deploy ${BACK_IMAGE_NAME}:${env.BUILD_NUMBER}"
+                    // sh "docker run -it -rm --name ${CONTAINER_NAME}"
 
                 }
             }
