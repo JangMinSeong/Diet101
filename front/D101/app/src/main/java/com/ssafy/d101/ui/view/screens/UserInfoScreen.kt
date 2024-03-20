@@ -36,7 +36,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,10 +59,23 @@ fun UserInfoScreen(navController: NavController) {
 
 @Composable
 fun UserInfo() {
-    var height by remember { mutableStateOf("") }
-    var weight by remember { mutableStateOf("") }
+    var height by remember { mutableStateOf("180") }
+    var weight by remember { mutableStateOf("88") }
     var activity by remember { mutableIntStateOf(0) }
-    var kcal by remember { mutableStateOf("") }
+    var kcal by remember { mutableStateOf("1900") }
+    val age = 30
+
+    fun calculateCalories(height: Int, weight: Int): Int {
+        val bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
+        val multiplier = when(activity) {
+            0 -> 1.2
+            1 -> 1.375
+            2 -> 1.55
+            3 -> 1.725
+            else -> 1.9
+        }
+        return (bmr * multiplier).toInt()
+    }
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -86,6 +98,7 @@ fun UserInfo() {
                             blurRadius = 8f
                         )
                     )
+
                 )
             }
             Button(
@@ -114,7 +127,7 @@ fun UserInfo() {
                 .weight(1f)
                 .padding(0.dp, 20.dp, 0.dp, 0.dp)) {
                 InfoText("이름", "장민숭")
-                InfoText("이메일", "jang@naver.com")
+                InfoText(title = "성별", content = "남")
             }
             Column(modifier = Modifier.padding(0.dp,0.dp,20.dp,0.dp)) {
                 AsyncImage(
@@ -125,17 +138,18 @@ fun UserInfo() {
                 )
             }
         }
-        InfoText(title = "성별", content = "남")
-        InfoText(title = "나이", content = "30세")
-        InfoInputField(title = "키", unit = "cm")
-        InfoInputField(title = "몸무게", unit = "kg")
-        InfoDropDownList(title = "활동량")
+        InfoText(title = "나이", content = age.toString()+"세")
+        InfoText("이메일", "jang@naver.com")
+        InfoInputField(title = "키", unit = "cm", value = height, onValueChange = { new -> height = new.filter { it.isDigit() } })
+        InfoInputField(title = "몸무게", unit = "kg", value = weight, onValueChange = { new -> weight = new.filter { it.isDigit() } })
+        InfoDropDownList(title = "활동량", activityIndex = activity, onItemClick = {activity = it})
         Row (modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp)){// 목표 칼로리
             Box(modifier=Modifier.width(90.dp)){Text(text = "목표 칼로리", style = titleTextStyle)}
-            InputField()
+            InputField(kcal, onValueChange = { new -> kcal = new.filter { it.isDigit() } })
             Spacer(modifier = Modifier.width(5.dp))
             Button(
                 onClick = {
+                          kcal = calculateCalories(height.toInt(),weight.toInt()).toString()
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Black, // 버튼 배경색
@@ -154,15 +168,13 @@ fun UserInfo() {
     }
 }
 @Composable
-fun InfoDropDownList(title: String) {
+fun InfoDropDownList(title: String, activityIndex: Int, onItemClick: (Int) -> Unit) {
     val items = listOf("운동을 거의 하지 않음", "주 1~3회 운동을 함", "주 3~5회 운동을 함", "주 6~7회 운동을 함","매일 운동을 함")
-    var selectedIndex by remember { mutableIntStateOf(0) }
     Row(modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp)) {
         Box(modifier=Modifier.width(80.dp)){Text(text = title, style = titleTextStyle)}
         Spacer(modifier = Modifier.width(10.dp))
-        DropdownList(itemList = items, selectedIndex = selectedIndex, modifier = Modifier.width(200.dp), onItemClick = {selectedIndex = it})
+        DropdownList(itemList = items, selectedIndex = activityIndex, modifier = Modifier.width(200.dp), onItemClick = onItemClick)
     }
-
 }
 
 @Composable
@@ -175,22 +187,21 @@ fun InfoText(title: String, content: String) {
 }
 
 @Composable
-fun InfoInputField(title: String, unit: String) {
+fun InfoInputField(title: String, unit: String, value: String, onValueChange: (String) -> Unit) {
     Row(modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp)) {
         Box(modifier=Modifier.width(80.dp)){Text(text = title, style = titleTextStyle)}
         Spacer(modifier = Modifier.width(10.dp))
-        InputField()
+        InputField(value = value, onValueChange = onValueChange)
         Spacer(modifier = Modifier.width(5.dp))
         Text(text = unit, style = titleTextStyle)
     }
 }
 
 @Composable
-fun InputField() {
-    var textState by remember { mutableStateOf(TextFieldValue("183")) }
+fun InputField(value: String, onValueChange: (String) -> Unit) {
     BasicTextField(
-        value = textState,
-        onValueChange = { textState = it },
+        value = value,
+        onValueChange = onValueChange,
         singleLine = true,
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
         decorationBox = { innerTextField ->
