@@ -21,13 +21,13 @@ import androidx.compose.ui.unit.sp
 
 data class StackedBarItem(
     val days: List<String> = listOf("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"),
-    val data: List<List<Float>>, // Nested list where each list contains [achieved, goal, expense] for a day
+    val data: List<List<Float>>,
     val colors: List<Color> = listOf(Color(0xFFA62D2D), Color(0xFFF28888), Color(0xFFF2C9C9)),
-    val maxValue: Float = 2000f // Maximum value to scale the bars
+    val maxValue: Float = 2000f
 )
 
 @Composable
-fun VerticalBarChartWithGuidelineNumbers(
+fun VerticalBarChart(
     weeklyData: StackedBarItem,
     modifier: Modifier = Modifier
 ) {
@@ -64,7 +64,7 @@ fun VerticalBarChartWithGuidelineNumbers(
                 }.measureText(step.toString())
                 drawContext.canvas.nativeCanvas.drawText(
                     step.toString(),
-                    textWidth - 15.dp.toPx(), // 왼쪽으로 이동시켜 겹치지 않게 함
+                    textWidth - 19.dp.toPx(), // 왼쪽으로 이동시켜 겹치지 않게 함
                     yPosition + 12.sp.toPx() / 2, // y축 가이드라인에 맞춤
                     android.graphics.Paint().apply {
                         color = android.graphics.Color.WHITE
@@ -77,14 +77,14 @@ fun VerticalBarChartWithGuidelineNumbers(
             // x축과 y축 그리기
             drawLine(
                 color = guideLineColor,
-                start = Offset(x = -50f, y = chartHeight),
+                start = Offset(x = -20.dp.toPx(), y = chartHeight),
                 end = Offset(x = chartWidth, y = chartHeight),
                 strokeWidth = 2.dp.toPx() // x축 선의 굵기
             )
             drawLine(
                 color = Color.LightGray,
-                start = Offset(x = offsetBars - 50f, y = 0f),
-                end = Offset(x = offsetBars - 50f, y = chartHeight + 80f),
+                start = Offset(x = offsetBars - 17.dp.toPx(), y = 0f),
+                end = Offset(x = offsetBars - 17.dp.toPx(), y = chartHeight + 25.dp.toPx()),
                 strokeWidth = 2.dp.toPx()
             )
 
@@ -142,17 +142,17 @@ fun WeeklyNutritionChart(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Spacer(Modifier.weight(1.4f))
+            Spacer(Modifier.weight(1.2f))
             Text(
                 text = title,
-                fontSize = 25.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 modifier = Modifier
-                    .weight(1f)
+                    .weight(2f)
                     .wrapContentWidth(Alignment.CenterHorizontally)
             )
-            Spacer(Modifier.weight(0.6f))
+            Spacer(Modifier.weight(0.5f))
 
             Column(
                 modifier = Modifier,
@@ -176,7 +176,7 @@ fun WeeklyNutritionChart(
         }
 
         // 차트
-        VerticalBarChartWithGuidelineNumbers(
+        VerticalBarChart(
             weeklyData = weeklyData,
             modifier = Modifier
                 .fillMaxWidth()
