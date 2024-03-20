@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation.runtime.ktx)
     val navVersion = "2.7.7" // 이 값을 최신 버전으로 설정하세요
 
     implementation(libs.androidx.navigation.fragment.ktx)

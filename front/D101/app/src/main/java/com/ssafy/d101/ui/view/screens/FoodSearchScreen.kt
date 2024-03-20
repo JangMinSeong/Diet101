@@ -50,8 +50,8 @@ fun FoodSearchScreen() {
     var expanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }  // 모달 카드 보여줄지 여부
 
-    // 화면 전체
 
+    // 화면 전체
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -64,7 +64,7 @@ fun FoodSearchScreen() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp, bottom = 10.dp),
+                .padding(top = 16.dp, bottom = 30.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -77,6 +77,7 @@ fun FoodSearchScreen() {
                     .weight(1f)
                     .padding(end = 16.dp)
             )
+
             // 카테고리
             Text(
                 text = "음식 검색",
@@ -87,45 +88,14 @@ fun FoodSearchScreen() {
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
             )
-
             Spacer(modifier = Modifier.weight(1f))
         }
 
-        // 검색 화면
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 25.dp, start = 16.dp, end = 16.dp, bottom = 30.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            // 돋보기 이미지
-            Image(
-                painter = painterResource(id = R.drawable.searchimage),
-                contentDescription = "Search Image",
-                modifier = Modifier
-                    .size(40.dp)
-                    .padding(end = 10.dp)
-            )
-            // 음식 검색창
-            TextField(
-                value = searchText,
-                onValueChange = {
-                    searchText = it
-                    expanded = it.isNotEmpty()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 8.dp),
-                placeholder = { Text("검색 음식명", fontSize = 14.sp) },
-                singleLine = true,
-            )
-        }
 
         // 음식 세부사항 BOX
         Box(
             modifier = Modifier
-                .clickable { showDialog = !showDialog }
+                .clickable { showDialog = true }
                 .width(330.dp)
                 .height(120.dp)
                 .background(Color.White, shape = RoundedCornerShape(10.dp))
@@ -141,12 +111,12 @@ fun FoodSearchScreen() {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 8.dp),
+                        .padding(top = 2.dp, bottom = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     // 음식명
                     Text(
-                        text = "음식명",
+                        text = "마가렛트",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
@@ -168,13 +138,13 @@ fun FoodSearchScreen() {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp),
+                        .padding(start = 5.dp, end = 10.dp, top = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     // 회사명
                     Text(
-                        text = "회사명",
+                        text = "오리온",
                         fontSize = 17.sp
                     )
 
@@ -194,8 +164,160 @@ fun FoodSearchScreen() {
                 }
             }
         }
+
         if (showDialog) {
-            OutlineCardExample()
+            var text by remember { mutableStateOf("") } // 사용자 입력 관리 상태 변수
+            // AlertDialog 표시
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = {
+                    Text(
+                        text = "마가렛트",
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
+                text = {
+                    Column {
+                        Text(text = "제조사 : 오리온\n식품종류 : 가공식품\n식품대분류 : 과자\n식품상세분류 : 쿠키")
+                        Text(
+                            text = "1회 제공량 48(g, ml)",
+                            modifier = Modifier.padding(top = 10.dp),
+                            color = Color.Gray,
+                        )
+                        Text(
+                            text = "먹은 양",
+                            modifier = Modifier.padding(top = 10.dp),
+                            color = Color.Gray,
+                        )
+
+                        // 먹은 양 입력 상자
+                        TextField(
+                            value = text,
+                            onValueChange = { text = it },
+                            modifier = Modifier
+                                .width(100.dp)
+                                .height(65.dp)
+                                .padding(bottom = 15.dp),
+                            singleLine = true,
+                            placeholder = { Text(text = "", fontSize = 10.sp) },
+                            textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                        )
+
+                        // 영양정보 박스
+                        Box(
+                            modifier = Modifier
+                                .width(450.dp)
+                                .height(160.dp)
+                                .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
+                                .padding(8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Top
+                            ) {
+                                Text(
+                                    "192kcal",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier
+                                        .align(Alignment.Start)
+                                        .padding(start = 35.dp)
+                                )
+
+                                Spacer(modifier = Modifier.height(5.dp))  // 텍스트와 선 사이 공간
+
+                                // 실선
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth(0.8f)
+                                        .height(3.dp)
+                                        .background(Color.Gray)
+                                        .padding(vertical = 45.dp)
+                                )
+
+                                // 탄단지 명칭
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 20.dp),
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    // 탄수화물
+                                    Text(
+                                        text = "탄수화물",
+                                        color = Color.Gray,
+                                        fontSize = 18.sp,
+                                        modifier = Modifier.padding(end = 16.dp)
+                                    )
+                                    // 단백질
+                                    Text(
+                                        text = "단백질",
+                                        color = Color.Gray,
+                                        fontSize = 18.sp,
+                                        modifier = Modifier.padding(end = 25.dp)
+                                    )
+                                    // 지방
+                                    Text(
+                                        text = "지방",
+                                        color = Color.Gray,
+                                        fontSize = 18.sp,
+                                    )
+                                }
+
+                                // 탄단지 그램 수
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 12.dp),
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    // 탄수화물 그램
+                                    Text(
+                                        text = "100g",
+                                        color = Color.Black,
+                                        fontSize = 15.sp,
+                                        modifier = Modifier.padding(start = 15.dp, end = 40.dp)
+                                    )
+                                    // 단백질 그램
+                                    Text(
+                                        text = "100g",
+                                        color = Color.Black,
+                                        fontSize = 15.sp,
+                                        modifier = Modifier.padding(end = 33.dp)
+                                    )
+                                    // 지방 그램
+                                    Text(
+                                        text = "200g",
+                                        color = Color.Black,
+                                        fontSize = 15.sp,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                },
+
+                // 취소 버튼
+                dismissButton = {
+                    Button(
+                        onClick = { showDialog = false }
+                    ) {
+                        Text("취소")
+                    }
+                },
+
+                // 추가 버튼
+                confirmButton = {
+                    Button(
+                        onClick = { /* 추가 버튼 클릭 시 로직 */ }
+                    ) {
+                        Text("추가")
+                    }
+                },
+            )
         }
     }
 }
@@ -218,171 +340,4 @@ fun FilledButtonExample(onClick: () -> Unit) {
     }
 }
 
-@Composable
-// 모달 카드
-fun OutlineCardExample() {
-    var text by remember { mutableStateOf("") } // 사용자 입력 관리 상태 변수
-
-    OutlinedCard(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
-        border = BorderStroke(3.dp, Color.Black),
-        modifier = Modifier
-            .padding(16.dp)
-            .size(width = 310.dp, height = 600.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(5.dp),
-        ) {
-            // 나가기 버튼
-            Image(
-                painter = painterResource(id = R.drawable.xbutton),
-                contentDescription = "exit Button",
-                modifier = Modifier
-                    .padding(bottom = 1.dp)
-                    .size(25.dp)
-            )
-
-            // 음식명
-            Text(
-                text = "피자",
-                textAlign = TextAlign.Center,
-                color = Color.Black,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-            )
-
-            // 1회제공량
-            Text(
-                text = "1회제공량 50(g, ml)",
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .padding(bottom = 10.dp)
-            )
-
-            // 먹은양
-            Text(
-                text = "먹은양",
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold
-            )
-
-            // 먹은 양 입력 상자
-            TextField(
-                value = text,
-                onValueChange = { text = it },
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(50.dp)
-                    .border(BorderStroke(2.dp, Color.Gray)),
-                singleLine = true,
-                placeholder = { Text(text = "", fontSize = 10.sp) },
-                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-            )
-
-            // 영양정보 박스
-            Box(
-                modifier = Modifier
-                    .width(450.dp)
-                    .height(160.dp)
-                    .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
-                    .padding(8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top
-                ) {
-                    Text(
-                        "500kcal",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .align(Alignment.Start)
-                            .padding(start = 35.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(5.dp))  // 텍스트와 선 사이 공간
-
-                    // 실선
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .height(3.dp)
-                            .background(Color.Gray)
-                            .padding(vertical = 45.dp)
-                    )
-
-                    // 탄단지 명칭
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 20.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // 탄수화물
-                        Text(
-                            text = "탄수화물",
-                            color = Color.Gray,
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(end = 16.dp)
-                        )
-                        // 단백질
-                        Text(
-                            text = "단백질",
-                            color = Color.Gray,
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(end = 25.dp)
-                        )
-                        // 지방
-                        Text(
-                            text = "지방",
-                            color = Color.Gray,
-                            fontSize = 18.sp,
-                        )
-                    }
-
-                    // 탄단지 그램 수
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 12.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // 탄수화물 그램
-                        Text(
-                            text = "100g",
-                            color = Color.Black,
-                            fontSize = 15.sp,
-                            modifier = Modifier.padding(start = 15.dp, end = 40.dp)
-                        )
-                        // 단백질 그램
-                        Text(
-                            text = "100g",
-                            color = Color.Black,
-                            fontSize = 15.sp,
-                            modifier = Modifier.padding(end = 33.dp)
-                        )
-                        // 지방 그램
-                        Text(
-                            text = "200g",
-                            color = Color.Black,
-                            fontSize = 15.sp,
-                        )
-                    }
-                }
-            }
-
-            // 추가하기 버튼
-            FilledButtonExample(onClick = {
-
-            })
-        }
-    }
-}
 

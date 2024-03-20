@@ -27,11 +27,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.ssafy.d101.navigation.Screens
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     var items = listOf(
-        BottomNavItem("home", Icons.Default.Home, "Home"),
+        BottomNavItem(Screens.Home.route, Icons.Default.Home, "Home"),
         BottomNavItem("addFood", Icons.Default.AddCircle, "AddFood"),
         BottomNavItem("myPage", Icons.Default.Person, "MyPage")
     )
