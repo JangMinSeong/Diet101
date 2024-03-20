@@ -60,7 +60,7 @@ pipeline {
         }
         stage('Add Env') {
             steps {
-                dir('back/src/resources') {
+                dir('back/src/main/resources') {
                     withCredentials([file(credentialsId: 'application', variable: 'application')]) {
                         sh 'cp ${application} application-deploy.yml'
                     }
