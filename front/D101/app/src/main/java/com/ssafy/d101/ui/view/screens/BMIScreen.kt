@@ -2,9 +2,11 @@ package com.ssafy.d101.ui.view.screens
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -96,39 +99,14 @@ fun CheckBMI() {
                 .size(100.dp, 30.dp)) {
                 Text(text = "키",style = textStyle
                 )}
-            OutlinedTextField(
-                modifier = Modifier
-                    .width(130.dp)
-                    .height(50.dp),
-                value = height,
-                onValueChange = { height = it },
-                shape = MaterialTheme.shapes.small.copy(
-                    CornerSize(percent = 50),
-                ),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Number // 키보드 타입을 Number로 설정
-                )
-            )
+            InputField(value = height, onValueChange = { height = it })
             Box(modifier = Modifier.padding(20.dp,0.dp,0.dp,0.dp)){Text(text = "cm",style = textStyle)}
         }
         Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) { // 키
             Box(modifier = Modifier
                 .padding(30.dp, 10.dp, 0.dp, 0.dp)
                 .size(100.dp, 30.dp)){Text(text = "몸무게",style = textStyle)}
-            OutlinedTextField(
-                modifier = Modifier
-                    .width(130.dp)
-                    .height(50.dp),
-                value = weight,
-                onValueChange = { weight = it },
-                shape = MaterialTheme.shapes.small.copy(
-                    CornerSize(percent = 50)
-                ),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Number // 키보드 타입을 Number로 설정
-                )
-
-            )
+            InputField(value = weight, onValueChange = { weight = it })
             Box(modifier = Modifier.padding(20.dp,0.dp,0.dp,0.dp)){Text(text = "kg",style = textStyle)}
         }
         Row(modifier = Modifier.padding(10.dp,0.dp), verticalAlignment = Alignment.CenterVertically) { // 성별
