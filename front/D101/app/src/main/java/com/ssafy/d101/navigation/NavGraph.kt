@@ -11,6 +11,7 @@ import com.ssafy.d101.ui.view.screens.BMIScreen
 import com.ssafy.d101.ui.view.screens.HomeScreen
 import com.ssafy.d101.ui.view.screens.LandingScreen
 import com.ssafy.d101.ui.view.screens.MyPageScreen
+import com.ssafy.d101.ui.view.screens.UserInfoScreen
 
 @Composable
 fun SetUpNavGraph(
@@ -25,5 +26,6 @@ fun SetUpNavGraph(
         composable(Screens.MyPage.route) { MyPageScreen(navController) }
         composable(Screens.BMI.route) { BMIScreen(navController) }
         composable(Screens.Allergy.route) { AllergyScreen(navController) }
+        composable(Screens.UserInfo.route) { UserInfoScreen(navController) }
     }
 }
