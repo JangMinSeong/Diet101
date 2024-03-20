@@ -7,4 +7,5 @@ sealed class Screens(val route: String) {
     object BMI : Screens("bmi")
     object Allergy : Screens("allergy")
     object Start : Screens("start")
+    object UserInfo : Screens("userinfo")
 }
