@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -36,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import com.ssafy.d101.R
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.view.components.BarItem
+import com.ssafy.d101.ui.view.components.CustomSemiCirclePieChart
+import com.ssafy.d101.ui.view.components.DailyHorizontalBar
 import com.ssafy.d101.ui.view.components.MonthLeaderboardScreen
 import com.ssafy.d101.ui.view.components.MonthRankingItem
 import com.ssafy.d101.ui.view.components.MonthlyNutritionChartHorizontal
@@ -49,7 +52,7 @@ fun DietAnalysis(
     monthTitle : String
 ) {
     // 선택된 분석 타입 (오늘의 분석, 과거 분석)을 추적하는 상태
-    var selectedAnalysis by remember { mutableStateOf("past") }
+    var selectedAnalysis by remember { mutableStateOf("today") }
     // 과거 분석시 선택된 타임라인 (주간, 월간)을 추적하는 상태
     var selectedTimeline by remember { mutableStateOf("weekly") }
     // 월간 랭킹 보기 + 식단 보기 클릭 상태
@@ -127,7 +130,17 @@ fun DietAnalysis(
                         )
                     }
                 }
+                
+                when(selectedAnalysis) {
+                    "today" -> {
+                        Spacer(modifier = Modifier.size(15.dp))
+                        CustomSemiCirclePieChart(consumedKcal = 1200, totalKcal = 1500, gender = 1)
+                        Spacer(modifier = Modifier.size(15.dp))
+                        DailyHorizontalBar(carbsPercentage = 30f, proteinPercentage = 30f, fatsPercentage = 40f) //합 100% 주의
 
+                    }
+                }
+                
                 if (selectedAnalysis == "past") {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -172,10 +185,6 @@ fun DietAnalysis(
                     }
 
                     when (selectedAnalysis) {
-                        "today" -> {
-                            // 오늘의 내 식단 분석 선택 시 표시할 내용
-                        }
-
                         "past" -> {
                             when (selectedTimeline) {
                                 "weekly" -> {
@@ -191,7 +200,7 @@ fun DietAnalysis(
                                                 listOf(400f, 600f, 400f), // SAT
                                                 listOf(500f, 500f, 500f)  // SUN
                                             ),
-                                            maxValue = 2000f
+                                            maxValue = 2000f  // 총합 계산해서 넣어야 비율로 나옴
                                         ),
                                         title = "WEEKLY"
                                     )
