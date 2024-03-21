@@ -41,13 +41,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.ssafy.d101.ui.theme.Green
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
 import com.ssafy.d101.ui.view.components.BackHeader
 
 @Composable
-fun BMIScreen(navController: NavController) {
+fun BMIScreen(navController: NavHostController) {
     Column( modifier = Modifier // 백그라운드
         .fillMaxSize()
         .background(Ivory)

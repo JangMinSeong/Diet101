@@ -37,12 +37,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
 
 @Composable
-fun MyPageScreen(navController: NavController) {
+fun MyPageScreen(navController: NavHostController) {
 
     Column( modifier = Modifier // 백그라운드
         .fillMaxSize()

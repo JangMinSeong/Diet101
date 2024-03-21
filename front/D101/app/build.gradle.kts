@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
@@ -13,6 +15,14 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        val keystoreFile = project.rootProject.file("local.properties")
+        val properties = Properties()
+        properties.load(keystoreFile.inputStream())
+
+        val kakaoAppKey = properties.getProperty("KAKAO_APP_KEY") ?: ""
+
+        buildConfigField("String", "KAKAO_APP_KEY", kakaoAppKey)
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -74,4 +84,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("com.google.accompanist:accompanist-flowlayout:0.34.0")
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.3")
+    implementation("com.kakao.sdk:v2-user:2.20.0")
 }
