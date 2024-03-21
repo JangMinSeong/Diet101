@@ -1,4 +1,5 @@
 package com.ssafy.d101.ui.view.screens
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -40,17 +41,26 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
+
 
 @Preview(showBackground = true)
 @Composable
 fun FoodAdditionScreen() {
     val dummyData = remember { mutableStateListOf("Apple", "Banana") }
-    val searchData = remember { mutableStateListOf("Apple", "Banana", "Grape", "Tomato", "Strawberry") }
-    var searchText by remember { mutableStateOf("") }
-    val filteredItems = searchData.filter { it.startsWith(searchText, ignoreCase = true) }
-    var expanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     var selectedFood by remember { mutableStateOf("") }
+    var eatenAmount by remember { mutableStateOf("1.0") }
+    var carbohydrate by remember { mutableStateOf("100g") }
+    var protein by remember { mutableStateOf("20g") }
+    var fat by remember { mutableStateOf("10g") }
 
     Column (
         modifier = Modifier
@@ -108,35 +118,20 @@ fun FoodAdditionScreen() {
                     .padding(end = 10.dp)
             )
 
-            // 검색창, 검색 로직
-            TextField(
-                value = searchText,
-                onValueChange = {
-                    searchText = it
-                    expanded = it.isNotEmpty()
+            // 타이틀 : 음식 검색하기
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline)) {
+                        append("음식 검색하러하기")
+                    }
                 },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 8.dp),
-                placeholder = { Text("음식명 입력", fontSize = 14.sp) },
-                singleLine = true,
+                    .weight(2f)
+                    .padding(start = 10.dp),
+                textAlign = TextAlign.Start,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
             )
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                filteredItems.forEach { label ->
-                    DropdownMenuItem(
-                        text = { Text(label) },
-                        onClick = {
-                            searchText = label
-                            expanded = false
-                        }
-                    )
-                }
-            }
         }
 
         // 내가 추가한 음식
@@ -184,7 +179,7 @@ fun FoodAdditionScreen() {
                                 .weight(1f)
                         )
                         // 선택 유무
-                        SwitchWithIconExample()
+//                        SwitchWithIconExample()
 
                         // 삭제 버튼
                         CancelButtonExample(onClick = {
@@ -205,39 +200,29 @@ fun FoodAdditionScreen() {
                         )
                     },
 
+                    // AlertDialog의 text 파트
                     text = {
                         Column {
+                            // 기타 정보 (제조사, 식품 종류 등)
+                            Text(text = "제조사 : 오리온\n식품종류 : 가공식품\n식품대분류 : 과자\n식품상세분류 : 쿠키")
                             Text(
-                                text = "1회 제공량 50(g, ml)",
-                                modifier = Modifier
-                                    .padding(bottom = 10.dp)
-                            )
-
-                            // 먹은양
-                            Text(
-                                text = "먹은양",
-                                textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.Bold,
+                                text = "1회 제공량 48(g, ml)",
+                                modifier = Modifier.padding(top = 10.dp),
                                 color = Color.Gray,
                             )
-
                             // 먹은 양 입력 상자
                             TextField(
-                                value = text,
-                                onValueChange = { text = it },
-                                modifier = Modifier
-                                    .width(100.dp)
-                                    .height(65.dp)
-                                    .padding(bottom = 15.dp),
+                                value = eatenAmount,
+                                onValueChange = { eatenAmount = it },
+                                label = { Text("먹은 양") },
                                 singleLine = true,
-                                placeholder = { Text(text = "", fontSize = 10.sp) },
-                                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                                modifier = Modifier.width(100.dp).padding(bottom = 15.dp)
                             )
 
                             // 영양정보 박스
                             Box(
                                 modifier = Modifier
-                                    .width(450.dp)
+                                    .fillMaxWidth()
                                     .height(160.dp)
                                     .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
                                     .padding(8.dp),
@@ -251,11 +236,8 @@ fun FoodAdditionScreen() {
                                         "192kcal",
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
-                                        modifier = Modifier
-                                            .align(Alignment.Start)
-                                            .padding(start = 35.dp)
+                                        modifier = Modifier.align(Alignment.Start).padding(start = 35.dp)
                                     )
-
                                     Spacer(modifier = Modifier.height(5.dp))  // 텍스트와 선 사이 공간
 
                                     // 실선
@@ -264,78 +246,28 @@ fun FoodAdditionScreen() {
                                             .fillMaxWidth(0.8f)
                                             .height(3.dp)
                                             .background(Color.Gray)
-                                            .padding(vertical = 45.dp)
                                     )
-
-                                    // 탄단지 명칭
+                                    Spacer(modifier = Modifier.height(20.dp))
+                                    // 영양소 정보 입력 필드
                                     Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(top = 20.dp),
-                                        horizontalArrangement = Arrangement.Center,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        // 탄수화물
-                                        Text(
-                                            text = "탄수화물",
-                                            color = Color.Gray,
-                                            fontSize = 18.sp,
-                                            modifier = Modifier.padding(end = 16.dp)
-                                        )
-                                        // 단백질
-                                        Text(
-                                            text = "단백질",
-                                            color = Color.Gray,
-                                            fontSize = 18.sp,
-                                            modifier = Modifier.padding(end = 25.dp)
-                                        )
-                                        // 지방
-                                        Text(
-                                            text = "지방",
-                                            color = Color.Gray,
-                                            fontSize = 18.sp,
-                                        )
-                                    }
-
-                                    // 탄단지 그램 수
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(top = 12.dp),
-                                        horizontalArrangement = Arrangement.Center,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        // 탄수화물 그램
-                                        Text(
-                                            text = "100g",
-                                            color = Color.Black,
-                                            fontSize = 15.sp,
-                                            modifier = Modifier.padding(start = 15.dp, end = 40.dp)
-                                        )
-                                        // 단백질 그램
-                                        Text(
-                                            text = "100g",
-                                            color = Color.Black,
-                                            fontSize = 15.sp,
-                                            modifier = Modifier.padding(end = 33.dp)
-                                        )
-                                        // 지방 그램
-                                        Text(
-                                            text = "200g",
-                                            color = Color.Black,
-                                            fontSize = 15.sp,
-                                        )
+                                        NutritionInfoFieldEditable("탄수화물", "100g")
+                                        NutritionInfoFieldEditable("단백질", "20g")
+                                        NutritionInfoFieldEditable("지방", "10g")
                                     }
                                 }
                             }
                         }
                     },
-
                     confirmButton = {
                         Button(
                             onClick = {
-
-                            }
+                                Log.d("Update", "먹은 양: $eatenAmount, 탄수화물: $carbohydrate, 단백질: $protein, 지방: $fat")
+                                showDialog = false
+                            },
                         ) {
                             Text("수정")
                         }
@@ -413,9 +345,9 @@ fun CancelButtonExample(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier
-            .width(50.dp)
+            .width(70.dp)
             .height(33.dp)
-            .padding(start = 5.dp, end = 5.dp),
+            .padding(start = 20.dp, end = 15.dp),
         contentPadding = PaddingValues(0.dp)
     ) {
         Text("X", fontSize = 20.sp)
@@ -436,3 +368,27 @@ fun AdditionButtonExample(onClick: () -> Unit) {
         Text("X", fontSize = 20.sp)
     }
 }
+
+@Composable
+fun NutritionInfoFieldEditable(labelText: String, initialText: String) {
+    var text by remember { mutableStateOf(initialText) }
+
+    // 사용자 입력에 반응하여 텍스트 필드의 상태를 업데이트합니다.
+    val onValueChange = { newValue: String ->
+        // 'g' 문자를 제외한 숫자 부분만 추출합니다.
+        val numberPart = newValue.filter { it.isDigit() }
+        // 숫자 부분 뒤에 'g'를 붙여 새로운 텍스트를 설정합니다.
+        text = "$numberPart g"
+    }
+
+    OutlinedTextField(
+        value = text,
+        onValueChange = onValueChange,
+        label = { Text(labelText) },
+        singleLine = true,
+        modifier = Modifier.width(80.dp)
+    )
+}
+
+
+
