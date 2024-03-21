@@ -1,7 +1,5 @@
 package com.d101.back.entity;
 
-import java.util.List;
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,6 +20,9 @@ public class Food extends BaseTimeEntity {
 	private String majorCategory;
 	private String minorCategory;
 
+	private String dbGroup;
+	private String manufacturer;
+
 	private int portionSize;
 	private String unit;
 
@@ -36,10 +37,12 @@ public class Food extends BaseTimeEntity {
 	private double sugar;
 
 	@Builder
-	public Food(String name, String majorCategory, String minorCategory, int portionSize, String unit, int calorie, double carbohydrate, double protein, double fat, double transFat, double saturatedFat, double cholesterol, double natrium, double sugar) {
+	public Food(String name, String majorCategory, String minorCategory, String dbGroup, String manufacturer, int portionSize, String unit, int calorie, double carbohydrate, double protein, double fat, double transFat, double saturatedFat, double cholesterol, double natrium, double sugar) {
 		this.name = name;
 		this.majorCategory = majorCategory;
 		this.minorCategory = minorCategory;
+		this.dbGroup = dbGroup;
+		this.manufacturer = manufacturer;
 		this.portionSize = portionSize;
 		this.unit = unit;
 		this.calorie = calorie;

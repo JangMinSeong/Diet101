@@ -3,7 +3,6 @@ package com.d101.back.service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 import com.d101.back.entity.*;
 import com.d101.back.entity.composite.UserFoodKey;
@@ -149,13 +148,4 @@ public class DietService {
 		}
 		throw new UnAuthorizedException(ExceptionStatus.UNAUTHORIZED);
 	}
-
-//	public IntakeDto getFoodDto(MealDto meal, Long food_id) {
-//		List<IntakeDto> intake = meal.getIntake().stream()
-//				.filter(i -> i.getFood().getId().equals(food_id)).toList();
-//		if (!intake.isEmpty()) {
-//			return intake.getFirst();
-//		}
-//		throw new NoSuchDataException(ExceptionStatus.FOOD_NOT_FOUND);
-//	}
 }
