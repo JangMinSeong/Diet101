@@ -6,5 +6,6 @@ sealed class Screens(val route: String) {
     object MyPage : Screens("myPage")
     object BMI : Screens("bmi")
     object Allergy : Screens("allergy")
+    object Start : Screens("start")
     object UserInfo : Screens("userinfo")
 }

@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,27 +54,122 @@ fun OutlineCardExample() {
         border = BorderStroke(3.dp, Color.Black),
         modifier = Modifier
             .padding(16.dp)
-            .size(width = 310.dp, height = 600.dp)
+            .size(width = 350.dp, height = 600.dp)
     ) {
         Box {
             Column(
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 32.dp, bottom = 16.dp),
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 32.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(5.dp),
             ) {
                 // 음식명
                 Text(
-                    text = "피자",
+                    text = "마가렛트",
                     textAlign = TextAlign.Center,
                     color = Color.Black,
-                    fontSize = 20.sp,
+                    fontSize = 25.sp,
                     fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(bottom = 10.dp, top = 5.dp)
                 )
+
+                // 제조사 구간
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    // 제조사
+                    Text(
+                        text = "제조사",
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(end = 5.dp)
+                    )
+
+                    // 오리온
+                    Text(
+                        text = "오리온",
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Gray,
+                    )
+                }
+
+                // 식품종류 구간
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    // 식폼종류
+                    Text(
+                        text = "식폼종류",
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(end = 5.dp)
+                    )
+
+                    // 가공식품
+                    Text(
+                        text = "가공식품",
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Gray,
+                    )
+                }
+
+                // 식품대분류 구간
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    // 식품대분류
+                    Text(
+                        text = "식품대분류",
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(end = 5.dp)
+                    )
+
+                    // 과자
+                    Text(
+                        text = "과자",
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Gray,
+                    )
+                }
+
+                // 식품상세분류 구간
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    // 식품상세분류
+                    Text(
+                        text = "식품상세분류",
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(end = 5.dp, bottom = 10.dp)
+                    )
+
+                    // 쿠키
+                    Text(
+                        text = "쿠키",
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(bottom = 10.dp)
+                    )
+                }
 
                 // 1회제공량
                 Text(
-                    text = "1회제공량 50(g, ml)",
+                    text = "1회제공량 48(g, ml)",
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
+                    color = Color.Gray,
                     modifier = Modifier
                         .padding(bottom = 10.dp)
                 )
@@ -80,7 +178,8 @@ fun OutlineCardExample() {
                 Text(
                     text = "먹은양",
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Gray,
                 )
 
                 // 먹은 양 입력 상자
@@ -89,8 +188,8 @@ fun OutlineCardExample() {
                     onValueChange = { text = it },
                     modifier = Modifier
                         .width(100.dp)
-                        .height(50.dp)
-                        .border(BorderStroke(2.dp, Color.Gray)),
+                        .height(65.dp)
+                        .padding(bottom = 15.dp),
                     singleLine = true,
                     placeholder = { Text(text = "", fontSize = 10.sp) },
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
@@ -110,7 +209,7 @@ fun OutlineCardExample() {
                         verticalArrangement = Arrangement.Top
                     ) {
                         Text(
-                            "500kcal",
+                            "192kcal",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier
@@ -190,12 +289,13 @@ fun OutlineCardExample() {
                         }
                     }
                 }
+                ElevatedButtonExample(onClick = {
 
-//                // 추가하기 버튼
-//                FilledButtonExample(onClick = {
-//
-//                })
+                })
             }
+
+
+
             // 나가기 버튼
             Image(
                 painter = painterResource(id = R.drawable.xbutton),
@@ -204,6 +304,35 @@ fun OutlineCardExample() {
                     .align(Alignment.TopEnd)
                     .padding(top = 12.dp, end = 12.dp)
                     .size(25.dp)
+            )
+        }
+    }
+}
+
+
+@Composable
+fun ElevatedButtonExample(onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp),
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        Button(
+            onClick = onClick,
+            modifier = Modifier
+                .width(150.dp)
+                .height(60.dp)
+                .padding(top = 12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Black
+            )
+        ) {
+            Text(
+                "추가하기",
+                color = Color.White,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
             )
         }
     }

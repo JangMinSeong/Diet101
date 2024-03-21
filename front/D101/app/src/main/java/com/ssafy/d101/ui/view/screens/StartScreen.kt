@@ -18,13 +18,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavHostController
 import com.ssafy.d101.R
 
-@Preview(showBackground = true)
 @Composable
-fun StartScreen() {
+fun StartScreen(navController: NavHostController) {
     Column (
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .fillMaxSize()
             .background(Color(0xFFFFFCE8)),
         horizontalAlignment = Alignment.CenterHorizontally,
