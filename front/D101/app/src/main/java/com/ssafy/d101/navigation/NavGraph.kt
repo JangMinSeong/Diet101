@@ -1,7 +1,5 @@
 package com.ssafy.d101.navigation
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -15,10 +13,12 @@ import com.ssafy.d101.ui.view.screens.MyPageScreen
 import com.ssafy.d101.ui.view.screens.SignUpCompleteScreen
 import com.ssafy.d101.ui.view.screens.SignUpScreen
 import com.ssafy.d101.ui.view.screens.StartScreen
+import com.ssafy.d101.viewmodel.KakaoAuthViewModel
 
 @Composable
 fun SetUpNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    kakaoAuthViewModel: KakaoAuthViewModel
 ) {
     NavHost(
         navController = navController,
@@ -30,7 +30,7 @@ fun SetUpNavGraph(
         composable(Screens.BMI.route) { BMIScreen(navController) }
         composable(Screens.Allergy.route) { AllergyScreen(navController) }
         composable(Screens.Start.route) { StartScreen(navController) }
-        composable(Screens.SignUp.route) { SignUpScreen(navController) }
+        composable(Screens.SignUp.route) { SignUpScreen(navController, kakaoAuthViewModel) }
         composable(Screens.SignUpComplete.route) { SignUpCompleteScreen(navController) }
         composable(Screens.LoginSuccess.route) { LoginSuccessScreen(navController) }
     }

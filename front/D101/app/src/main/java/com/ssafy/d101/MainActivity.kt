@@ -5,49 +5,31 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.MaterialTheme
+import androidx.activity.viewModels
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.kakao.sdk.common.KakaoSdk
-import com.kakao.sdk.v2.auth.BuildConfig
-import com.ssafy.d101.model.BottomNavItem
-import com.ssafy.d101.navigation.AppScaffold
 import com.ssafy.d101.navigation.Screens
 import com.ssafy.d101.navigation.SetUpNavGraph
 import com.ssafy.d101.ui.theme.D101Theme
 import com.ssafy.d101.ui.view.components.BottomNavigationBar
-import com.ssafy.d101.ui.view.screens.AllergyScreen
-import com.ssafy.d101.ui.view.screens.BMIScreen
-import com.ssafy.d101.ui.view.screens.HomeScreen
-import com.ssafy.d101.ui.view.screens.LandingScreen
-import com.ssafy.d101.ui.view.screens.MyPageScreen
+import com.ssafy.d101.viewmodel.KakaoAuthViewModel
 
 class MainActivity : ComponentActivity() {
+
+    private val kakaoAuthViewModel : KakaoAuthViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        KakaoSdk.init(this, R.string.kakao_app_key.toString())
-        Log.e("Kakao", BuildConfig)
         setContent {
-            MyApp()
+            MyApp(kakaoAuthViewModel)
         }
     }
 }
 
 @Composable
-fun MyApp() {
+fun MyApp(kakaoAurthViewModel: KakaoAuthViewModel) {
 
     D101Theme {
         val navController = rememberNavController()
@@ -62,7 +44,7 @@ fun MyApp() {
                 }
             }
         ) { innerPadding ->
-            SetUpNavGraph(navController = navController)
+            SetUpNavGraph(navController = navController, kakaoAuthViewModel = kakaoAurthViewModel)
         }
     }
 }

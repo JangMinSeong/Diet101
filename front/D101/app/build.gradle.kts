@@ -23,6 +23,7 @@ android {
         val kakaoAppKey = properties.getProperty("KAKAO_APP_KEY") ?: ""
 
         buildConfigField("String", "KAKAO_APP_KEY", kakaoAppKey)
+        addManifestPlaceholders(mapOf("KAKAO_APP_KEY" to kakaoAppKey))
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -48,6 +49,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
