@@ -42,6 +42,10 @@ public class FoodService {
                 .natrium(foodDto.getNatrium())
                 .saturatedFat(foodDto.getSaturatedFat())
                 .transFat(foodDto.getTransFat())
+                .majorCategory(foodDto.getMajorCategory())
+                .minorCategory(foodDto.getMinorCategory())
+                .dbGroup(foodDto.getDbGroup())
+                .manufacturer(foodDto.getManufacturer())
                 .build();
         foodRepository.save(food);
     }
