@@ -265,16 +265,36 @@ fun FoodAdditionScreen() {
                     confirmButton = {
                         Button(
                             onClick = {
-                                Log.d("Update", "먹은 양: $eatenAmount, 탄수화물: $carbohydrate, 단백질: $protein, 지방: $fat")
+                                Log.d("Update", "먹은 양: $text, 탄수화물: $carbohydrate, 단백질: $protein, 지방: $fat")
                                 showDialog = false
                             },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                            modifier = Modifier
+                                .width(80.dp)
+                                .height(60.dp)
+                                .padding(top = 20.dp),
                         ) {
-                            Text("수정")
+                            Text(
+                                text = "수정",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                            )
                         }
                     },
                     dismissButton = {
-                        Button(onClick = { showDialog = false }) {
-                            Text("취소")
+                        Button(
+                            onClick = { showDialog = false },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                            modifier = Modifier
+                                .width(80.dp)
+                                .height(60.dp)
+                                .padding(top = 20.dp),
+                        ) {
+                            Text(
+                                text = "취소",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                            )
                         }
                     }
                 )
