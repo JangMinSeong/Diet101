@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Divider
@@ -41,9 +39,11 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
+import com.ssafy.d101.viewmodel.KakaoAuthViewModel
 
 @Composable
-fun MyPageScreen(navController: NavHostController) {
+fun MyPageScreen(navController: NavHostController, kakaoAuthViewModel: KakaoAuthViewModel) {
+    kakaoAuthViewModel.kakaoLogout()
 
     Column( modifier = Modifier // 백그라운드
         .fillMaxSize()
@@ -110,7 +110,7 @@ fun MyProfile() {
                         model = "https://d101-bucket.s3.ap-northeast-2.amazonaws.com/diet/%EB%96%A1%EB%B3%B6%EC%9D%B4.jpg",
                         contentDescription = "profileImage",
                         contentScale = ContentScale.Fit,
-                        modifier = Modifier.size(100.dp)
+                        modifier = Modifier.size(100.dp),
                     )
                 }
             }

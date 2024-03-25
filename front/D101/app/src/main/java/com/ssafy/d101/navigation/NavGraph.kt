@@ -1,6 +1,7 @@
 package com.ssafy.d101.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,13 +21,16 @@ fun SetUpNavGraph(
     navController: NavHostController,
     kakaoAuthViewModel: KakaoAuthViewModel
 ) {
+    kakaoAuthViewModel.checkLogin()
+    val isLoggedIn = kakaoAuthViewModel.isLoggedIn.collectAsState()
+    val startDestination = if (isLoggedIn.value) Screens.Home.route else Screens.Start.route
     NavHost(
         navController = navController,
-        startDestination = Screens.Start.route
+        startDestination = startDestination
     ) {
         composable(Screens.Landing.route) { LandingScreen(navController) }
         composable(Screens.Home.route) { HomeScreen(navController) }
-        composable(Screens.MyPage.route) { MyPageScreen(navController) }
+        composable(Screens.MyPage.route) { MyPageScreen(navController, kakaoAuthViewModel) }
         composable(Screens.BMI.route) { BMIScreen(navController) }
         composable(Screens.Allergy.route) { AllergyScreen(navController) }
         composable(Screens.Start.route) { StartScreen(navController) }

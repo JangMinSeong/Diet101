@@ -27,6 +27,8 @@ import com.ssafy.d101.viewmodel.KakaoAuthViewModel
 @Composable
 fun SignUpScreen(navController: NavHostController, kakaoAuthViewModel: KakaoAuthViewModel) {
 
+
+
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -56,7 +58,9 @@ fun SignUpScreen(navController: NavHostController, kakaoAuthViewModel: KakaoAuth
                 .padding(bottom = 30.dp)
                 .width(300.dp)
                 .height(50.dp)
-                .clickable(onClick = { kakaoAuthViewModel.handleKakaoLogin() })
+                .clickable(onClick = {
+                    kakaoAuthViewModel.kakaoLogin()
+                })
         )
 
         // 가입 관련 멘트

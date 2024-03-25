@@ -8,12 +8,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.rememberNavController
-import com.ssafy.d101.ui.view.components.BottomNavigationBar
-import com.ssafy.d101.model.NavigationActions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.ssafy.d101.ui.view.screens.*
+import androidx.navigation.compose.rememberNavController
+import com.ssafy.d101.model.NavigationActions
+import com.ssafy.d101.ui.view.components.BottomNavigationBar
+import com.ssafy.d101.ui.view.screens.HomeScreen
+import com.ssafy.d101.ui.view.screens.LandingScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -43,7 +44,7 @@ fun AppScaffold() {
         ) {
             composable("landing") { LandingScreen(navController) }
             composable("home") { HomeScreen(navController) }
-            composable("myPage") { MyPageScreen(navController) }
+//            composable("myPage") { MyPageScreen(navController) }
             // Add other composable screens and navigation logic here.
         }
     }

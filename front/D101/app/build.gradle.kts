@@ -21,9 +21,10 @@ android {
         properties.load(keystoreFile.inputStream())
 
         val kakaoAppKey = properties.getProperty("KAKAO_APP_KEY") ?: ""
+        val kakaoRedirectUri = properties.getProperty("KAKAO_REDIRECT_URI") ?: ""
 
         buildConfigField("String", "KAKAO_APP_KEY", kakaoAppKey)
-        addManifestPlaceholders(mapOf("KAKAO_APP_KEY" to kakaoAppKey))
+        resValue("string", "KAKAO_REDIRECT_URI", kakaoRedirectUri)
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -88,4 +89,6 @@ dependencies {
     implementation("com.google.accompanist:accompanist-flowlayout:0.34.0")
     implementation("androidx.compose.ui:ui-text-google-fonts:1.6.3")
     implementation("com.kakao.sdk:v2-user:2.20.0")
+    implementation("com.squareup.retrofit2:retrofit:2.10.0")
+    implementation("com.google.code.gson:gson:2.10.1")
 }

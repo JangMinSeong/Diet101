@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.kakao.sdk.common.KakaoSdk
+import com.kakao.sdk.common.util.Utility
 import com.ssafy.d101.navigation.Screens
 import com.ssafy.d101.navigation.SetUpNavGraph
 import com.ssafy.d101.ui.theme.D101Theme
@@ -29,7 +30,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MyApp(kakaoAurthViewModel: KakaoAuthViewModel) {
+fun MyApp(kakaoAuthViewModel: KakaoAuthViewModel) {
 
     D101Theme {
         val navController = rememberNavController()
@@ -44,7 +45,7 @@ fun MyApp(kakaoAurthViewModel: KakaoAuthViewModel) {
                 }
             }
         ) { innerPadding ->
-            SetUpNavGraph(navController = navController, kakaoAuthViewModel = kakaoAurthViewModel)
+            SetUpNavGraph(navController = navController, kakaoAuthViewModel = kakaoAuthViewModel)
         }
     }
 }
