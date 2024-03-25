@@ -4,16 +4,21 @@ import com.d101.back.dto.FoodDto;
 import com.d101.back.entity.Food;
 import com.d101.back.repository.FoodRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FoodService {
     private final FoodRepository foodRepository;
+    private final WebClient webClient;
 
     @Transactional(readOnly = true)
     public List<FoodDto> searchByName(String name) {
@@ -49,4 +54,17 @@ public class FoodService {
                 .build();
         foodRepository.save(food);
     }
+
+    public void getRecommend(String email, int kcal) {
+        Mono<String> response = webClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/recommend")
+                        .queryParam("email", email)
+                        .queryParam("kcal", kcal)
+                        .build())
+                .retrieve().bodyToMono(String.class);
+        response.subscribe(log::info);
+    }
+
 }
