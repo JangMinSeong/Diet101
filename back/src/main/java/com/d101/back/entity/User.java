@@ -1,5 +1,6 @@
 package com.d101.back.entity;
 
+import com.d101.back.dto.request.LoginReq;
 import com.d101.back.entity.enums.Provider;
 import com.d101.back.entity.enums.Role;
 import jakarta.persistence.*;
@@ -7,7 +8,7 @@ import lombok.*;
 
 import java.util.List;
 
-
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter @Setter
@@ -22,7 +23,7 @@ public class User extends BaseTimeEntity {
     private String email;
 
     private String username;
-
+    private int age;
     private String image;
 
     private int calorie;
@@ -43,14 +44,17 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user")
     private List<Meal> meals;
 
-    @Builder
-    public User(String email, String username, String image, Role role, Provider provider, String oauthId) {
-        this.email = email;
-        this.username = username;
-        this.image = image;
-        this.role = role;
-        this.provider = provider;
-        this.oauthId = oauthId;
+    public static User of(LoginReq req) {
+        User user = new User();
+        user.setEmail(req.getEmail());
+        user.setUsername(req.getUsername());
+        user.setGender(req.getGender());
+        user.setAge(req.getAge());
+        user.setImage(req.getImage());
+        user.setOauthId(req.getOauthId());
+        user.setRole(Role.ROLE_USER);
+        user.setProvider(Provider.KAKAO);
+        return user;
     }
 
 }
