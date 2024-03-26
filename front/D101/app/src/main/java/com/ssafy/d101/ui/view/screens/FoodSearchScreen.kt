@@ -295,13 +295,35 @@ fun FoodSearchScreen() {
                 }
             },
             confirmButton = {
-                Button(onClick = {}) {
-                    Text("추가")
+                Button(
+                    onClick = { },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                    modifier = Modifier
+                        .width(80.dp)
+                        .height(60.dp)
+                        .padding(top = 20.dp),
+                ) {
+                    Text(
+                        text = "추가",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                    )
                 }
             },
             dismissButton = {
-                Button(onClick = { selectedFoodItemName = null }) {
-                    Text("취소")
+                Button(
+                    onClick = { selectedFoodItemName = null },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                    modifier = Modifier
+                        .width(80.dp)
+                        .height(60.dp)
+                        .padding(top = 20.dp),
+                ) {
+                    Text(
+                        text = "취소",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                    )
                 }
             }
         )
