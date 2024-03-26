@@ -77,7 +77,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("com.google.accompanist:accompanist-flowlayout:0.34.0")
+    // Retrofit
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    // Gson Converter
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation ("androidx.camera:camera-camera2:1.0.0-beta07")
     implementation ("androidx.camera:camera-lifecycle:1.0.0-beta07")
