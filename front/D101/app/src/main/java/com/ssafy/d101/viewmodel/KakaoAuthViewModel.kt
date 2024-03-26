@@ -94,13 +94,15 @@ class KakaoAuthViewModel(application: Application) : AndroidViewModel(applicatio
                         if (error != null) {
                             Log.e(TAG, "사용자 정보 요청 실패", error)
                             continuation.resume(false)
-                        } else {
-                            // 서버로 사용자 정보 전송
+                        } else if (user != null) {
+                            Log.i(TAG, "사용자 정보 요청 성공" +
+                                    "\n회원번호: ${user.id}" +
+                                    "\n닉네임: ${user.kakaoAccount?.profile?.nickname}" +
+                                    "\n이메일: ${user.kakaoAccount?.email}" +
+                                    "\n프로필 이미지: ${user.kakaoAccount?.profile?.thumbnailImageUrl}")
                             continuation.resume(true)
                         }
-
                     }
-                    continuation.resume(true)
                 }
             }
 
