@@ -45,7 +45,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
@@ -105,9 +104,9 @@ fun SearchAllergy() {
     )
 
     var selectedIndex by remember { mutableIntStateOf(0) }
-    var myAllergy = mutableListOf(0,1,7,8,9,10,11);
+    var myAllergy by remember { mutableStateOf(mutableListOf(0, 1, 7, 8, 9, 10, 11)) }
 
-     Row(modifier = Modifier.padding(20.dp)) {
+     Row(modifier = Modifier.padding(20.dp,20.dp,0.dp,10.dp)) {
         Icon(
             modifier = Modifier.size(20.dp),
             painter = painterResource(id = R.drawable.search),
@@ -116,13 +115,17 @@ fun SearchAllergy() {
          Spacer(modifier = Modifier.padding(horizontal = 7.dp))
         Text(text = allergyText)
     }
-    Row(modifier = Modifier.padding(20.dp,0.dp)){
+    Row(modifier = Modifier.padding(30.dp,0.dp,0.dp,10.dp)){
         var optionModifier = Modifier.width(200.dp)
-        Box(contentAlignment = Alignment.CenterEnd) {
+        Box(modifier=Modifier.padding(0.dp,11.dp)) {
             DropdownList(itemList = items, selectedIndex = selectedIndex, modifier = optionModifier, onItemClick = {selectedIndex = it})
         }
         Box(){
-            IconButton(onClick = { /* TODO : */}) {
+            IconButton(onClick = {
+                if (!myAllergy.contains(selectedIndex)) {
+                    myAllergy = myAllergy.toMutableList().apply { add(selectedIndex) }
+                }
+            }) {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = "Back Button"
@@ -146,12 +149,8 @@ fun SearchAllergy() {
     FlowRow (
         modifier = Modifier.padding(30.dp,0.dp,30.dp,20.dp)
     ) {
-        myAllergy.onEachIndexed { index, item ->
-            AllergyItem(
-                icon = images[index],
-                onRemoveClick = { myAllergy.remove(item) },
-                name = items[index]
-            )
+        myAllergy.forEach {item ->
+            AllergyItem(icon = images[item], onRemoveClick = { myAllergy = myAllergy.toMutableList().apply { remove(item) } }, name = items[item])
         }
     }
 
@@ -220,37 +219,39 @@ fun DropdownList(itemList: List<String>, selectedIndex: Int, modifier: Modifier,
                     // to dismiss on click outside
                     onDismissRequest = { showDropdown = false }
                 ) {
+                    Box(modifier=Modifier.border(
+                        BorderStroke(2.dp, Color.Black), // 테두리 굵기와 색상 설정
+                        shape = RoundedCornerShape(5.dp) // 모서리 둥근 정도 설정
+                    )){
+                        Column(
+                            modifier = modifier
+                                .heightIn(max = 90.dp)
+                                .verticalScroll(state = scrollState),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
 
-                    Column(
-                        modifier = modifier
-                            .heightIn(max = 90.dp)
-                            .verticalScroll(state = scrollState)
-                            .border(
-                                BorderStroke(2.dp, Color.Black), // 테두리 굵기와 색상 설정
-                                shape = RoundedCornerShape(5.dp) // 모서리 둥근 정도 설정
-                            ),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
+                            itemList.onEachIndexed { index, item ->
+                                if (index != 0) {
+                                    Divider(thickness = 1.dp, color = Color.LightGray)
+                                }
+                                Box(
+                                    modifier = Modifier
+                                        .height(30.dp)
+                                        .background(Color.White)
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            onItemClick(index)
+                                            showDropdown = !showDropdown
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(text = item,)
+                                }
+                            }
 
-                        itemList.onEachIndexed { index, item ->
-                            if (index != 0) {
-                                Divider(thickness = 1.dp, color = Color.LightGray)
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .background(Color.White)
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        onItemClick(index)
-                                        showDropdown = !showDropdown
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(text = item,)
-                            }
                         }
-
                     }
+
                 }
             }
         }
@@ -267,9 +268,9 @@ val allergyText = buildAnnotatedString {
     }
 }
 
-@Preview(showSystemUi = true)
-@Composable
-fun PreviewTest(){
-    val navController = rememberNavController()
-    AllergyScreen(navController = navController)
-}
+//@Preview(showSystemUi = true)
+//@Composable
+//fun previewTest(){
+//    val navController = rememberNavController()
+//    AllergyScreen(navController = navController)
+//}

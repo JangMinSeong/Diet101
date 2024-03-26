@@ -13,6 +13,12 @@ public class FoodDto {
 
     private String name;
 
+    private String majorCategory;
+    private String minorCategory;
+
+    private String dbGroup;
+    private String manufacturer;
+
     private int calorie;
     private double carbohydrate;
     private double protein;
@@ -27,6 +33,10 @@ public class FoodDto {
         return new FoodDto(
                 food.getId(),
                 food.getName(),
+                food.getMajorCategory(),
+                food.getMinorCategory(),
+                food.getDbGroup(),
+                food.getManufacturer(),
                 food.getCalorie(),
                 food.getCarbohydrate(),
                 food.getProtein(),

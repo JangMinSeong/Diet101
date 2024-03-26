@@ -15,6 +15,7 @@ import com.ssafy.d101.ui.view.screens.SignUpCompleteScreen
 import com.ssafy.d101.ui.view.screens.SignUpScreen
 import com.ssafy.d101.ui.view.screens.StartScreen
 import com.ssafy.d101.viewmodel.KakaoAuthViewModel
+import com.ssafy.d101.ui.view.screens.UserInfoScreen
 
 @Composable
 fun SetUpNavGraph(
@@ -37,5 +38,6 @@ fun SetUpNavGraph(
         composable(Screens.SignUp.route) { SignUpScreen(navController, kakaoAuthViewModel) }
         composable(Screens.SignUpComplete.route) { SignUpCompleteScreen(navController) }
         composable(Screens.LoginSuccess.route) { LoginSuccessScreen(navController) }
+        composable(Screens.UserInfo.route) { UserInfoScreen(navController) }
     }
 }

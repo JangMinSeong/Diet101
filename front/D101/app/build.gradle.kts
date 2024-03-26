@@ -74,6 +74,9 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation.runtime.ktx)
+//    implementation(libs.androidx.material3.android)
+
     val navVersion = "2.7.7" // 이 값을 최신 버전으로 설정하세요
 
     implementation(libs.androidx.navigation.fragment.ktx)
@@ -91,4 +94,9 @@ dependencies {
     implementation("com.kakao.sdk:v2-user:2.20.0")
     implementation("com.squareup.retrofit2:retrofit:2.10.0")
     implementation("com.google.code.gson:gson:2.10.1")
+
+    implementation ("androidx.camera:camera-camera2:1.0.0-beta07")
+    implementation ("androidx.camera:camera-lifecycle:1.0.0-beta07")
+    implementation ("androidx.camera:camera-view:1.0.0-alpha20")
+    implementation ("androidx.activity:activity-compose:1.3.1")
 }

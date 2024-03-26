@@ -49,14 +49,14 @@ fun MyPageScreen(navController: NavHostController, kakaoAuthViewModel: KakaoAuth
         .fillMaxSize()
         .background(Ivory)
     ) {
-        MyPageHeader()
+        MyPageHeader(navController)
         MyProfile()
         MyMenu(navController)
     }
 
 }
 @Composable
-fun MyPageHeader() {
+fun MyPageHeader(navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -72,7 +72,7 @@ fun MyPageHeader() {
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
             textAlign = TextAlign.Center // 텍스트를 가운데 정렬함
         )
-        IconButton(onClick = { /* 할 일 */ }) {
+        IconButton(onClick = { navController.navigate("userinfo") }) {
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = "MyPage Button"

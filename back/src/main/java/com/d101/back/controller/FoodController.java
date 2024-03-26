@@ -35,4 +35,11 @@ public class FoodController {
 
         return ResponseEntity.ok("Success");
     }
+
+    @GetMapping("/recommend")
+    public ResponseEntity<?> getRecommendFood(Authentication authentication, @RequestParam(value = "kcal") String kcal) {
+        foodService.getRecommend(authentication.getName(), Integer.parseInt(kcal));
+        return ResponseEntity.ok(null);
+    }
+
 }

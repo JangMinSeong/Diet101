@@ -31,7 +31,6 @@ fun StartScreen(navController: NavHostController) {
     Column (
         modifier = Modifier
             .fillMaxSize()
-            .fillMaxSize()
             .background(Color(0xFFFFFCE8)),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
