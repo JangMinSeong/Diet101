@@ -5,6 +5,10 @@ back/.idea
 back/src/main/resources/application-dev.yml
 back/src/main/resources/application-local.yml
 
+### ai ###
+ai/__pycache__
+ai/.env
+
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
