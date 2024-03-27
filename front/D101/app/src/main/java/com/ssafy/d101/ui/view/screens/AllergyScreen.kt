@@ -50,13 +50,15 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.ssafy.d101.R
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
 import com.ssafy.d101.ui.view.components.BackHeader
 
 @Composable
-fun AllergyScreen(navController: NavController) {
+fun AllergyScreen(navController: NavHostController) {
     Column( modifier = Modifier // 백그라운드
         .fillMaxSize()
         .background(Ivory)
