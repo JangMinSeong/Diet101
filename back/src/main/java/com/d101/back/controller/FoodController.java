@@ -43,10 +43,18 @@ public class FoodController {
         return ResponseEntity.ok(null);
     }
 
-    @PostMapping("/db")
-    public ResponseEntity<?> addFoodToDb(@RequestParam("file") MultipartFile file) throws Exception {
+    @PostMapping("/db/unprocessedFood")
+    public ResponseEntity<?> addUnprocessedFoodToDb(@RequestParam("file") MultipartFile file) throws Exception {
 
-        foodService.uploadExcelFile(file);
+        foodService.unprocessedFood(file);
+
+        return ResponseEntity.ok("Success");
+    }
+
+    @PostMapping("/db/processedFood")
+    public ResponseEntity<?> addProcessedFoodToDb(@RequestParam("file") MultipartFile file) throws Exception {
+
+        foodService.processedFood(file);
 
         return ResponseEntity.ok("Success");
     }
