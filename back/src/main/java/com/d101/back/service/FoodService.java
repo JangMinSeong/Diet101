@@ -5,7 +5,10 @@ import com.d101.back.entity.Food;
 import com.d101.back.repository.FoodRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -17,8 +20,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class FoodService {
+    @Value("${ai.server.url}")
+    private String url;
     private final FoodRepository foodRepository;
-    private final WebClient webClient;
 
     @Transactional(readOnly = true)
     public List<FoodDto> searchByName(String name) {
@@ -56,7 +60,8 @@ public class FoodService {
     }
 
     public void getRecommend(String email, int kcal) {
-        Mono<String> response = webClient
+
+        Mono<String> response = getWebClient()
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/recommend")
@@ -67,4 +72,10 @@ public class FoodService {
         response.subscribe(log::info);
     }
 
+    public WebClient getWebClient() {
+        return WebClient.builder()
+                .baseUrl(url)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
 }
