@@ -93,83 +93,103 @@ public class FoodService {
 
 
             Cell dbGroup = currentRow.getCell(0);
-            if (dbGroup != null && dbGroup.getStringCellValue() != "") {
+            if (dbGroup != null) {
                 foodDto.setDbGroup(dbGroup.getStringCellValue());
             }
 
             Cell name = currentRow.getCell(1);
-            if (name != null && name.getStringCellValue() != "") {
+            if (name != null) {
                 foodDto.setName(name.getStringCellValue());
             }
 
             Cell manufacturer = currentRow.getCell(2);
-            if (manufacturer != null && manufacturer.getStringCellValue() != "") {
+            if (manufacturer != null) {
                 foodDto.setManufacturer(manufacturer.getStringCellValue());
             }
 
             Cell majorCategory = currentRow.getCell(3);
-            if (majorCategory != null && majorCategory.getStringCellValue() != "") {
+            if (majorCategory != null) {
                 foodDto.setMajorCategory(majorCategory.getStringCellValue());
             }
 
             Cell minorCategory = currentRow.getCell(4);
-            if (minorCategory != null && minorCategory.getStringCellValue() != "") {
+            if (minorCategory != null) {
                 foodDto.setMinorCategory(minorCategory.getStringCellValue());
             }
 
             Cell portionSize = currentRow.getCell(5);
-            if (portionSize != null && portionSize.getStringCellValue() != "") {
+            try {
                 foodDto.setPortionSize(Integer.parseInt(portionSize.getStringCellValue()));
+            } catch (NumberFormatException e) {
+
             }
 
             Cell unit = currentRow.getCell(6);
-            if (unit != null && unit.getStringCellValue() != "") {
+            if (unit != null) {
                 foodDto.setUnit(unit.getStringCellValue());
             }
 
             Cell calorie = currentRow.getCell(7);
-            if (calorie != null && calorie.getStringCellValue() != "") {
+            try {
                 foodDto.setCalorie((int)Double.parseDouble(calorie.getStringCellValue()));
+            } catch (NumberFormatException e) {
+
             }
 
             Cell protein = currentRow.getCell(8);
-            if (protein != null && protein.getStringCellValue() != "") {
+            try {
                 foodDto.setProtein(Double.parseDouble(protein.getStringCellValue()));
+            } catch (NumberFormatException e) {
+
             }
 
             Cell fat = currentRow.getCell(9);
-            if (fat != null && fat.getStringCellValue() != "") {
+            try {
                 foodDto.setFat(Double.parseDouble(fat.getStringCellValue()));
+            } catch (NumberFormatException e) {
+
             }
 
             Cell carbohydrate = currentRow.getCell(10);
-            if (carbohydrate != null && carbohydrate.getStringCellValue() != "") {
+            try {
                 foodDto.setCarbohydrate(Double.parseDouble(carbohydrate.getStringCellValue()));
+            } catch (NumberFormatException e) {
+
             }
 
             Cell sugar = currentRow.getCell(11);
-            if (sugar != null && sugar.getStringCellValue() != "") {
+            try {
                 foodDto.setSugar(Double.parseDouble(sugar.getStringCellValue()));
+            } catch (NumberFormatException e) {
+
             }
 
             Cell natrium = currentRow.getCell(12);
-            if (natrium != null && natrium.getStringCellValue() != "") {
+            try {
                 foodDto.setNatrium(Double.parseDouble(natrium.getStringCellValue()));
+            } catch (NumberFormatException e) {
+
             }
 
             Cell cholesterol = currentRow.getCell(13);
-            if (cholesterol != null && cholesterol.getStringCellValue() != "") {
+            try {
                 foodDto.setCholesterol(Double.parseDouble(cholesterol.getStringCellValue()));
+            } catch (NumberFormatException e) {
+
             }
 
             Cell saturatedFat = currentRow.getCell(14);
-            if (saturatedFat != null && saturatedFat.getStringCellValue() != "") {
+            try {
                 foodDto.setSaturatedFat(Double.parseDouble(saturatedFat.getStringCellValue()));
+            } catch (NumberFormatException e) {
+
             }
 
             Cell transFat = currentRow.getCell(15);
-            if (transFat != null && transFat.getStringCellValue() != "") {
+            try {
                 foodDto.setTransFat(Double.parseDouble(transFat.getStringCellValue()));
+            } catch (NumberFormatException e) {
+
             }
 
             addFood(foodDto);
