@@ -1,6 +1,8 @@
 package com.ssafy.d101.ui.view.screens
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.height
@@ -19,13 +21,15 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.ssafy.d101.R
+import com.ssafy.d101.navigation.Screens
+import com.ssafy.d101.ui.theme.D101Theme
 
 @Composable
 fun StartScreen(navController: NavHostController) {
     Column (
         modifier = Modifier
-            .fillMaxSize()
             .fillMaxSize()
             .background(Color(0xFFFFFCE8)),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -58,6 +62,14 @@ fun StartScreen(navController: NavHostController) {
                 .padding(top = 45.dp)
                 .width(300.dp)
                 .height(50.dp)
+                .clickable(onClick = { navController.navigate(Screens.SignUp.route) })
         )
     }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+fun StartScreenPreview() {
+    val navController = rememberNavController()
+    StartScreen(navController = navController)
 }
