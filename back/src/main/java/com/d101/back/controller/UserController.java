@@ -2,6 +2,7 @@ package com.d101.back.controller;
 
 import com.d101.back.dto.LoginTokenDto;
 import com.d101.back.dto.oauth.KakaoLoginReq;
+import com.d101.back.dto.request.LoginReq;
 import com.d101.back.dto.request.ModifyUserReq;
 import com.d101.back.dto.request.UpdateAllergyReq;
 import com.d101.back.service.UserService;
@@ -22,6 +23,11 @@ public class UserController {
     @PostMapping("/login/kakao")
     public ResponseEntity<LoginTokenDto> loginOauth(@RequestBody KakaoLoginReq kakaoLoginReq) {
         return ResponseEntity.ok(userService.loginOauth(kakaoLoginReq));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginTokenDto> login(@RequestBody LoginReq loginReq) {
+        return ResponseEntity.ok(userService.login(loginReq));
     }
 
     @PostMapping("/reissue")
