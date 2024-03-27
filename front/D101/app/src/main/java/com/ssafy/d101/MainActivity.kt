@@ -17,7 +17,9 @@ import com.ssafy.d101.navigation.SetUpNavGraph
 import com.ssafy.d101.ui.theme.D101Theme
 import com.ssafy.d101.ui.view.components.BottomNavigationBar
 import com.ssafy.d101.viewmodel.KakaoAuthViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val kakaoAuthViewModel : KakaoAuthViewModel by viewModels()

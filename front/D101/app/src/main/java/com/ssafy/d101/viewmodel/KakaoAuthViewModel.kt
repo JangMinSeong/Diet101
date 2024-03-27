@@ -10,8 +10,16 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.common.model.KakaoSdkError
 import com.kakao.sdk.user.UserApiClient
+import com.ssafy.d101.api.RetrofitBuilder
+import com.ssafy.d101.model.RegisterResponse
+import com.ssafy.d101.model.UserInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Response
+import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -41,6 +49,15 @@ class KakaoAuthViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch {
             isLoggedIn.emit(handleKakaoLogout())
         }
+    }
+
+    private fun calculateAge(birthdateStr: String): Int {
+        val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+        val birthdate = LocalDate.parse(birthdateStr, formatter)
+
+        val currentDate = LocalDate.now()
+
+        return Period.between(birthdate, currentDate).years
     }
 
     private suspend fun hasToken() : Boolean =
@@ -95,11 +112,35 @@ class KakaoAuthViewModel(application: Application) : AndroidViewModel(applicatio
                             Log.e(TAG, "사용자 정보 요청 실패", error)
                             continuation.resume(false)
                         } else if (user != null) {
+                            val userInfo = UserInfo(
+                                oauthId = user.id.toString(),
+                                email = user.kakaoAccount?.email?: "",
+                                username = user.kakaoAccount?.profile?.nickname?: "",
+                                age = calculateAge(user.kakaoAccount?.birthyear.toString() + user.kakaoAccount?.birthday.toString()),
+                                gender = user.kakaoAccount?.gender?.name?: "",
+                                image = user.kakaoAccount?.profile?.profileImageUrl?: ""
+                            )
                             Log.i(TAG, "사용자 정보 요청 성공" +
-                                    "\n회원번호: ${user.id}" +
-                                    "\n닉네임: ${user.kakaoAccount?.profile?.nickname}" +
-                                    "\n이메일: ${user.kakaoAccount?.email}" +
-                                    "\n프로필 이미지: ${user.kakaoAccount?.profile?.thumbnailImageUrl}")
+                                    "\n${userInfo.toString()}"
+                            )
+
+                            RetrofitBuilder.userService.registerUser(userInfo).enqueue(object: retrofit2.Callback<RegisterResponse> {
+                                override fun onResponse(call: Call<RegisterResponse>, response: Response<RegisterResponse>) {
+                                    if (response.isSuccessful) {
+                                        // 회원가입 성공 처리
+                                        Log.d("Register", "회원가입 성공")
+                                    } else {
+                                        // 에러 처리
+                                        Log.e("Register", "회원가입 실패: ${response.errorBody()?.string()}")
+                                    }
+                                }
+
+                                override fun onFailure(call: Call<RegisterResponse>, t: Throwable) {
+                                    // 네트워크 에러 등의 실패 처리
+                                    Log.e("Register", "회원가입 에러: $t")
+                                }
+                            })
+
                             continuation.resume(true)
                         }
                     }

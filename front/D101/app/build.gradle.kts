@@ -3,6 +3,8 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    kotlin("kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -99,4 +101,11 @@ dependencies {
     implementation ("androidx.camera:camera-lifecycle:1.0.0-beta07")
     implementation ("androidx.camera:camera-view:1.0.0-alpha20")
     implementation ("androidx.activity:activity-compose:1.3.1")
+    implementation("com.google.dagger:hilt-android:2.51")
+    kapt("com.google.dagger:hilt-compiler:2.51")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+}
+
+kapt {
+    correctErrorTypes = true
 }

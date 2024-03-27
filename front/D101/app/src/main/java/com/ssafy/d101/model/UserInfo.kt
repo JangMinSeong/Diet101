@@ -9,7 +9,14 @@ data class UserInfo(
     val age: Int,
 )
 
+data class User(
+    val userInfo: UserInfo,
+    val accessToken: String,
+    val refreshToken: String,
+)
+
 data class RegisterResponse(
-    val success: Boolean,
-    val message: String,
+    val email: String,
+    val accessToken: String,
+    val refreshToken: String
 )
