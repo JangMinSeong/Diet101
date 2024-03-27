@@ -19,6 +19,9 @@ public class FoodDto {
     private String dbGroup;
     private String manufacturer;
 
+    private int portionSize;
+    private String unit;
+
     private int calorie;
     private double carbohydrate;
     private double protein;
@@ -37,6 +40,8 @@ public class FoodDto {
                 food.getMinorCategory(),
                 food.getDbGroup(),
                 food.getManufacturer(),
+                food.getPortionSize(),
+                food.getUnit(),
                 food.getCalorie(),
                 food.getCarbohydrate(),
                 food.getProtein(),
