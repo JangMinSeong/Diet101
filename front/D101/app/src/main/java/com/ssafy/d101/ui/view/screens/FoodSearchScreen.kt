@@ -42,22 +42,92 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+import android.util.Log
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collect
+import retrofit2.Call
+import retrofit2.Response
+import retrofit2.http.GET
+import retrofit2.http.Query
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.Callback
 
+// 엔드포인트 설정
+interface FoodService {
+    @GET("/api/food/search")
+    suspend fun searchFood(@Query("name") foodName: String): Response<List<String>>
+}
+
+// HTTP 요청 수행 로직 >> baseUrl 설정, JSON 응답 -> Kotlin 객체 자동 변환
+object RetrofitInstance {
+    val retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl("https://j10d101.p.ssafy.io:8000")
+            .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(CoroutineCallAdapterFactory()) // 코루틴 콜 어댑터 추가
+            .build()
+    }
+
+    val foodService: FoodService by lazy {
+        retrofit.create(FoodService::class.java)
+    }
+}
+
+// 백엔드에서 음식 정보 가져오는 로직
+class FoodViewModel : ViewModel() {
+    private val _foodItems = MutableStateFlow<List<String>>(listOf())
+    val foodItems: StateFlow<List<String>> = _foodItems
+
+    fun searchFood(foodName: String) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.foodService.searchFood(foodName)
+                if (response.isSuccessful && response.body() != null) {
+                    _foodItems.value = response.body()!!
+                    Log.d("FoodSearch", "Received ${response.body()?.size ?: 0} items")
+                } else {
+                    Log.e("FoodSearch", "Error: ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                Log.e("FoodSearch", "Exception", e)
+            }
+        }
+    }
+}
+
+
+
+// UI 구성 및 음식 리스트 표시
 @Preview(showBackground = true)
 @Composable
-fun FoodSearchScreen() {
-    val dummyData = listOf("Apple", "Applemango", "Banana", "Cherry", "Date", "Elderberry")
+fun FoodSearchScreen(viewModel: FoodViewModel = viewModel()) {
+//    val dummyData = listOf("Apple", "Applemango", "Banana", "Cherry", "Date", "Elderberry")
     var searchText by remember { mutableStateOf("") }
-    val filteredItems = if (searchText.isEmpty()) {
-        dummyData // 검색 텍스트가 비어있다면 모든 데이터를 표시
-    } else {
-        dummyData.filter { it.startsWith(searchText, ignoreCase = true) }
-    }
+//    val filteredItems = if (searchText.isEmpty()) {
+//        dummyData // 검색 텍스트가 비어있다면 모든 데이터를 표시
+//    } else {
+//        dummyData.filter { it.startsWith(searchText, ignoreCase = true) }
+//    }
     var expanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }  // 모달 카드 보여줄지 여부
     var selectedFoodItemName by remember { mutableStateOf<String?>(null) }
+    val foodItems by viewModel.foodItems.collectAsState()
+
+    // 검색 텍스트가 변경될 때마다 API 호출
+    LaunchedEffect(searchText) {
+        viewModel.searchFood(searchText)
+    }
 
     // 화면 전체
     Column(
@@ -135,7 +205,7 @@ fun FoodSearchScreen() {
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            items(filteredItems) {foodItem ->
+            items(foodItems) {foodItem ->
                 Box(
                     modifier = Modifier
                         .clickable { selectedFoodItemName = foodItem }
@@ -268,7 +338,9 @@ fun FoodSearchScreen() {
                                 "192kcal",
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.align(Alignment.Start).padding(start = 35.dp)
+                                modifier = Modifier
+                                    .align(Alignment.Start)
+                                    .padding(start = 35.dp)
                             )
                             Spacer(modifier = Modifier.height(5.dp))  // 텍스트와 선 사이 공간
 
