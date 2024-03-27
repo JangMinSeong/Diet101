@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -42,4 +43,11 @@ public class FoodController {
         return ResponseEntity.ok(null);
     }
 
+    @PostMapping("/db")
+    public ResponseEntity<?> addFoodToDb(@RequestParam("file") MultipartFile file) throws Exception {
+
+        foodService.uploadExcelFile(file);
+
+        return ResponseEntity.ok("Success");
+    }
 }
