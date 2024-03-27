@@ -17,6 +17,12 @@ import javax.inject.Inject
 
 class AuthInterceptor @Inject constructor(private val tokenManager: TokenManager) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
+
+        val originalRequest = chain.request()
+        if (originalRequest.url.encodedPath.contains("user/login")) {
+            return chain.proceed(originalRequest)
+        }
+
         val token: String = runBlocking {
             tokenManager.getAccessToken().first()
         } ?: return errorResponse(chain.request())
