@@ -88,7 +88,7 @@ public class DietService {
 				.orElseThrow(() -> new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND));
 
 		// 이미지 저장
-		String img = s3Service.saveFile(file, "diet");
+		String img = s3Service.saveFile(file, String.format("user/%s", user.getId()));
 
 		Meal meal = new Meal(user, img, Dunchfast.valueOf(req.getType()), req.getTime(),
 				req.getTotalKcal(), req.getTotalCarbohydrate(),

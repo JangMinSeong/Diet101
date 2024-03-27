@@ -5,6 +5,7 @@ import com.d101.back.api.OAuthApi;
 import com.d101.back.dto.LoginTokenDto;
 import com.d101.back.dto.oauth.OAuth2UserInfo;
 import com.d101.back.dto.oauth.OAuthLoginReq;
+import com.d101.back.dto.request.LoginReq;
 import com.d101.back.dto.request.ModifyUserReq;
 import com.d101.back.entity.Allergy;
 import com.d101.back.entity.CustomUserDetails;
@@ -12,6 +13,7 @@ import com.d101.back.entity.QAllergy;
 import com.d101.back.entity.User;
 import com.d101.back.entity.composite.UserAllergyKey;
 import com.d101.back.entity.enums.AllergyType;
+import com.d101.back.entity.enums.Provider;
 import com.d101.back.entity.enums.Role;
 import com.d101.back.exception.BadRequestException;
 import com.d101.back.exception.NoSuchDataException;
@@ -68,6 +70,15 @@ public class UserService {
         } catch (Exception e) {
             throw new UnAuthorizedException(ExceptionStatus.OAUTH_LOGIN_FAIL);
         }
+    }
+
+    public LoginTokenDto login(LoginReq loginReq) {
+        User user = userRepository.findByEmail(loginReq.getEmail())
+                .orElseGet(() -> User.of(loginReq));
+        LoginTokenDto loginTokenDto = jwtProvider.getLoginResponse(user);
+        user.setRefresh_token(loginTokenDto.getRefreshToken()); // ⭐ 리프레시토큰 저장
+        userRepository.save(user);
+        return loginTokenDto;
     }
 
     public User createNewUser(OAuth2UserInfo oAuth2UserInfo) {
