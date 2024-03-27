@@ -12,7 +12,7 @@ session = Session()
 metadata = MetaData()
 metadata.bind = engine
 
-food_table = Table('food', metadata, autoload_with=engine)
+food_table = Table('Food', metadata, autoload_with=engine)
 preference_table = Table('preference', metadata, autoload_with=engine)
 
 def getFoodListByKcal(kcal: int):
