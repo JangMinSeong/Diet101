@@ -36,6 +36,8 @@ import androidx.navigation.compose.rememberNavController
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
 import com.ssafy.d101.ui.view.components.BackHeader
+import com.ssafy.d101.ui.view.components.FoodInfo
+import com.ssafy.d101.ui.view.components.FoodList
 
 @Composable
 fun RecommendScreen(navController: NavHostController) {
@@ -95,9 +97,14 @@ fun RecommendScreen(navController: NavHostController) {
 }
 @Composable
 fun RecommendStepThree() {
-    Column(modifier = Modifier.padding(40.dp)) {
+    Column(modifier = Modifier.padding(40.dp,10.dp,40.dp,100.dp)) {
         Text(text = "추천된 음식을 확인하고", style = textStyle)
         Text(text = "식단에 추가해 보세요", style = textStyle)
+        FoodList(foodInfos = listOf(
+            FoodInfo("등갈비 김치찜", 200, 25.5f, 32.0f,21.9f,427.1f),
+            FoodInfo("공깃밥",1,31.7f,2.7f,0.3f,140.3f),
+            FoodInfo("모코코",10,31.7f,2.7f,0.3f,140.3f)
+        ))
     }
 }
 
