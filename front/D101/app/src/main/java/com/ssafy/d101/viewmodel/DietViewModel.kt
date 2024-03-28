@@ -19,7 +19,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 
-class DietViewModel(private val dietService: DietService) : ViewModel() {
+class DietViewModel() : ViewModel() {
     fun getCurrentDate(): String {
         return LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
     }

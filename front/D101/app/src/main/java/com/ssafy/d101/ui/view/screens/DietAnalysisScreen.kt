@@ -55,14 +55,17 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.ssafy.d101.model.AnalysisDiet
 
 @Composable
-fun DietAnalysis(
-    dateTitle : String,
-    weekTitle : String,
-    monthTitle : String,
+fun DietAnalysis(navController: NavController
 ) {
-
+    val dateTitle : String = ""
+    val weekTitle : String = ""
+    val monthTitle : String = ""
     val userViewModel :UserViewModel = viewModel()
     val dietViewModel :DietViewModel = viewModel()
 
@@ -156,14 +159,19 @@ fun DietAnalysis(
                 when(selectedAnalysis) {
                     "today" -> {
                         Spacer(modifier = Modifier.size(15.dp))
-                        var userGender : Int = 5
+                        var userGender : Int
                         if(user?.userInfo?.gender == "MALE") userGender = 1
                         else userGender = 2
                         ////////////////TODO: API 요청  user, 일일 식단 기록 필요
-                        user?.userSubInfo?.calorie?.let { CustomSemiCirclePieChart(consumedKcal = 1200, totalKcal = it, gender = userGender) }
+                        val dailyCal = analysisDiet?.let{ calculateTotalCalories(it) }
+                        if(user != null && dailyCal != null)
+                            CustomSemiCirclePieChart(consumedKcal = dailyCal, totalKcal = user!!.userSubInfo.calorie, gender = userGender)
                         Spacer(modifier = Modifier.size(15.dp))
                         ////////////////TODO: API 요청   일일 식단 기록 필요
-                        DailyHorizontalBar(carbsPercentage = 30f, proteinPercentage = 30f, fatsPercentage = 40f) //합 100% 주의
+                        val nutri = analysisDiet?.let { calculateDailyNutrientRatios(it) }
+                        if (nutri != null) {
+                            DailyHorizontalBar(carbsPercentage = nutri.first, proteinPercentage = nutri.second, fatsPercentage = nutri.third)
+                        } //합 100% 주의
 
                     }
                 }
@@ -291,9 +299,50 @@ fun DietAnalysis(
     }
 }
 
+fun calculateDailyNutrientRatios(analysisDiet: AnalysisDiet): Triple<Float, Float, Float> {
+    var totalCarbs = 0.0
+    var totalProtein = 0.0
+    var totalFat = 0.0
+
+    analysisDiet.dailyDiet.forEach { dietInfo ->
+        dietInfo.intake.forEach { intakeInfo ->
+            val foodInfo = intakeInfo.food
+            val intakeAmount = intakeInfo.amount / foodInfo.portionSize.toDouble()
+
+            totalCarbs += foodInfo.carbohydrate * intakeAmount
+            totalProtein += foodInfo.protein * intakeAmount
+            totalFat += foodInfo.fat * intakeAmount
+        }
+    }
+
+    val totalCaloriesFromCarbs = totalCarbs * 4
+    val totalCaloriesFromProtein = totalProtein * 4
+    val totalCaloriesFromFat = totalFat * 9
+
+    val totalCalories = totalCaloriesFromCarbs + totalCaloriesFromProtein + totalCaloriesFromFat
+
+    val carbsPercentage = (totalCaloriesFromCarbs / totalCalories * 100).toFloat()
+    val proteinPercentage = (totalCaloriesFromProtein / totalCalories * 100).toFloat()
+    val fatPercentage = (totalCaloriesFromFat / totalCalories * 100).toFloat()
+
+    return Triple(carbsPercentage, proteinPercentage, fatPercentage)
+}
+
+fun calculateTotalCalories(analysisDiet: AnalysisDiet): Int {
+    return analysisDiet.dailyDiet.sumOf { dietInfo ->
+        dietInfo.intake.sumOf { intakeInfo ->
+            val foodInfo = intakeInfo.food
+            val intakeAmount = intakeInfo.amount
+
+            ((foodInfo.carbohydrate * 4 + foodInfo.protein * 4 + foodInfo.fat * 9) * intakeAmount).toInt()
+        }
+    }
+}
+
+
 @Preview(showBackground = true)
 @Composable
 fun PreviewDietAnalysis() {
     //dateTitle : 일별 날짜 제목, weekTitle : 주별 날짜 제목, monthTitle : 월별 날짜 제목
-    DietAnalysis(dateTitle = "2024 03 06 식단 분석",weekTitle = "3월 2째주 식단 분석", monthTitle = "3월 식단 분석")
+    DietAnalysis(navController = rememberNavController())
 }

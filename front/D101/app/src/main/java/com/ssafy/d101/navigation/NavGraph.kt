@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.ssafy.d101.ui.view.screens.AllergyScreen
 import com.ssafy.d101.ui.view.screens.BMIScreen
+import com.ssafy.d101.ui.view.screens.DietAnalysis
 import com.ssafy.d101.ui.view.screens.HomeScreen
 import com.ssafy.d101.ui.view.screens.LandingScreen
 import com.ssafy.d101.ui.view.screens.LoginSuccessScreen
@@ -59,6 +60,7 @@ fun SetUpNavGraph(
             composable(Screens.SignUpComplete.route) { SignUpCompleteScreen(navController) }
             composable(Screens.LoginSuccess.route) { LoginSuccessScreen(navController) }
             composable(Screens.UserInfo.route) { UserInfoScreen(navController) }
+            composable(Screens.AnalysisDiet.route) { DietAnalysis(navController)}
         }
     }
 

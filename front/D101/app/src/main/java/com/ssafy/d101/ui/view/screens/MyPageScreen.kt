@@ -37,13 +37,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.ssafy.d101.navigation.Screens
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
 import com.ssafy.d101.viewmodel.KakaoAuthViewModel
 
 @Composable
 fun MyPageScreen(navController: NavHostController, kakaoAuthViewModel: KakaoAuthViewModel) {
-    kakaoAuthViewModel.kakaoLogout()
 
     Column( modifier = Modifier // 백그라운드
         .fillMaxSize()
@@ -194,7 +194,7 @@ fun MyMenu(navController: NavController) {
             )
             SettingItem("음식 추천", navController, "")
             SettingItem("하루 섭취 정보", navController, "")
-            SettingItem("식단 분석", navController, "")
+            SettingItem("식단 분석", navController, Screens.AnalysisDiet.route)
         }
     }
 
