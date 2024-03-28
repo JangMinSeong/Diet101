@@ -11,7 +11,7 @@ import okhttp3.Interceptor
 import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.Response
-import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import java.net.HttpURLConnection.HTTP_OK
 import javax.inject.Inject
 
@@ -23,12 +23,15 @@ class AuthInterceptor @Inject constructor(private val tokenManager: TokenManager
             return chain.proceed(originalRequest)
         }
 
+        // 저장된 엑세스 토큰을 가져옴
         val token: String = runBlocking {
             tokenManager.getAccessToken().first()
         } ?: return errorResponse(chain.request())
 
+        // 헤더에 엑세스 토큰을 추가
         val request = chain.request().newBuilder().header(AUTHORIZATION, "Bearer $token").build()
 
+        // 요청을 실행하고 응답을 반환
         val response = chain.proceed(request)
         if (response.code == HTTP_OK) {
             val newAccessToken: String = response.header(AUTHORIZATION, null) ?: return response
@@ -53,6 +56,6 @@ class AuthInterceptor @Inject constructor(private val tokenManager: TokenManager
         .protocol(Protocol.HTTP_2)
         .code(100)
         .message("")
-        .body(ResponseBody.create(null, ""))
+        .body("".toResponseBody(null))
         .build()
 }

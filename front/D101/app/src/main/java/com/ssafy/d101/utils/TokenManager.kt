@@ -4,7 +4,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.ssafy.d101.api.RetrofitBuilder
+import com.ssafy.d101.model.RegisterResponse
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -50,5 +53,10 @@ class TokenManager @Inject constructor(
         dataStore.edit { prefs ->
             prefs.remove(REFRESH_TOKEN_KEY)
         }
+    }
+
+    suspend fun refreshAccessToken(): String {
+        val registerResponse: RegisterResponse = RegisterResponse(accessToken = getAccessToken().first() ?: "", refreshToken = getRefreshToken().first() ?: "", email = "")
+        val response = RetrofitBuilder.userService.reissueToken(registerResponse)
     }
 }
