@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 class UserViewModel : ViewModel() {
     private val _user = MutableStateFlow<User?>(null)
     val user = _user.asStateFlow()
-
+    
     fun updateUser(user: User) {
         viewModelScope.launch {
             _user.emit(user)
