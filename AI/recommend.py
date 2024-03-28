@@ -7,7 +7,7 @@ def getRecommendFoodList(kcal: int, user_id: int):
     foods = getFoodListByKcal(kcal)
     preferences = getPreferenceList()
 
-    preferences_pd = pd.DataFrame(preferences, columns=['weight','food_id','user_id'])
+    preferences_pd = pd.DataFrame(preferences, columns=['food_id','user_id','weight'])
     foods_pd = pd.DataFrame(foods, columns=['food_id'])
 
     preferences_foods = pd.merge(preferences_pd, foods_pd, on="food_id")
