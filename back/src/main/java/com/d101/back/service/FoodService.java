@@ -263,49 +263,54 @@ public class FoodService {
                 foodDto.setUnit(unit.getStringCellValue());
             }
 
-            Cell totalSize = currentRow.getCell(7);
             try {
+                Cell totalSize = currentRow.getCell(7);
                 foodDto.setTotalSize(Double.parseDouble(totalSize.getStringCellValue()));
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException e1) {
+                try {
+                    Cell totalSize = currentRow.getCell(8);
+                    foodDto.setTotalSize(Double.parseDouble(totalSize.getStringCellValue()));
+                } catch (NumberFormatException e2) {
 
+                }
             }
 
-            Cell calorie = currentRow.getCell(8);
+            Cell calorie = currentRow.getCell(9);
             try {
                 foodDto.setCalorie((int)Double.parseDouble(calorie.getStringCellValue()));
             } catch (NumberFormatException e) {
 
             }
 
-            Cell protein = currentRow.getCell(9);
+            Cell protein = currentRow.getCell(10);
             try {
                 foodDto.setProtein(Double.parseDouble(protein.getStringCellValue()));
             } catch (NumberFormatException e) {
 
             }
 
-            Cell fat = currentRow.getCell(10);
+            Cell fat = currentRow.getCell(11);
             try {
                 foodDto.setFat(Double.parseDouble(fat.getStringCellValue()));
             } catch (NumberFormatException e) {
 
             }
 
-            Cell carbohydrate = currentRow.getCell(11);
+            Cell carbohydrate = currentRow.getCell(12);
             try {
                 foodDto.setCarbohydrate(Double.parseDouble(carbohydrate.getStringCellValue()));
             } catch (NumberFormatException e) {
 
             }
 
-            Cell sugar = currentRow.getCell(12);
+            Cell sugar = currentRow.getCell(13);
             try {
                 foodDto.setSugar(Double.parseDouble(sugar.getStringCellValue()));
             } catch (NumberFormatException e) {
 
             }
 
-            Cell natrium = currentRow.getCell(13);
+            Cell natrium = currentRow.getCell(14);
             try {
                 foodDto.setNatrium(Double.parseDouble(natrium.getStringCellValue()));
             } catch (NumberFormatException e) {
@@ -313,25 +318,25 @@ public class FoodService {
             }
 
             try {
-                Cell cholesterol = currentRow.getCell(14);
+                Cell cholesterol = currentRow.getCell(15);
                 foodDto.setCholesterol(Double.parseDouble(cholesterol.getStringCellValue()));
             } catch (NumberFormatException e1) {
                 try {
-                    Cell cholesterol = currentRow.getCell(15);
+                    Cell cholesterol = currentRow.getCell(16);
                     foodDto.setCholesterol(Double.parseDouble(cholesterol.getStringCellValue()));
                 } catch (NumberFormatException e2) {
 
                 }
             }
 
-            Cell saturatedFat = currentRow.getCell(16);
+            Cell saturatedFat = currentRow.getCell(17);
             try {
                 foodDto.setSaturatedFat(Double.parseDouble(saturatedFat.getStringCellValue()));
             } catch (NumberFormatException e) {
 
             }
 
-            Cell transFat = currentRow.getCell(17);
+            Cell transFat = currentRow.getCell(18);
             try {
                 foodDto.setTransFat(Double.parseDouble(transFat.getStringCellValue()));
             } catch (NumberFormatException e) {
