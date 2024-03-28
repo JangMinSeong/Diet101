@@ -24,6 +24,7 @@ public class Food extends BaseTimeEntity {
 	private String manufacturer;
 
 	private int portionSize;
+	private double totalSize;
 	private String unit;
 
 	private int calorie;
@@ -37,13 +38,14 @@ public class Food extends BaseTimeEntity {
 	private double sugar;
 
 	@Builder
-	public Food(String name, String majorCategory, String minorCategory, String dbGroup, String manufacturer, int portionSize, String unit, int calorie, double carbohydrate, double protein, double fat, double transFat, double saturatedFat, double cholesterol, double natrium, double sugar) {
+	public Food(String name, String majorCategory, String minorCategory, String dbGroup, String manufacturer, int portionSize, double totalSize, String unit, int calorie, double carbohydrate, double protein, double fat, double transFat, double saturatedFat, double cholesterol, double natrium, double sugar) {
 		this.name = name;
 		this.majorCategory = majorCategory;
 		this.minorCategory = minorCategory;
 		this.dbGroup = dbGroup;
 		this.manufacturer = manufacturer;
 		this.portionSize = portionSize;
+		this.totalSize = totalSize;
 		this.unit = unit;
 		this.calorie = calorie;
 		this.carbohydrate = carbohydrate;

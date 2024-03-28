@@ -20,6 +20,7 @@ public class FoodDto {
     private String manufacturer;
 
     private int portionSize;
+    private double totalSize;
     private String unit;
 
     private int calorie;
@@ -41,6 +42,7 @@ public class FoodDto {
                 food.getDbGroup(),
                 food.getManufacturer(),
                 food.getPortionSize(),
+                food.getTotalSize(),
                 food.getUnit(),
                 food.getCalorie(),
                 food.getCarbohydrate(),
