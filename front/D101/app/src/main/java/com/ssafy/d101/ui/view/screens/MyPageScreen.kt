@@ -42,8 +42,7 @@ import com.ssafy.d101.ui.theme.White
 import com.ssafy.d101.viewmodel.KakaoAuthViewModel
 
 @Composable
-fun MyPageScreen(navController: NavHostController, kakaoAuthViewModel: KakaoAuthViewModel) {
-    kakaoAuthViewModel.kakaoLogout()
+fun MyPageScreen(navController: NavHostController) {
 
     Column( modifier = Modifier // 백그라운드
         .fillMaxSize()
@@ -192,7 +191,7 @@ fun MyMenu(navController: NavController) {
                     )
                 )
             )
-            SettingItem("음식 추천", navController, "")
+            SettingItem("음식 추천", navController, "recommend")
             SettingItem("하루 섭취 정보", navController, "")
             SettingItem("식단 분석", navController, "")
         }

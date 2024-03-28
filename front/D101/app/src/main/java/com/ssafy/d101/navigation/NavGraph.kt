@@ -19,6 +19,7 @@ import com.ssafy.d101.ui.view.screens.HomeScreen
 import com.ssafy.d101.ui.view.screens.LandingScreen
 import com.ssafy.d101.ui.view.screens.LoginSuccessScreen
 import com.ssafy.d101.ui.view.screens.MyPageScreen
+import com.ssafy.d101.ui.view.screens.RecommendScreen
 import com.ssafy.d101.ui.view.screens.SignUpCompleteScreen
 import com.ssafy.d101.ui.view.screens.SignUpScreen
 import com.ssafy.d101.ui.view.screens.StartScreen
@@ -51,7 +52,7 @@ fun SetUpNavGraph(
         ) {
             composable(Screens.Landing.route) { LandingScreen(navController) }
             composable(Screens.Home.route) { HomeScreen(navController) }
-            composable(Screens.MyPage.route) { MyPageScreen(navController, kakaoAuthViewModel) }
+            composable(Screens.MyPage.route) { MyPageScreen(navController) }
             composable(Screens.BMI.route) { BMIScreen(navController) }
             composable(Screens.Allergy.route) { AllergyScreen(navController) }
             composable(Screens.Start.route) { StartScreen(navController) }
@@ -59,6 +60,7 @@ fun SetUpNavGraph(
             composable(Screens.SignUpComplete.route) { SignUpCompleteScreen(navController) }
             composable(Screens.LoginSuccess.route) { LoginSuccessScreen(navController) }
             composable(Screens.UserInfo.route) { UserInfoScreen(navController) }
+            composable(Screens.Recommend.route) { RecommendScreen(navController)}
         }
     }
 
