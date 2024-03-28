@@ -13,4 +13,12 @@ object RetrofitBuilder {
             .build()
             .create(UserService::class.java)
     }
+
+    val dietService : DietService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(DietService::class.java)
+    }
 }

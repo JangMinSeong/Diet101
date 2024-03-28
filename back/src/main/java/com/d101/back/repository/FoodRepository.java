@@ -16,4 +16,6 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
             "WHERE u.email = :email " +
             "ORDER BY p.weight DESC")
     List<Food> rankingByEmail(@Param("email") String email, Pageable pageable);
+
+
 }
