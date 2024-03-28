@@ -17,8 +17,11 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -48,58 +51,81 @@ fun RecommendScreen(navController: NavHostController) {
         .background(Ivory)
     ) {
         BackHeader("음식 추천", navController)
-        RecommendSteps(step = 0)
-        Column(modifier = Modifier.padding(40.dp)) {
-            Text(text = "남은 끼니 수를 알려 주시면", style = textStyle)
-            Text(text = "적당한 한 끼를 추천해 드릴게요.", style = textStyle)
+        var step by remember {mutableIntStateOf(0)};
+        RecommendSteps(step)
+        when (step) {
+            0 -> RecommendStepOne(goal_cal = goal_cal, rest_cal = rest_cal)
+            1 -> RecommendStepTwo()
+            2 -> RecommendStepThree()
+            else -> { }
         }
-        Column ( modifier = Modifier
-            .padding(30.dp, 0.dp, 30.dp, 30.dp)
-            .shadow(15.dp, RoundedCornerShape(12.dp))
-            .background(White, shape = RoundedCornerShape(12.dp))
-        ) {
-            Row (modifier = Modifier.padding(20.dp,20.dp,20.dp,0.dp)){
-                Text(text = "목표 칼로리", style = textStyle)
-                Spacer(Modifier.weight(1f))
-                Text(text = "${goal_cal} kcal", style = textStyle)
-            }
-            Row (modifier = Modifier.padding(20.dp,10.dp,20.dp,15.dp)){
-                Text(text = "남은 칼로리", style = textStyle)
-                Spacer(Modifier.weight(1f))
-                Text(text = "${rest_cal} kcal", style = textStyle)
-            }
-            Row (modifier = Modifier
-                .padding(20.dp, 10.dp, 20.dp, 15.dp)
-                .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center){
-                Text(text = "남은 끼니", style = textStyle, modifier = Modifier.align(Alignment.CenterVertically))
-            }
 
-//                Text(text = "1234")
-        }
-        Column(Modifier.fillMaxSize().padding(30.dp,0.dp,30.dp,100.dp)) {
-            Spacer(modifier = Modifier.weight(1f).fillMaxSize())
-            Button(
-                onClick = {/*TODO*/ },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFB6B284), // 버튼 배경색
-                    contentColor = Color.White // 버튼 텍스트색
-                ),
-                // 버튼의 크기를 설정
-                modifier = Modifier.size(width = 80.dp, height = 35.dp).align(Alignment.End)
-            ) {
-                Text(
-                    text = "다음", style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp,
-                        color = Color.White // 색상도 설정할 수 있음
+        if(step<=1) {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(30.dp, 0.dp, 30.dp, 100.dp)) {
+                Spacer(modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize())
+                Button(
+                    onClick = {step+=1 },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFB6B284), // 버튼 배경색
+                        contentColor = Color.White // 버튼 텍스트색
+                    ),
+                    // 버튼의 크기를 설정
+                    modifier = Modifier
+                        .size(width = 80.dp, height = 35.dp)
+                        .align(Alignment.End)
+                ) {
+                    Text(
+                        text = "다음", style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            color = Color.White // 색상도 설정할 수 있음
+                        )
                     )
-                )
+                }
             }
         }
 
     }
 
+}
+@Composable
+fun RecommendStepThree() {
+    Column(modifier = Modifier.padding(40.dp)) {
+        Text(text = "추천된 음식을 확인하고", style = textStyle)
+        Text(text = "식단에 추가해 보세요", style = textStyle)
+    }
+}
+
+@Composable
+fun RecommendStepTwo() {
+    Column(modifier = Modifier.padding(40.dp)) {
+        Text(text = "한 끼에 적당한 칼로리를 계산했어요", style = textStyle)
+        Text(text = "가벼운 한 끼를 위해서 줄이거나", style = textStyle)
+        Text(text = "맛있는 한 끼를 위해서 늘려보세요", style = textStyle)
+    }
+    Column ( modifier = Modifier
+        .padding(30.dp, 0.dp, 30.dp, 30.dp)
+        .shadow(15.dp, RoundedCornerShape(12.dp))
+        .background(White, shape = RoundedCornerShape(12.dp))
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(20.dp, 10.dp, 20.dp, 15.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "칼로리",
+                style = textStyle,
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
+        }
+    }
 }
 
 @Composable
@@ -158,6 +184,42 @@ fun Step(modifier: Modifier = Modifier, isCompete: Boolean, isCurrent: Boolean) 
                 drawCircle(color = innerCircleColor)
             }
         )
+    }
+}
+
+@Composable
+fun RecommendStepOne(goal_cal: Int, rest_cal: Int) {
+    Column(modifier = Modifier.padding(40.dp)) {
+        Text(text = "남은 끼니 수를 알려 주시면", style = textStyle)
+        Text(text = "적당한 한 끼를 추천해 드릴게요.", style = textStyle)
+    }
+    Column ( modifier = Modifier
+        .padding(30.dp, 0.dp, 30.dp, 30.dp)
+        .shadow(15.dp, RoundedCornerShape(12.dp))
+        .background(White, shape = RoundedCornerShape(12.dp))
+    ) {
+        Row(modifier = Modifier.padding(20.dp, 20.dp, 20.dp, 0.dp)) {
+            Text(text = "목표 칼로리", style = textStyle)
+            Spacer(Modifier.weight(1f))
+            Text(text = "${goal_cal} kcal", style = textStyle)
+        }
+        Row(modifier = Modifier.padding(20.dp, 10.dp, 20.dp, 15.dp)) {
+            Text(text = "남은 칼로리", style = textStyle)
+            Spacer(Modifier.weight(1f))
+            Text(text = "${rest_cal} kcal", style = textStyle)
+        }
+        Row(
+            modifier = Modifier
+                .padding(20.dp, 10.dp, 20.dp, 15.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "남은 끼니",
+                style = textStyle,
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
+        }
     }
 }
 
