@@ -106,6 +106,8 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     implementation ("androidx.compose.runtime:runtime-livedata")
+
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 }
 
 kapt {

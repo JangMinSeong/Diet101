@@ -25,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -40,6 +39,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
@@ -68,7 +68,7 @@ fun UserInfo(userViewModel: UserViewModel) {
     var weight = userSubInfo?.weight.toString()
     var activity by remember { mutableIntStateOf(0) }
     var kcal = userSubInfo?.calorie.toString()
-    val age = userInfo?.age ?: 30
+    val age = userInfo?.age ?: 0
 
     fun calculateCalories(height: Int, weight: Int): Int {
         val bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
@@ -224,10 +224,12 @@ fun InputField(value: String, onValueChange: (String) -> Unit) {
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun UserInfoPreview(userViewModel: UserViewModel) {
+fun UserInfoPreview() {
     val navController = rememberNavController()
+    val userViewModel: UserViewModel = hiltViewModel()
+
     UserInfoScreen(navController = navController, userViewModel = userViewModel)
 }
 

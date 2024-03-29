@@ -1,8 +1,8 @@
 package com.ssafy.d101.viewmodel
 
-import android.app.Application
+import android.content.Context
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kakao.sdk.auth.AuthApiClient
 import com.kakao.sdk.auth.model.OAuthToken
@@ -10,9 +10,11 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.common.model.KakaoSdkError
 import com.kakao.sdk.user.UserApiClient
-import com.ssafy.d101.api.RetrofitBuilder
+import com.ssafy.d101.api.UserLoginService
 import com.ssafy.d101.model.RegisterResponse
 import com.ssafy.d101.model.UserInfo
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -20,16 +22,18 @@ import retrofit2.Response
 import java.time.LocalDate
 import java.time.Period
 import java.time.format.DateTimeFormatter
+import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class KakaoAuthViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class KakaoAuthViewModel @Inject constructor(private val userLoginService: UserLoginService,
+                                             @ApplicationContext private val context: Context
+    ) : ViewModel() {
 
     companion object {
         private const val TAG = "KakaoAuthViewModel"
     }
-
-    private val context = application.applicationContext
 
     val isLoggedIn = MutableStateFlow<Boolean>(false)
 
@@ -124,7 +128,7 @@ class KakaoAuthViewModel(application: Application) : AndroidViewModel(applicatio
                                     "\n${userInfo.toString()}"
                             )
 
-                            RetrofitBuilder.userService.registerUser(userInfo).enqueue(object: retrofit2.Callback<RegisterResponse> {
+                            userLoginService.registerUser(userInfo).enqueue(object: retrofit2.Callback<RegisterResponse> {
                                 override fun onResponse(call: Call<RegisterResponse>, response: Response<RegisterResponse>) {
                                     if (response.isSuccessful) {
                                         // 회원가입 성공 처리
