@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.d101.api.FoodSearchService
-import com.ssafy.d101.api.userAdditionFoodService
 import com.ssafy.d101.model.FoodInfo
 import com.ssafy.d101.model.FoodItem
 import kotlinx.coroutines.flow.MutableStateFlow
