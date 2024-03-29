@@ -33,7 +33,7 @@ class UserViewModel : ViewModel() {
     fun getUserSubInfo() {
         viewModelScope.launch {
             val response = withContext(Dispatchers.IO) {
-                RetrofitBuilder.userService.getUserInfo()
+                RetrofitBuilder.userService.getUserSubInfo()
             }
             if (response.isSuccessful) {
                 _userSubInfo.value = response.body()
@@ -41,4 +41,11 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    fun updateUserInfo(userSubInfo: UserSubInfo) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                RetrofitBuilder.userService.updateUserSubInfo(userSubInfo)
+            }
+        }
+    }
 }
