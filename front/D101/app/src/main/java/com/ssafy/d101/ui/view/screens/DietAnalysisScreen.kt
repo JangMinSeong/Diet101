@@ -1,8 +1,5 @@
 package com.ssafy.d101.ui.view.screens
 
-import com.ssafy.d101.ui.view.components.StackedBarItem
-import com.ssafy.d101.ui.view.components.WeeklyNutritionChart
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,16 +42,12 @@ import com.ssafy.d101.ui.view.components.DailyHorizontalBar
 import com.ssafy.d101.ui.view.components.MonthLeaderboardScreen
 import com.ssafy.d101.ui.view.components.MonthRankingItem
 import com.ssafy.d101.ui.view.components.MonthlyNutritionChartHorizontal
+import com.ssafy.d101.ui.view.components.StackedBarItem
 import com.ssafy.d101.ui.view.components.WeekLeaderboardScreen
 import com.ssafy.d101.ui.view.components.WeekRankingItem
+import com.ssafy.d101.ui.view.components.WeeklyNutritionChart
 import com.ssafy.d101.viewmodel.DietViewModel
 import com.ssafy.d101.viewmodel.UserViewModel
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalAdjusters
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun DietAnalysis(
@@ -66,7 +59,7 @@ fun DietAnalysis(
     val userViewModel :UserViewModel = viewModel()
     val dietViewModel :DietViewModel = viewModel()
 
-    val user by userViewModel.user.collectAsState()
+    val user by userViewModel.getUser().collectAsState(initial = null)
     val analysisDiet by dietViewModel.resultDiet.observeAsState()
 
     LaunchedEffect(Unit) {

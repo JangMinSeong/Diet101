@@ -23,12 +23,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.ssafy.d101.R
 import com.ssafy.d101.viewmodel.KakaoAuthViewModel
+import com.ssafy.d101.viewmodel.UserViewModel
 
 
 @Composable
 fun SignUpScreen(navController: NavHostController) {
 
     val kakaoAuthViewModel: KakaoAuthViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
 
     Column (
         modifier = Modifier

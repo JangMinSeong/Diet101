@@ -23,6 +23,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -49,7 +50,8 @@ import com.ssafy.d101.ui.view.components.BackHeader
 import com.ssafy.d101.viewmodel.UserViewModel
 
 @Composable
-fun UserInfoScreen(navController: NavController, userViewModel: UserViewModel) {
+fun UserInfoScreen(navController: NavController) {
+    val userViewModel: UserViewModel = hiltViewModel()
     Column( modifier = Modifier // 백그라운드
         .fillMaxSize()
         .background(Ivory)
@@ -62,8 +64,9 @@ fun UserInfoScreen(navController: NavController, userViewModel: UserViewModel) {
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun UserInfo(userViewModel: UserViewModel) {
-    val userInfo = userViewModel.user.value?.userInfo
-    val userSubInfo = userViewModel.user.value?.userSubInfo
+    val user by userViewModel.getUser().collectAsState(initial = null)
+    val userInfo = user?.userInfo
+    val userSubInfo = user?.userSubInfo
     var height = userSubInfo?.height.toString()
     var weight = userSubInfo?.weight.toString()
     var activity by remember { mutableIntStateOf(0) }
@@ -230,7 +233,7 @@ fun UserInfoPreview() {
     val navController = rememberNavController()
     val userViewModel: UserViewModel = hiltViewModel()
 
-    UserInfoScreen(navController = navController, userViewModel = userViewModel)
+    UserInfoScreen(navController = navController)
 }
 
 val titleTextStyle = TextStyle(

@@ -24,6 +24,8 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -35,18 +37,18 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
-import com.ssafy.d101.viewmodel.KakaoAuthViewModel
 import com.ssafy.d101.viewmodel.UserViewModel
 
 @Composable
 
-fun MyPageScreen(navController: NavHostController, kakaoAuthViewModel: KakaoAuthViewModel, userViewModel: UserViewModel) {
-//    kakaoAuthViewModel.kakaoLogout()
+fun MyPageScreen(navController: NavHostController) {
+    val userViewModel: UserViewModel = hiltViewModel()
 
     Column( modifier = Modifier // 백그라운드
         .fillMaxSize()
@@ -86,10 +88,13 @@ fun MyPageHeader(navController: NavController) {
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun MyProfile(userViewModel: UserViewModel) {
+fun MyProfile(userViewModel: UserViewModel = hiltViewModel()) {
+
+    val user by userViewModel.getUser().collectAsState(initial = null)
+
     Row( modifier = Modifier
         .fillMaxWidth()
-        .padding(30.dp,0.dp,30.dp,30.dp)
+        .padding(30.dp, 0.dp, 30.dp, 30.dp)
         .shadow(15.dp, RoundedCornerShape(12.dp))
         .background(White, shape = RoundedCornerShape(12.dp))
     ) { // 프로필 칸 @!
@@ -102,7 +107,7 @@ fun MyProfile(userViewModel: UserViewModel) {
                     contentAlignment = Alignment.CenterStart
                 ){ // 닉네임 @!
                     Text(
-                        text = userViewModel.user.value?.userInfo?.username +"님,",
+                        text = user?.userInfo?.username ?: "사용자 이름",
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -111,7 +116,7 @@ fun MyProfile(userViewModel: UserViewModel) {
                     contentAlignment = Alignment.CenterEnd
                 ){ // 프로필 이미지 @!
                     AsyncImage(
-                        model = userViewModel.user.value?.userInfo?.image,
+                        model = user?.userInfo?.image,
                         contentDescription = "profileImage",
                         contentScale = ContentScale.Fit,
                         modifier = Modifier.size(100.dp),
@@ -209,7 +214,7 @@ fun SettingItem(text: String, navController: NavController, path: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(20.dp,8.dp, 0.dp,5.dp)
+            .padding(20.dp, 8.dp, 0.dp, 5.dp)
             .clickable { navController.navigate(path) },
         verticalAlignment = Alignment.CenterVertically
     ) { // > 아이콘

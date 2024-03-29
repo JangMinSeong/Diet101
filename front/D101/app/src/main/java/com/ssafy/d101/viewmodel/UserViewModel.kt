@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.d101.api.UserService
 import com.ssafy.d101.model.User
 import com.ssafy.d101.model.UserSubInfo
+import com.ssafy.d101.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,21 +15,13 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class UserViewModel @Inject constructor(private val userService: UserService) : ViewModel() {
-    private val _user = MutableStateFlow<User?>(null)
-    val user = _user.asStateFlow()
+class UserViewModel @Inject constructor(
+    private val userService: UserService,
+    private val userRepository: UserRepository
+) : ViewModel() {
+    fun getUser() = userRepository.getUser()
 
-    fun updateUser(user: User) {
-        viewModelScope.launch {
-            _user.emit(user)
-        }
-    }
-
-    fun clearUser() {
-        viewModelScope.launch {
-            _user.emit(null)
-        }
-    }
+    suspend fun setUser(user: User) = userRepository.fetchAndStoreUser(user)
 
     private val _userSubInfo = MutableStateFlow<UserSubInfo?>(null)
     val userSubInfo = _userSubInfo.asStateFlow()

@@ -11,14 +11,12 @@ import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.common.model.KakaoSdkError
 import com.kakao.sdk.user.UserApiClient
 import com.ssafy.d101.api.UserLoginService
-import com.ssafy.d101.model.RegisterResponse
 import com.ssafy.d101.model.UserInfo
+import com.ssafy.d101.utils.TokenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Response
 import java.time.LocalDate
 import java.time.Period
 import java.time.format.DateTimeFormatter
@@ -28,6 +26,7 @@ import kotlin.coroutines.suspendCoroutine
 
 @HiltViewModel
 class KakaoAuthViewModel @Inject constructor(private val userLoginService: UserLoginService,
+                                             private val tokenManager: TokenManager,
                                              @ApplicationContext private val context: Context
     ) : ViewModel() {
 
@@ -128,22 +127,26 @@ class KakaoAuthViewModel @Inject constructor(private val userLoginService: UserL
                                     "\n${userInfo.toString()}"
                             )
 
-                            userLoginService.registerUser(userInfo).enqueue(object: retrofit2.Callback<RegisterResponse> {
-                                override fun onResponse(call: Call<RegisterResponse>, response: Response<RegisterResponse>) {
+                            viewModelScope.launch {
+                                try {
+                                    val response = userLoginService.registerUser(userInfo)
                                     if (response.isSuccessful) {
-                                        // 회원가입 성공 처리
                                         Log.d("Register", "회원가입 성공")
+                                        response.body()?.accessToken?.let { accessToken ->
+                                            tokenManager.saveAccessToken(accessToken)
+                                        }
+                                        response.body()?.refreshToken?.let { refreshToken ->
+                                            tokenManager.saveRefreshToken(refreshToken)
+                                        }
                                     } else {
                                         // 에러 처리
                                         Log.e("Register", "회원가입 실패: ${response.errorBody()?.string()}")
                                     }
-                                }
-
-                                override fun onFailure(call: Call<RegisterResponse>, t: Throwable) {
+                                } catch (t: Throwable) {
                                     // 네트워크 에러 등의 실패 처리
                                     Log.e("Register", "회원가입 에러: $t")
                                 }
-                            })
+                            }
 
                             continuation.resume(true)
                         }
