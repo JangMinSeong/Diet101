@@ -93,7 +93,7 @@ fun DietAnalysis(navController: NavController
     }
 
     // 선택된 분석 타입 (오늘의 분석, 과거 분석)을 추적하는 상태
-    var selectedAnalysis by remember { mutableStateOf("past") }
+    var selectedAnalysis by remember { mutableStateOf("today") }
     // 과거 분석시 선택된 타임라인 (주간, 월간)을 추적하는 상태
     var selectedTimeline by remember { mutableStateOf("weekly") }
     // 월간 랭킹 보기 + 식단 보기 클릭 상태
@@ -228,7 +228,7 @@ fun DietAnalysis(navController: NavController
                                 selectedMonthOption = if (selectedMonthOption == "diet") "ranking" else "diet"
                             }) {
                                 Text(
-                                    text = if (selectedMonthOption == "diet") "내 월간 랭킹 보기" else "월간 식단 분석 보기",
+                                    text = if (selectedMonthOption == "diet") "내 식단 랭킹 보기" else "월간 식단 분석 보기",
                                     color = Color.Red
                                 )
                             }

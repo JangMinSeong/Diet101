@@ -1,5 +1,6 @@
 package com.ssafy.d101.viewmodel;
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,7 +39,7 @@ class DietViewModel() : ViewModel() {
     private val _analysisDiet = MutableLiveData<AnalysisDiet>()
     val resultDiet: LiveData<AnalysisDiet> = _analysisDiet
 
-    suspend fun analysisDiet() {
+    fun analysisDiet() {
         val date = getCurrentDate()
         val dateFrom = getStartOfWeek()
         val dateTo = getEndOfWeek()
@@ -48,12 +49,12 @@ class DietViewModel() : ViewModel() {
                 if (response.isSuccessful) {
                     _analysisDiet.postValue(response.body())
                 } else {
-                    // Handle the error
+                    Log.i("AnalysisDiet", "정보 가져 오기 실패" + response.errorBody().toString())
                 }
             }
 
             override fun onFailure(call: Call<AnalysisDiet>, t: Throwable) {
-                // Handle failure, e.g., by logging or showing an error message
+                Log.i("AnalysisDiet", "에러 발생  $t")
             }
         })
     }
