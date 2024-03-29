@@ -1,33 +1,47 @@
 package com.ssafy.d101.ui.view.screens
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.PagerSnapDistance
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,6 +52,8 @@ import com.ssafy.d101.ui.theme.White
 import com.ssafy.d101.ui.view.components.BackHeader
 import com.ssafy.d101.ui.view.components.FoodInfo
 import com.ssafy.d101.ui.view.components.FoodList
+import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 
 @Composable
 fun RecommendScreen(navController: NavHostController) {
@@ -122,7 +138,7 @@ fun RecommendStepTwo() {
     ) {
         Row(
             modifier = Modifier
-                .padding(20.dp, 10.dp, 20.dp, 15.dp)
+                .padding(20.dp, 10.dp, 20.dp, 0.dp)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
@@ -131,6 +147,9 @@ fun RecommendStepTwo() {
                 style = textStyle,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
+        }
+        Row(modifier= Modifier.padding(horizontal = 30.dp)) {
+            NumberPicker(current = (800 -1)/10, end = 1100, step = 10)
         }
     }
 }
@@ -217,7 +236,7 @@ fun RecommendStepOne(goal_cal: Int, rest_cal: Int) {
         }
         Row(
             modifier = Modifier
-                .padding(20.dp, 10.dp, 20.dp, 15.dp)
+                .padding(20.dp, 10.dp, 20.dp, 0.dp)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
@@ -226,6 +245,84 @@ fun RecommendStepOne(goal_cal: Int, rest_cal: Int) {
                 style = textStyle,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
+        }
+        Row(modifier= Modifier.padding(horizontal = 30.dp)) {
+            NumberPicker(current = (1-1)/1, end = 5, step = 1)
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun NumberPicker(modifier: Modifier = Modifier, current: Int, end: Int, step: Int) {
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val contentPadding = (maxWidth - 50.dp) / 2
+        val offSet = maxWidth / 5
+        val itemSpacing = offSet - 50.dp
+        val pagerState = rememberPagerState(initialPage = current, pageCount = {
+            end
+        })
+
+        val scope = rememberCoroutineScope()
+
+        val mutableInteractionSource = remember {
+            MutableInteractionSource()
+        }
+        /** 이벤트 로직 **/
+        LaunchedEffect(pagerState.currentPage) {
+            val selectedNumber = pagerState.currentPage + 1
+            println("현재 선택된 숫자: $selectedNumber")
+        }
+        /**
+        CenterCircle(
+            modifier = modifier
+                .size(50.dp)
+                .align(Alignment.Center),
+            fillColor = Color.Magenta,
+            strokeWidth = 2.dp
+        )
+        **/
+        HorizontalPager(
+            modifier = modifier,
+            state = pagerState,
+            flingBehavior = PagerDefaults.flingBehavior(
+                state = pagerState,
+                pagerSnapDistance = PagerSnapDistance.atMost(0)
+            ),
+            contentPadding = PaddingValues(horizontal = contentPadding),
+            pageSpacing = itemSpacing,
+        ) { page ->
+            Box(
+                modifier = Modifier
+                    .size(50.dp)
+                    .graphicsLayer {
+                        val pageOffset = ((pagerState.currentPage - page) + pagerState
+                            .currentPageOffsetFraction).absoluteValue
+                        val percentFromCenter = 1.0f - (pageOffset / (5f / 2f))
+                        val opacity = 0.25f + (percentFromCenter * 0.75f).coerceIn(0f, 1f)
+
+                        alpha = opacity
+                        clip = true
+                    }
+                    .clickable(
+                        interactionSource = mutableInteractionSource,
+                        indication = null,
+                        enabled = true,
+                    ) {
+                        scope.launch {
+                            pagerState.animateScrollToPage(page)
+                        }
+                    }) {
+                Text(
+                    text = "${(page+1)*step}",
+                    color = if (pagerState.currentPage==page) Color(0xFFDA9000) else Color.Black,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .wrapContentHeight(),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }
