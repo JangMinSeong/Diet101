@@ -4,14 +4,19 @@ import com.ssafy.d101.model.RegisterResponse
 import com.ssafy.d101.model.UserInfo
 import com.ssafy.d101.model.UserSubInfo
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 
 interface UserService {
     @POST("user/login")
     fun registerUser(@Body userInfo: UserInfo): Call<RegisterResponse>
 
     @GET("user/info/profile")
-    fun getUserInfo() : Call<UserSubInfo>
+    suspend fun getUserSubInfo() : Response<UserSubInfo>
+
+    @PUT("user/info/profile")
+    suspend fun updateUserSubInfo(@Body userSubInfo: UserSubInfo) : Response<Any>
 }

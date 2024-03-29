@@ -19,15 +19,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.ssafy.d101.R
 import com.ssafy.d101.viewmodel.KakaoAuthViewModel
 
 
 @Composable
-fun SignUpScreen(navController: NavHostController, kakaoAuthViewModel: KakaoAuthViewModel) {
+fun SignUpScreen(navController: NavHostController) {
 
-
+    val kakaoAuthViewModel: KakaoAuthViewModel = hiltViewModel()
 
     Column (
         modifier = Modifier
