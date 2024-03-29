@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.d101.api.UserService
 import com.ssafy.d101.model.User
 import com.ssafy.d101.model.UserSubInfo
-import kotlinx.coroutines.Dispatchers
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -36,7 +36,7 @@ class UserViewModel @Inject constructor(private val userService: UserService) : 
     fun getUserSubInfo() {
         viewModelScope.launch {
             val response = withContext(Dispatchers.IO) {
-                RetrofitBuilder.userService.getUserSubInfo()
+                userService.getUserSubInfo()
             }
             if (response.isSuccessful) {
                 _userSubInfo.value = response.body()
@@ -47,7 +47,7 @@ class UserViewModel @Inject constructor(private val userService: UserService) : 
     fun updateUserInfo(userSubInfo: UserSubInfo) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                RetrofitBuilder.userService.updateUserSubInfo(userSubInfo)
+                userService.updateUserSubInfo(userSubInfo)
             }
         }
     }
