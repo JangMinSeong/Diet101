@@ -11,10 +11,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.ssafy.d101.ui.view.screens.AllergyScreen
 import com.ssafy.d101.ui.view.screens.BMIScreen
+import com.ssafy.d101.ui.view.screens.FoodAdditionScreen
+import com.ssafy.d101.ui.view.screens.FoodResistScreen
+import com.ssafy.d101.ui.view.screens.FoodSearchScreen
 import com.ssafy.d101.ui.view.screens.HomeScreen
 import com.ssafy.d101.ui.view.screens.LandingScreen
 import com.ssafy.d101.ui.view.screens.LoginSuccessScreen
@@ -63,6 +68,15 @@ fun SetUpNavGraph(
             composable(Screens.LoginSuccess.route) { LoginSuccessScreen(navController) }
             composable(Screens.Recommend.route) { RecommendScreen(navController)}
             composable(Screens.UserInfo.route) { UserInfoScreen(navController, userViewModel) }
+            composable(Screens.FoodResist.route) { FoodResistScreen(navController) }
+            composable(Screens.FoodAddition.route) { FoodAdditionScreen(navController) }
+            composable(
+                Screens.FoodSearch.route,
+                arguments = listOf(navArgument("foodName") { type = NavType.StringType })
+            ) {
+                backStackEntry ->
+                val foodName = backStackEntry.arguments?.getString("foodName") ?:""
+                FoodSearchScreen(navController, foodName) }
         }
     }
 

@@ -1,4 +1,4 @@
-package com.ssafy.d101.ui.view.components
+package com.ssafy.d101.ui.vziew.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image

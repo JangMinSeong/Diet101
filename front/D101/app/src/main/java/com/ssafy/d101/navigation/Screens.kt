@@ -12,4 +12,9 @@ sealed class Screens(val route: String) {
     data object LoginSuccess : Screens("loginSuccess")
     data object UserInfo : Screens("userinfo")
     data object Recommend : Screens("recommend")
+    data object FoodResist : Screens("foodResist")
+    data object FoodAddition : Screens("foodAddition")
+    data object FoodSearch : Screens("foodSearch/{foodName}") {
+        fun createRoute(foodName: String) = "foodSearch/$foodName"
+    }
 }
