@@ -58,7 +58,7 @@ fun SetUpNavGraph(
             composable(Screens.BMI.route) { BMIScreen(navController) }
             composable(Screens.Allergy.route) { AllergyScreen(navController) }
             composable(Screens.Start.route) { StartScreen(navController) }
-            composable(Screens.SignUp.route) { SignUpScreen(navController, kakaoAuthViewModel) }
+            composable(Screens.SignUp.route) { SignUpScreen(navController) }
             composable(Screens.SignUpComplete.route) { SignUpCompleteScreen(navController) }
             composable(Screens.LoginSuccess.route) { LoginSuccessScreen(navController) }
             composable(Screens.Recommend.route) { RecommendScreen(navController)}

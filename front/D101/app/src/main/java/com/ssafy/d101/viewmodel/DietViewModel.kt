@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.d101.api.DietService
-import com.ssafy.d101.api.RetrofitBuilder.dietService
 import com.ssafy.d101.model.AnalysisDiet
 import com.ssafy.d101.model.DietInfo
 import kotlinx.coroutines.flow.MutableStateFlow
