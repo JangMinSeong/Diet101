@@ -38,6 +38,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -68,7 +69,7 @@ fun UserInfo(userViewModel: UserViewModel) {
     var weight = userSubInfo?.weight.toString()
     var activity by remember { mutableIntStateOf(0) }
     var kcal = userSubInfo?.calorie.toString()
-    val age = userInfo?.age ?: 30
+    val age = userInfo?.age ?: 0
 
     fun calculateCalories(height: Int, weight: Int): Int {
         val bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
@@ -224,10 +225,12 @@ fun InputField(value: String, onValueChange: (String) -> Unit) {
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun UserInfoPreview(userViewModel: UserViewModel) {
+fun UserInfoPreview() {
     val navController = rememberNavController()
+    val userViewModel = UserViewModel()
+
     UserInfoScreen(navController = navController, userViewModel = userViewModel)
 }
 
