@@ -1,8 +1,13 @@
 package com.d101.back.service;
 
 import com.d101.back.dto.FoodDto;
+import com.d101.back.dto.response.RecommendRes;
 import com.d101.back.entity.Food;
+import com.d101.back.entity.User;
+import com.d101.back.exception.NoSuchDataException;
+import com.d101.back.exception.response.ExceptionStatus;
 import com.d101.back.repository.FoodRepository;
+import com.d101.back.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
@@ -14,9 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,6 +30,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FoodService {
     private final FoodRepository foodRepository;
+    private final UserRepository userRepository;
     private final WebClient webClient;
 
     @Transactional(readOnly = true)
@@ -65,16 +71,26 @@ public class FoodService {
         foodRepository.save(food);
     }
 
-    public void getRecommend(String email, int kcal) {
-        Mono<String> response = webClient
+    public List<FoodDto> getRecommend(String email, int kcal) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND));
+        RecommendRes response = webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/recommend")
-                        .queryParam("email", email)
+                        .queryParam("user_id", user.getId())
                         .queryParam("kcal", kcal)
                         .build())
-                .retrieve().bodyToMono(String.class);
-        response.subscribe(log::info);
+                .retrieve()
+                .bodyToMono(RecommendRes.class).block();
+        List<FoodDto> foods = new ArrayList<>();
+        assert response != null;
+        response.getFoods().forEach(food_id -> {
+            Food food = foodRepository.findById(food_id)
+                    .orElseThrow(() -> new NoSuchDataException(ExceptionStatus.FOOD_NOT_FOUND));
+            foods.add(FoodDto.fromEntity(food));
+        } );
+        return foods;
     }
 
     public void unprocessedFood(MultipartFile file) throws Exception {

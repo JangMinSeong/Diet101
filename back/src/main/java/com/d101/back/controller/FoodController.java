@@ -39,8 +39,7 @@ public class FoodController {
 
     @GetMapping("/recommend")
     public ResponseEntity<?> getRecommendFood(Authentication authentication, @RequestParam(value = "kcal") String kcal) {
-        foodService.getRecommend(authentication.getName(), Integer.parseInt(kcal));
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(foodService.getRecommend(authentication.getName(), Integer.parseInt(kcal)));
     }
 
     @PostMapping("/db/unprocessedFood")
