@@ -24,11 +24,13 @@ import com.ssafy.d101.ui.view.screens.SignUpScreen
 import com.ssafy.d101.ui.view.screens.StartScreen
 import com.ssafy.d101.ui.view.screens.UserInfoScreen
 import com.ssafy.d101.viewmodel.KakaoAuthViewModel
+import com.ssafy.d101.viewmodel.UserViewModel
 
 @Composable
 fun SetUpNavGraph(
     navController: NavHostController,
-    kakaoAuthViewModel: KakaoAuthViewModel
+    kakaoAuthViewModel: KakaoAuthViewModel,
+    userViewModel: UserViewModel
 ) {
     var isLoginChecked by remember { mutableStateOf(false) }
     var isLoggedIn by remember { mutableStateOf(false) }
@@ -51,14 +53,14 @@ fun SetUpNavGraph(
         ) {
             composable(Screens.Landing.route) { LandingScreen(navController) }
             composable(Screens.Home.route) { HomeScreen(navController) }
-            composable(Screens.MyPage.route) { MyPageScreen(navController, kakaoAuthViewModel) }
+            composable(Screens.MyPage.route) { MyPageScreen(navController, kakaoAuthViewModel, userViewModel) }
             composable(Screens.BMI.route) { BMIScreen(navController) }
             composable(Screens.Allergy.route) { AllergyScreen(navController) }
             composable(Screens.Start.route) { StartScreen(navController) }
             composable(Screens.SignUp.route) { SignUpScreen(navController, kakaoAuthViewModel) }
             composable(Screens.SignUpComplete.route) { SignUpCompleteScreen(navController) }
             composable(Screens.LoginSuccess.route) { LoginSuccessScreen(navController) }
-            composable(Screens.UserInfo.route) { UserInfoScreen(navController) }
+            composable(Screens.UserInfo.route) { UserInfoScreen(navController, userViewModel) }
         }
     }
 
