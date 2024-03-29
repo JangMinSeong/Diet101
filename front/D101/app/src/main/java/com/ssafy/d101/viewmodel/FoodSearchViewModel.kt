@@ -3,14 +3,15 @@ package com.ssafy.d101.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssafy.d101.api.RetrofitBuilder
+import com.ssafy.d101.api.FoodSearchService
+import com.ssafy.d101.api.userAdditionFoodService
 import com.ssafy.d101.model.FoodInfo
 import com.ssafy.d101.model.FoodItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class FoodSearchViewModel : ViewModel() {
+class FoodSearchViewModel(private val foodSearchService: FoodSearchService) : ViewModel() {
     private val _foodItems = MutableStateFlow<List<FoodItem>>(emptyList())
     val foodItems: StateFlow<List<FoodItem>> = _foodItems
 
@@ -18,7 +19,7 @@ class FoodSearchViewModel : ViewModel() {
     fun fetchFoodItems(foodName: String) {
         viewModelScope.launch {
             try {
-                val response = RetrofitBuilder.foodSerchService.fetchFoodItems(foodName)
+                val response = foodSearchService.fetchFoodItems(foodName)
                 if (response.isSuccessful && response.body() != null) {
                     _foodItems.value = response.body()!!
                     Log.d("FoodSearchViewModel", "Fetched ${response.body()?.size} food items")
@@ -47,19 +48,19 @@ class FoodSearchViewModel : ViewModel() {
 
 
     // 서버에 음식 정보를 POST 요청하는 함수
-    fun postFoodToServer(foodInfo: FoodInfo) {
-        viewModelScope.launch {
-            try {
-                val response = RetrofitBuilder.userAdditionFoodService.postUserAdditionFood(foodInfo)
-                if (response.isSuccessful) {
-                    // 요청 성공
-                    Log.d("PostFood", "Success: ${response.body()}")
-                } else {
-                    Log.e("PostFood", "Failed: ${response.errorBody()?.string()}")
-                }
-            } catch (e: Exception) {
-                Log.e("PostFood", "Exception", e)
-            }
-        }
-    }
+//    fun postFoodToServer(foodInfo: FoodInfo) {
+//        viewModelScope.launch {
+//            try {
+//                val response = userAdditionFoodService.postUserAdditionFood(foodInfo)
+//                if (response.isSuccessful) {
+//                    // 요청 성공
+//                    Log.d("PostFood", "Success: ${response.body()}")
+//                } else {
+//                    Log.e("PostFood", "Failed: ${response.errorBody()?.string()}")
+//                }
+//            } catch (e: Exception) {
+//                Log.e("PostFood", "Exception", e)
+//            }
+//        }
+//    }
 }

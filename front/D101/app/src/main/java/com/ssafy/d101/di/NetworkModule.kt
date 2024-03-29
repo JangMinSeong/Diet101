@@ -55,4 +55,16 @@ object NetworkModule {
     @Singleton
     fun provideUserService(@Named("auth") retrofit: Retrofit): UserLoginService =
         retrofit.create(UserLoginService::class.java)
+
+    @Provides
+    @Singleton
+    fun foodSearchService(@Named("auth") retrofit: Retrofit): UserLoginService =
+        retrofit.create(UserLoginService::class.java)
+
+    @Provides
+    @Singleton
+    fun userAdditionfoodService(@Named("auth") retrofit: Retrofit): UserLoginService =
+        retrofit.create(UserLoginService::class.java)
+
 }
+

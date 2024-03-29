@@ -25,11 +25,6 @@ interface UserService {
     suspend fun updateUserSubInfo(@Body userSubInfo: UserSubInfo) : Response<Any>
 }
 
-interface foodSearchService {
-    @GET("food/search")
-    suspend fun fetchFoodItems(@Query("name") foodName: String): Response<List<FoodItem>>
-}
-
 interface UserAdditionFoodService {
     @POST("food/insert")
     suspend fun postUserAdditionFood(@Body foodInfo : FoodInfo): Response<FoodResponse>
