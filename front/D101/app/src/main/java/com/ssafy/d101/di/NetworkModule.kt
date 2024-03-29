@@ -1,7 +1,6 @@
 package com.ssafy.d101.di
 
 import com.ssafy.d101.api.UserLoginService
-import com.ssafy.d101.api.UserService
 import com.ssafy.d101.utils.AuthAuthenticator
 import com.ssafy.d101.utils.AuthInterceptor
 import com.ssafy.d101.utils.TokenManager
@@ -54,11 +53,6 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideUserLoginService(@Named("auth") retrofit: Retrofit): UserLoginService =
+    fun provideUserService(@Named("auth") retrofit: Retrofit): UserLoginService =
         retrofit.create(UserLoginService::class.java)
-
-    @Provides
-    @Singleton
-    fun provideUserService(retrofit: Retrofit): UserService =
-        retrofit.create(UserService::class.java)
 }
