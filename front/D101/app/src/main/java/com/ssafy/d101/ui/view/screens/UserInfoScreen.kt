@@ -1,5 +1,6 @@
 package com.ssafy.d101.ui.view.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +38,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -45,25 +47,29 @@ import coil.compose.AsyncImage
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
 import com.ssafy.d101.ui.view.components.BackHeader
+import com.ssafy.d101.viewmodel.UserViewModel
 
 @Composable
-fun UserInfoScreen(navController: NavController) {
+fun UserInfoScreen(navController: NavController, userViewModel: UserViewModel) {
     Column( modifier = Modifier // 백그라운드
         .fillMaxSize()
         .background(Ivory)
     ) {
         BackHeader("마이페이지", navController)
-        UserInfo()
+        UserInfo(userViewModel)
     }
 }
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun UserInfo() {
-    var height by remember { mutableStateOf("180") }
-    var weight by remember { mutableStateOf("88") }
+fun UserInfo(userViewModel: UserViewModel) {
+    val userInfo = userViewModel.user.value?.userInfo
+    val userSubInfo = userViewModel.user.value?.userSubInfo
+    var height = userSubInfo?.height.toString()
+    var weight = userSubInfo?.weight.toString()
     var activity by remember { mutableIntStateOf(0) }
-    var kcal by remember { mutableStateOf("1900") }
-    val age = 30
+    var kcal = userSubInfo?.calorie.toString()
+    val age = userInfo?.age ?: 0
 
     fun calculateCalories(height: Int, weight: Int): Int {
         val bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
@@ -126,12 +132,12 @@ fun UserInfo() {
             Column(modifier= Modifier
                 .weight(1f)
                 .padding(0.dp, 20.dp, 0.dp, 0.dp)) {
-                InfoText("이름", "장민숭")
-                InfoText(title = "성별", content = "남")
+                InfoText("이름", userInfo?.username ?: "name")
+                InfoText(title = "성별", content = userInfo?.gender ?: "gender")
             }
             Column(modifier = Modifier.padding(0.dp,0.dp,20.dp,0.dp)) {
                 AsyncImage(
-                    model = "https://d101-bucket.s3.ap-northeast-2.amazonaws.com/diet/%EB%96%A1%EB%B3%B6%EC%9D%B4.jpg",
+                    model = userInfo?.image ?: "https://d101-bucket.s3.ap-northeast-2.amazonaws.com/diet/%EB%96%A1%EB%B3%B6%EC%9D%B4.jpg",
                     contentDescription = "profileImage",
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.size(90.dp)
@@ -139,7 +145,7 @@ fun UserInfo() {
             }
         }
         InfoText(title = "나이", content = age.toString()+"세")
-        InfoText("이메일", "jang@naver.com")
+        InfoText("이메일", userInfo?.email ?: "null@naver.com")
         InfoInputField(title = "키", unit = "cm", value = height, onValueChange = { new -> height = new.filter { it.isDigit() } })
         InfoInputField(title = "몸무게", unit = "kg", value = weight, onValueChange = { new -> weight = new.filter { it.isDigit() } })
         InfoDropDownList(title = "활동량", activityIndex = activity, onItemClick = {activity = it})
@@ -219,11 +225,13 @@ fun InputField(value: String, onValueChange: (String) -> Unit) {
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun UserInfoPreview() {
     val navController = rememberNavController()
-    UserInfoScreen(navController = navController)
+    val userViewModel = UserViewModel()
+
+    UserInfoScreen(navController = navController, userViewModel = userViewModel)
 }
 
 val titleTextStyle = TextStyle(

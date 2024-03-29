@@ -17,22 +17,24 @@ import com.ssafy.d101.navigation.SetUpNavGraph
 import com.ssafy.d101.ui.theme.D101Theme
 import com.ssafy.d101.ui.view.components.BottomNavigationBar
 import com.ssafy.d101.viewmodel.KakaoAuthViewModel
+import com.ssafy.d101.viewmodel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val kakaoAuthViewModel : KakaoAuthViewModel by viewModels()
+    private val userViewModel: UserViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MyApp(kakaoAuthViewModel)
+            MyApp(kakaoAuthViewModel, userViewModel)
         }
     }
 }
 
 @Composable
-fun MyApp(kakaoAuthViewModel: KakaoAuthViewModel) {
+fun MyApp(kakaoAuthViewModel: KakaoAuthViewModel, userViewModel: UserViewModel) {
 
     D101Theme {
         val navController = rememberNavController()
@@ -47,7 +49,7 @@ fun MyApp(kakaoAuthViewModel: KakaoAuthViewModel) {
                 }
             }
         ) { innerPadding ->
-            SetUpNavGraph(navController = navController, kakaoAuthViewModel = kakaoAuthViewModel)
+            SetUpNavGraph(navController = navController, kakaoAuthViewModel = kakaoAuthViewModel, userViewModel = userViewModel)
         }
     }
 }

@@ -104,6 +104,8 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.51")
     kapt("com.google.dagger:hilt-compiler:2.51")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    implementation ("androidx.compose.runtime:runtime-livedata")
 }
 
 kapt {

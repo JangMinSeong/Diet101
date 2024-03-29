@@ -19,7 +19,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class ModelService {
 
-    @Value("${ai.server.url}")
+    @Value("${gpu.server.url}")
     private String url;
 
     public String transmitImageToYolo(MultipartFile multipartFile) throws IOException {

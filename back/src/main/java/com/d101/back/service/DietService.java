@@ -2,11 +2,17 @@ package com.d101.back.service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import com.d101.back.dto.FoodDto;
+import com.d101.back.dto.response.CalAnnualNutrient;
+import com.d101.back.dto.response.ResAnalysisDiet;
 import com.d101.back.entity.*;
 import com.d101.back.entity.composite.UserFoodKey;
 import com.d101.back.repository.*;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -147,5 +153,30 @@ public class DietService {
 			return new IntakeDto(food, intake.getAmount());
 		}
 		throw new UnAuthorizedException(ExceptionStatus.UNAUTHORIZED);
+	}
+
+	@Transactional
+	public ResAnalysisDiet analysisDiet(String date, String dateFrom, String dateTo, String email) {
+		ResAnalysisDiet result = new ResAnalysisDiet();
+
+		result.setDailyDiet(getMealsForSpecificDate(email,date));
+		result.setWeeklyDiet(getMealsForSpecificTerm(email,dateFrom,dateTo));
+
+		result.setAnnualNutrients(dietRepository.findAnnualNutritionByEmail(email).stream()
+				.map(row -> new CalAnnualNutrient(
+						((Number) row[0]).intValue(), // month
+						((Number) row[1]).intValue(), // totalCalorie
+						((Number) row[2]).doubleValue(), // totalCarbohydrate
+						((Number) row[3]).doubleValue(), // totalFat
+						((Number) row[4]).doubleValue()  // totalProtein
+				))
+				.collect(Collectors.toList()));
+
+		result.setTotalRank(foodRepository.rankingByEmail(email, PageRequest.of(0, 7)).stream()
+				.map(FoodDto::fromEntity)
+				.map(FoodDto::getName)
+				.collect(Collectors.toList()));
+
+		return result;
 	}
 }
