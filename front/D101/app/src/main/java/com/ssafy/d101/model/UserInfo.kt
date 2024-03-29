@@ -9,8 +9,15 @@ data class UserInfo(
     val age: Int,
 )
 
+data class UserSubInfo(
+    val calorie : Int,
+    val height : Int,
+    val weight : Int
+)
+
 data class User(
     val userInfo: UserInfo,
+    val userSubInfo : UserSubInfo,
     val accessToken: String,
     val refreshToken: String,
 )

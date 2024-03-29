@@ -1,6 +1,7 @@
 package com.d101.back.controller;
 
 import com.d101.back.dto.LoginTokenDto;
+import com.d101.back.dto.UserDto;
 import com.d101.back.dto.oauth.KakaoLoginReq;
 import com.d101.back.dto.request.LoginReq;
 import com.d101.back.dto.request.ModifyUserReq;
@@ -50,5 +51,10 @@ public class UserController {
     @GetMapping("/info/allergy")
     public ResponseEntity<List<String>> getAllergy(Authentication authentication) {
         return ResponseEntity.ok(userService.getAllergy(authentication.getName()));
+    }
+
+    @GetMapping("/info/profile")
+    public ResponseEntity<UserDto> getUserInfo(Authentication authentication) {
+        return ResponseEntity.ok(userService.getUserInfo(authentication.getName()));
     }
 }
