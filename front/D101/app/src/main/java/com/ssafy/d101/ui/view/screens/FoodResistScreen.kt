@@ -34,13 +34,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.font.FontFamily
+import androidx.navigation.NavHostController
 import java.time.LocalDate
 
 @Preview(showBackground = true)
 @Composable
-fun FoodResistScreen() {
+fun FoodResistScreen(navController: NavHostController) {
     val currentDate = remember { LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")) }
     // 선택된 항목을 추적하는 상태 변수
     var selectedMeal by remember { mutableStateOf<String?>(null) }
@@ -67,7 +69,7 @@ fun FoodResistScreen() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp, bottom = 30.dp),
+                .padding(top = 16.dp, bottom = 45.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -79,6 +81,7 @@ fun FoodResistScreen() {
                     .size(40.dp)
                     .weight(1f)
                     .padding(end = 16.dp)
+                    .clickable { navController.popBackStack() }
             )
 
             // 카테고리
@@ -96,17 +99,150 @@ fun FoodResistScreen() {
                 .padding(bottom = 10.dp))
         }
 
-        // 오늘은 어떤 음식을 드셨나요?
-        Text(
-            text = "오늘은 어떤 음식을 드셨나요?",
+        // 스크롤 가능 영역
+        LazyColumn(
             modifier = Modifier
-                .weight(2f)
-                .padding(start = 10.dp),
-            textAlign = TextAlign.Center,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF004D40),
-        )
+                .padding(16.dp)
+        ) {
+            item {
+                // 오늘은 어떤 음식을 드셨나요?
+                Text(
+                    text = "오늘은 어떤 음식을 드셨나요?",
+                    modifier = Modifier
+                        .weight(2f)
+                        .padding(start = 10.dp),
+                    textAlign = TextAlign.Center,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF004D40),
+                )
+            }
+
+            item {
+                // 사진 등록 배경
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .background(Color(0x3700897B), RoundedCornerShape(10.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        // 날짜
+                        Text(
+                            text = currentDate,
+                            color = Color.Black,
+                            fontSize = 21.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .padding(top = 10.dp, bottom = 20.dp)
+                        )
+
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+
+                                // 섭취한 음식 사진 타이틀
+                                Text(
+                                    text = "섭취한 음식 사진",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                )
+
+                                // 섭취한 음식 사진 첨부 공간
+                                Image(
+                                    painter = painterResource(id = R.drawable.file),
+                                    contentDescription = "섭취한 음식 사진",
+                                    modifier = Modifier
+                                        .size(150.dp)
+                                        .padding(top = 8.dp)
+                                        .clickable(onClick = { showDialog = true })
+                                )
+                            }
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+
+                                // 영양정보표/원재료 등록 타이틀
+                                Text(
+                                    text = "영양정보표/원재료 등록",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                )
+
+                                // 영양정보표/원재료 등록 첨부 공간
+                                Image(
+                                    painter = painterResource(id = R.drawable.file),
+                                    contentDescription = "영양정보표/원재료 등록",
+                                    modifier = Modifier
+                                        .size(150.dp)
+                                        .padding(top = 8.dp)
+                                        .clickable(onClick = { showDialog2 = true })
+                                )
+                            }
+                        }
+                        Text(
+                            "분류",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .align(Alignment.Start)
+                                .padding(start = 35.dp, top = 10.dp)
+                        )
+                        listOf("아침", "아점", "점심", "점저", "저녁", "야식", "간식", "음료", "주류").chunked(3)
+                            .forEach { chunk ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp),
+                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                ) {
+                                    chunk.forEach { meal ->
+                                        OutlinedButton(
+                                            onClick = { onMealSelected(meal) },
+                                            border = BorderStroke(
+                                                if (isItemSelected(meal)) 4.dp else 1.dp,
+                                                Color.Black
+                                            ),
+                                            modifier = Modifier
+                                                .width(90.dp)
+                                        ) {
+                                            Text(
+                                                meal,
+                                                fontWeight = FontWeight.Bold,
+                                                color = if (isItemSelected(meal)) Color.Black else Color.Black
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                        // "등록하기" 버튼 추가
+                        Button(
+                            onClick = { /* TODO: 버튼 클릭 이벤트 처리 */ },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                            modifier = Modifier
+                                .width(130.dp)
+                                .height(60.dp)
+                                .padding(top = 20.dp),
+                        ) {
+                            Text(
+                                text = "등록하기",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                            )
+                        }
+                    }
+                }
+            }
+        }
 
         // 섭취한 음식 사진 첨부 AlertDialog 표시 로직
         if (showDialog) {
@@ -130,7 +266,7 @@ fun FoodResistScreen() {
                             // 갤러리 아이템 클릭 시 수행할 로직
                         }
                         TextItem("내가 추가한 음식", R.drawable.minefood) {
-                            // 내가 추가한 음식 클릭 시 수행할 로직
+                            navController.navigate("foodAddition")
                         }
                     }
                 },
@@ -171,113 +307,6 @@ fun FoodResistScreen() {
                 },
             )
         }
-
-        // 사진 등록 배경
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-                .background(Color(0x3700897B), RoundedCornerShape(10.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Column (
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(16.dp)
-            ) {
-                // 날짜
-                Text(
-                    text = currentDate,
-                    color = Color.Black,
-                    fontSize = 21.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(top = 10.dp, bottom = 20.dp)
-                )
-
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-
-                        // 섭취한 음식 사진 타이틀
-                        Text(
-                            text = "섭취한 음식 사진",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-
-                        // 섭취한 음식 사진 첨부 공간
-                        Image(
-                            painter = painterResource(id = R.drawable.file),
-                            contentDescription = "섭취한 음식 사진",
-                            modifier = Modifier
-                                .size(150.dp)
-                                .padding(top = 8.dp)
-                                .clickable(onClick = { showDialog = true })
-                        )
-                    }
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-
-                        // 영양정보표/원재료 등록 타이틀
-                        Text(
-                            text = "영양정보표/원재료 등록",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-
-                        // 영양정보표/원재료 등록 첨부 공간
-                        Image(
-                            painter = painterResource(id = R.drawable.file),
-                            contentDescription = "영양정보표/원재료 등록",
-                            modifier = Modifier
-                                .size(150.dp)
-                                .padding(top = 8.dp)
-                                .clickable(onClick = { showDialog2 = true })
-                        )
-                    }
-                }
-                Text("분류", fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier
-                    .align(Alignment.Start)
-                    .padding(start = 35.dp, top = 10.dp))
-                listOf("아침", "아점", "점심", "점저", "저녁", "야식", "간식", "음료", "주류").chunked(3).forEach { chunk ->
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        chunk.forEach { meal ->
-                            OutlinedButton(
-                                onClick = { onMealSelected(meal) },
-                                border = BorderStroke(if (isItemSelected(meal)) 4.dp else 1.dp, Color.Black),
-                                modifier = Modifier
-                                    .width(90.dp)
-                            ) {
-                                Text(meal, fontWeight = FontWeight.Bold, color = if (isItemSelected(meal)) Color.Black else Color.Black)
-                            }
-                        }
-                    }
-                }
-
-                // "등록하기" 버튼 추가
-                Button(
-                    onClick = { /* TODO: 버튼 클릭 이벤트 처리 */ },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                    modifier = Modifier
-                        .width(130.dp)
-                        .height(60.dp)
-                        .padding(top = 20.dp),
-                ) {
-                    Text(
-                        text = "등록하기",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                    )
-                }
-            }
-        }
     }
 }
 
@@ -286,7 +315,7 @@ fun TextItem(text: String, iconRes: Int, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { }
+            .clickable(onClick = onClick)
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
