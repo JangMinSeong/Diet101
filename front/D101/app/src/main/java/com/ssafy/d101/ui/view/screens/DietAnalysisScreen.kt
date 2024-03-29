@@ -23,6 +23,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ssafy.d101.R
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.view.components.BarItem
@@ -44,13 +47,32 @@ import com.ssafy.d101.ui.view.components.MonthRankingItem
 import com.ssafy.d101.ui.view.components.MonthlyNutritionChartHorizontal
 import com.ssafy.d101.ui.view.components.WeekLeaderboardScreen
 import com.ssafy.d101.ui.view.components.WeekRankingItem
+import com.ssafy.d101.viewmodel.DietViewModel
+import com.ssafy.d101.viewmodel.UserViewModel
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAdjusters
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun DietAnalysis(
     dateTitle : String,
     weekTitle : String,
-    monthTitle : String
+    monthTitle : String,
 ) {
+
+    val userViewModel :UserViewModel = viewModel()
+    val dietViewModel :DietViewModel = viewModel()
+
+    val user by userViewModel.user.collectAsState()
+    val analysisDiet by dietViewModel.resultDiet.observeAsState()
+
+    LaunchedEffect(Unit) {
+        dietViewModel.analysisDiet()
+    }
+
     // 선택된 분석 타입 (오늘의 분석, 과거 분석)을 추적하는 상태
     var selectedAnalysis by remember { mutableStateOf("today") }
     // 과거 분석시 선택된 타임라인 (주간, 월간)을 추적하는 상태
@@ -134,8 +156,13 @@ fun DietAnalysis(
                 when(selectedAnalysis) {
                     "today" -> {
                         Spacer(modifier = Modifier.size(15.dp))
-                        CustomSemiCirclePieChart(consumedKcal = 1200, totalKcal = 1500, gender = 1)
+                        var userGender : Int = 5
+                        if(user?.userInfo?.gender == "MALE") userGender = 1
+                        else userGender = 2
+                        ////////////////TODO: API 요청  user, 일일 식단 기록 필요
+                        user?.userSubInfo?.calorie?.let { CustomSemiCirclePieChart(consumedKcal = 1200, totalKcal = it, gender = userGender) }
                         Spacer(modifier = Modifier.size(15.dp))
+                        ////////////////TODO: API 요청   일일 식단 기록 필요
                         DailyHorizontalBar(carbsPercentage = 30f, proteinPercentage = 30f, fatsPercentage = 40f) //합 100% 주의
 
                     }
@@ -189,6 +216,7 @@ fun DietAnalysis(
                             when (selectedTimeline) {
                                 "weekly" -> {
                                     //주간 식단 분석
+                                    /////////TODO : api 필요    주간 식단 필요
                                     WeeklyNutritionChart(
                                         weeklyData = StackedBarItem(
                                             data = listOf(
@@ -205,6 +233,8 @@ fun DietAnalysis(
                                         title = "WEEKLY"
                                     )
                                     Spacer(modifier = Modifier.size(7.dp))
+
+                                    ///////TODO : api 필요    사용자 랭킹 상위 3개 필요
                                     WeekLeaderboardScreen(
                                         data = WeekRankingItem(
                                             rank = listOf(1, 2, 3),
@@ -218,6 +248,7 @@ fun DietAnalysis(
                                     when(selectedMonthOption) {
                                         "diet" -> {
                                             //월간 식단 분석
+                                            //////////TODO : api 필요  월간 식단 필요
                                             MonthlyNutritionChartHorizontal(
                                                 weeklyData = BarItem(
                                                     data = listOf(
@@ -241,6 +272,7 @@ fun DietAnalysis(
                                         }
                                         "ranking" -> {
                                             // 월간 랭킹
+                                            ////// TODO : api 필요    월간 랭킹 상위 7개 필요
                                             MonthLeaderboardScreen(
                                                 data = MonthRankingItem(
                                                     rank = listOf(1,2,3,4,5,6,7),

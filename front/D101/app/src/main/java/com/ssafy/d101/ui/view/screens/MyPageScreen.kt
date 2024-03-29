@@ -1,5 +1,6 @@
 package com.ssafy.d101.ui.view.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -40,16 +41,19 @@ import coil.compose.AsyncImage
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
 import com.ssafy.d101.viewmodel.KakaoAuthViewModel
+import com.ssafy.d101.viewmodel.UserViewModel
 
 @Composable
-fun MyPageScreen(navController: NavHostController) {
+
+fun MyPageScreen(navController: NavHostController, kakaoAuthViewModel: KakaoAuthViewModel, userViewModel: UserViewModel) {
+//    kakaoAuthViewModel.kakaoLogout()
 
     Column( modifier = Modifier // 백그라운드
         .fillMaxSize()
         .background(Ivory)
     ) {
         MyPageHeader(navController)
-        MyProfile()
+        MyProfile(userViewModel)
         MyMenu(navController)
     }
 
@@ -80,8 +84,9 @@ fun MyPageHeader(navController: NavController) {
     }
 }
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun MyProfile() {
+fun MyProfile(userViewModel: UserViewModel) {
     Row( modifier = Modifier
         .fillMaxWidth()
         .padding(30.dp,0.dp,30.dp,30.dp)
@@ -97,7 +102,7 @@ fun MyProfile() {
                     contentAlignment = Alignment.CenterStart
                 ){ // 닉네임 @!
                     Text(
-                        text = "보근"+"님,",
+                        text = userViewModel.user.value?.userInfo?.username +"님,",
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -106,7 +111,7 @@ fun MyProfile() {
                     contentAlignment = Alignment.CenterEnd
                 ){ // 프로필 이미지 @!
                     AsyncImage(
-                        model = "https://d101-bucket.s3.ap-northeast-2.amazonaws.com/diet/%EB%96%A1%EB%B3%B6%EC%9D%B4.jpg",
+                        model = userViewModel.user.value?.userInfo?.image,
                         contentDescription = "profileImage",
                         contentScale = ContentScale.Fit,
                         modifier = Modifier.size(100.dp),

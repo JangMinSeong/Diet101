@@ -6,6 +6,7 @@ import java.util.List;
 import com.d101.back.dto.IntakeDto;
 import com.d101.back.dto.MealDto;
 import com.d101.back.dto.request.CreateMealReq;
+import com.d101.back.dto.response.ResAnalysisDiet;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -57,5 +58,11 @@ public class DietController {
 	public ResponseEntity<?> getFoodFromDiet(@PathVariable(value = "meal_id") Long meal_id, @PathVariable(value = "food_id") Long food_id, Authentication authentication) {
 		IntakeDto intake = dietService.getFoodDto(meal_id, food_id, authentication.getName());
 		return new ResponseEntity<>(intake, HttpStatus.OK);
+	}
+
+	@GetMapping("/analysis")
+	public ResponseEntity<?> getAnalysisDiet(@RequestParam(value = "date") String date, @RequestParam(value = "dateFrom") String dateFrom, @RequestParam(value = "dateTo") String dateTo, Authentication authentication) {
+		ResAnalysisDiet result = dietService.analysisDiet(date,dateFrom,dateTo,authentication.getName());
+		return ResponseEntity.ok(result);
 	}
 }

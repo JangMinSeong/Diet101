@@ -3,6 +3,7 @@ package com.d101.back.service;
 import com.d101.back.api.KakaoOAuthApi;
 import com.d101.back.api.OAuthApi;
 import com.d101.back.dto.LoginTokenDto;
+import com.d101.back.dto.UserDto;
 import com.d101.back.dto.oauth.OAuth2UserInfo;
 import com.d101.back.dto.oauth.OAuthLoginReq;
 import com.d101.back.dto.request.LoginReq;
@@ -164,4 +165,15 @@ public class UserService {
         return  allergies.stream().map(AllergyType::name).toList();
     }
 
+    public UserDto getUserInfo(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND));
+
+        UserDto result = new UserDto();
+        result.setCalorie(user.getCalorie());
+        result.setHeight(user.getHeight());
+        result.setWeight(user.getWeight());
+
+        return result;
+    }
 }
