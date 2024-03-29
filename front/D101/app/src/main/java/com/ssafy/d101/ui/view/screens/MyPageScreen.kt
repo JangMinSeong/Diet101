@@ -44,6 +44,7 @@ import com.ssafy.d101.viewmodel.KakaoAuthViewModel
 import com.ssafy.d101.viewmodel.UserViewModel
 
 @Composable
+
 fun MyPageScreen(navController: NavHostController, kakaoAuthViewModel: KakaoAuthViewModel, userViewModel: UserViewModel) {
 //    kakaoAuthViewModel.kakaoLogout()
 
@@ -195,7 +196,7 @@ fun MyMenu(navController: NavController) {
                     )
                 )
             )
-            SettingItem("음식 추천", navController, "")
+            SettingItem("음식 추천", navController, "recommend")
             SettingItem("하루 섭취 정보", navController, "")
             SettingItem("식단 분석", navController, "")
         }
