@@ -1,5 +1,6 @@
 package com.ssafy.d101.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.d101.api.UserService
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,11 +30,17 @@ class UserViewModel @Inject constructor(
 
     fun getUserSubInfo() {
         viewModelScope.launch {
-            val response = withContext(Dispatchers.IO) {
-                userService.getUserSubInfo()
-            }
-            if (response.isSuccessful) {
-                _userSubInfo.value = response.body()
+            val response: Response<UserSubInfo>
+            try {
+                response = userService.getUserSubInfo()
+                if (response.isSuccessful && response.body() != null) {
+                    _userSubInfo.value = response.body()
+                    Log.d("UserViewModel", "getUserSubInfo - ${response.body()}")
+                } else {
+                    Log.e("UserViewModel", "Error getUserSubInfo - ${response.errorBody()}")
+                }
+            } catch (e: Exception) {
+                Log.e("UserViewModel", "Exception fetching userSubInfo")
             }
         }
     }

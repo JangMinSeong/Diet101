@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -51,26 +52,26 @@ import com.ssafy.d101.viewmodel.UserViewModel
 
 @Composable
 fun UserInfoScreen(navController: NavController) {
-    val userViewModel: UserViewModel = hiltViewModel()
     Column( modifier = Modifier // 백그라운드
         .fillMaxSize()
         .background(Ivory)
     ) {
         BackHeader("마이페이지", navController)
-        UserInfo(userViewModel)
+        UserInfo()
     }
 }
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun UserInfo(userViewModel: UserViewModel) {
+fun UserInfo() {
+    val userViewModel: UserViewModel = hiltViewModel()
     val user by userViewModel.getUser().collectAsState(initial = null)
     val userInfo = user?.userInfo
-    val userSubInfo = user?.userSubInfo
-    var height = userSubInfo?.height.toString()
-    var weight = userSubInfo?.weight.toString()
+    val userSubInfo = userViewModel.userSubInfo.value
+    var height by remember { mutableStateOf(userSubInfo?.height.toString()) }
+    var weight by remember { mutableStateOf(userSubInfo?.weight.toString()) }
     var activity by remember { mutableIntStateOf(0) }
-    var kcal = userSubInfo?.calorie.toString()
+    var kcal by remember { mutableStateOf(userSubInfo?.calorie.toString()) }
     val age = userInfo?.age ?: 0
 
     fun calculateCalories(height: Int, weight: Int): Int {
