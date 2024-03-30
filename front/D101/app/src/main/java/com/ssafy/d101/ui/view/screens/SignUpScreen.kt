@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.ssafy.d101.R
+import com.ssafy.d101.navigation.Screens
 import com.ssafy.d101.viewmodel.KakaoAuthViewModel
 import com.ssafy.d101.viewmodel.UserViewModel
 
@@ -31,6 +35,18 @@ fun SignUpScreen(navController: NavHostController) {
 
     val kakaoAuthViewModel: KakaoAuthViewModel = hiltViewModel()
     val userViewModel: UserViewModel = hiltViewModel()
+
+    val isLoggedIn by kakaoAuthViewModel.isLoggedIn.collectAsState()
+
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn) {
+            navController.navigate(Screens.Height.route) {
+                popUpTo(navController.graph.startDestinationId) {
+                    inclusive = true
+                }
+            }
+        }
+    }
 
     Column (
         modifier = Modifier
