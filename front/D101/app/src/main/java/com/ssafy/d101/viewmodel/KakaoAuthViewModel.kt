@@ -37,6 +37,9 @@ class KakaoAuthViewModel @Inject constructor(
     private val _isLoggedIn = MutableStateFlow<Boolean>(false)
     val isLoggedIn = _isLoggedIn.asStateFlow()
 
+    private val _loginChecked = MutableStateFlow<Boolean>(false)
+    val loginChecked = _loginChecked.asStateFlow()
+
     fun kakaoLogin() {
         viewModelScope.launch {
             _isLoggedIn.emit(handleKakaoLogin())
@@ -46,6 +49,7 @@ class KakaoAuthViewModel @Inject constructor(
     fun checkLogin() {
         viewModelScope.launch {
             _isLoggedIn.emit(hasToken())
+            _loginChecked.emit(true)
         }
     }
 

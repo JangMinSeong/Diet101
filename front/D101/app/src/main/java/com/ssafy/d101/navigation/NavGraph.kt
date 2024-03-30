@@ -31,6 +31,7 @@ import com.ssafy.d101.ui.view.screens.SignUpScreen
 import com.ssafy.d101.ui.view.screens.StartScreen
 import com.ssafy.d101.ui.view.screens.UserInfoScreen
 import com.ssafy.d101.ui.view.screens.SignUpHeightScreen
+import com.ssafy.d101.ui.view.screens.SignUpWeightScreen
 import com.ssafy.d101.viewmodel.KakaoAuthViewModel
 import com.ssafy.d101.viewmodel.UserViewModel
 
@@ -69,6 +70,7 @@ fun SetUpNavGraph(
         composable(Screens.FoodResist.route) { FoodResistScreen(navController) }
         composable(Screens.FoodAddition.route) { FoodAdditionScreen(navController) }
         composable(Screens.Height.route) { SignUpHeightScreen(navController) }
+        composable(Screens.Weight.route) { SignUpWeightScreen(navController) }
         composable(Screens.Loading.route) { LoadingScreen(navController)}
         composable(
             Screens.FoodSearch.route,
