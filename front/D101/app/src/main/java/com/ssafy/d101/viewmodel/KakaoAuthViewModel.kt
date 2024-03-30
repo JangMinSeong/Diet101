@@ -10,12 +10,12 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.common.model.KakaoSdkError
 import com.kakao.sdk.user.UserApiClient
-import com.ssafy.d101.api.UserLoginService
 import com.ssafy.d101.model.UserInfo
-import com.ssafy.d101.utils.TokenManager
+import com.ssafy.d101.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.Period
@@ -25,32 +25,33 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 @HiltViewModel
-class KakaoAuthViewModel @Inject constructor(private val userLoginService: UserLoginService,
-                                             private val tokenManager: TokenManager,
-                                             @ApplicationContext private val context: Context
-    ) : ViewModel() {
+class KakaoAuthViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+    @ApplicationContext private val context: Context
+) : ViewModel() {
 
     companion object {
         private const val TAG = "KakaoAuthViewModel"
     }
 
-    val isLoggedIn = MutableStateFlow<Boolean>(false)
+    private val _isLoggedIn = MutableStateFlow<Boolean>(false)
+    val isLoggedIn = _isLoggedIn.asStateFlow()
 
     fun kakaoLogin() {
         viewModelScope.launch {
-            isLoggedIn.emit(handleKakaoLogin())
+            _isLoggedIn.emit(handleKakaoLogin())
         }
     }
 
     fun checkLogin() {
         viewModelScope.launch {
-            isLoggedIn.emit(hasToken())
+            _isLoggedIn.emit(hasToken())
         }
     }
 
     fun kakaoLogout() {
         viewModelScope.launch {
-            isLoggedIn.emit(handleKakaoLogout())
+            _isLoggedIn.emit(handleKakaoLogout())
         }
     }
 
@@ -128,27 +129,14 @@ class KakaoAuthViewModel @Inject constructor(private val userLoginService: UserL
                             )
 
                             viewModelScope.launch {
-                                try {
-                                    val response = userLoginService.registerUser(userInfo)
-                                    if (response.isSuccessful) {
-                                        Log.d("Register", "회원가입 성공")
-                                        response.body()?.accessToken?.let { accessToken ->
-                                            tokenManager.saveAccessToken(accessToken)
-                                        }
-                                        response.body()?.refreshToken?.let { refreshToken ->
-                                            tokenManager.saveRefreshToken(refreshToken)
-                                        }
-                                    } else {
-                                        // 에러 처리
-                                        Log.e("Register", "회원가입 실패: ${response.errorBody()?.string()}")
-                                    }
-                                } catch (t: Throwable) {
-                                    // 네트워크 에러 등의 실패 처리
-                                    Log.e("Register", "회원가입 에러: $t")
+                                val result = userRepository.registerUser(userInfo)
+                                if (result.isSuccess && result.getOrDefault(false)) {
+                                    continuation.resume(true)
+                                }
+                                else {
+                                    continuation.resume(false)
                                 }
                             }
-
-                            continuation.resume(true)
                         }
                     }
                 }
