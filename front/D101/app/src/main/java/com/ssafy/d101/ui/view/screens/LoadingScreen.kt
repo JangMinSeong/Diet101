@@ -25,35 +25,48 @@ fun LoadingScreen(navController: NavHostController) {
     val userViewModel: UserViewModel = hiltViewModel()
 
     val isLoggedIn by kakaoAuthViewModel.isLoggedIn.collectAsState(initial = false)
+    val loginChecked by kakaoAuthViewModel.loginChecked.collectAsState(initial = false)
     val hasUserSubInfo by userViewModel.hasUserSubInfo.collectAsState(initial = false)
 
     // 로그인 상태가 변경될 때 마다 실행
-    LaunchedEffect(isLoggedIn) {
-        if (isLoggedIn) {
-            Log.i("LoadingScreen", "isLoggedIn: $isLoggedIn")
-            // 로그인이 되었다면, 서버에 사용자 SubInfo 존재 여부를 확인
-            val result = userViewModel.getUserSubInfo()
-            Log.i("LoadingScreen", "result: $result")
-            if (result.isSuccess) {
-                val userSubInfo = result.getOrNull()
-                if (userSubInfo?.height == 0 || userSubInfo?.weight == 0 || userSubInfo?.calorie == 0) {
-                    // SubInfo가 없다면 입력 화면으로 이동
-                    navController.navigate(Screens.Height.route) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
+    LaunchedEffect(loginChecked) {
+        if (loginChecked) {
+            if (isLoggedIn) {
+                Log.i("LoadingScreen", "isLoggedIn: $isLoggedIn")
+                // 로그인이 되었다면, 서버에 사용자 SubInfo 존재 여부를 확인
+                val result = userViewModel.getUserSubInfo()
+                Log.i("LoadingScreen", "result: $result")
+                if (result.isSuccess) {
+                    val userSubInfo = result.getOrNull()
+                    if (userSubInfo?.height == 0 || userSubInfo?.weight == 0 || userSubInfo?.calorie == 0) {
+                        // SubInfo가 없다면 입력 화면으로 이동
+                        navController.navigate(Screens.Height.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true
+                            }
                         }
-                    }
-                } else {
-                    // SubInfo가 있다면 홈 화면으로 이동
-                    navController.navigate(Screens.Home.route) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
+                    } else {
+                        // SubInfo가 있다면 홈 화면으로 이동
+                        navController.navigate(Screens.Home.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true
+                            }
                         }
-                    }
 
+                    }
                 }
             }
+            else {
+                // 로그인이 되어있지 않다면, 로그인 화면으로 이동
+                navController.navigate(Screens.Start.route) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        inclusive = true
+                    }
+                }
+
+            }
         }
+
     }
     Box(modifier = Modifier.fillMaxSize()) {
         Text(text = "Loading...")
