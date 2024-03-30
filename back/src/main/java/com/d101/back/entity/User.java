@@ -39,7 +39,7 @@ public class User extends BaseTimeEntity {
     private Provider provider;
 
     private String oauthId;
-
+    private int activity;
 
     @OneToMany(mappedBy = "user")
     private List<Meal> meals;

@@ -129,8 +129,7 @@ public class UserService {
     public void updateUserInfo(String email, ModifyUserReq req) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND));
-        user.setUsername(req.getUsername());
-        user.setGender(req.getGender());
+        user.setActivity(req.getActivity());
         user.setCalorie(req.getCalorie());
         user.setHeight(req.getHeight());
         user.setWeight(req.getWeight());
