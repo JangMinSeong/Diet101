@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ModifyUserReq {
-
-    private String username;
-    private String gender;
+    private int activity;
     private int calorie;
     private int height;
     private int weight;
