@@ -52,7 +52,7 @@ fun MonthLeaderboardScreen(data : MonthRankingItem) {
                 contentDescription = "트로피" // 접근성을 위한 이미지 설명
             )
             Spacer(modifier = Modifier.size(8.dp))
-            Text("이번주 선호 음식 랭킹", style = MaterialTheme.typography.bodySmall)
+            Text("나의 선호 음식 랭킹", style = MaterialTheme.typography.bodySmall)
             Spacer(modifier = Modifier.size(15.dp))
             Column {
                 data.rank.zip(data.name).forEach { (rank, name) ->

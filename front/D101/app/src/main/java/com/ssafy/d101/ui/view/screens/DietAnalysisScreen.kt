@@ -1,8 +1,5 @@
 package com.ssafy.d101.ui.view.screens
 
-import com.ssafy.d101.ui.view.components.StackedBarItem
-import com.ssafy.d101.ui.view.components.WeeklyNutritionChart
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,29 +42,52 @@ import com.ssafy.d101.ui.view.components.DailyHorizontalBar
 import com.ssafy.d101.ui.view.components.MonthLeaderboardScreen
 import com.ssafy.d101.ui.view.components.MonthRankingItem
 import com.ssafy.d101.ui.view.components.MonthlyNutritionChartHorizontal
+import com.ssafy.d101.ui.view.components.StackedBarItem
 import com.ssafy.d101.ui.view.components.WeekLeaderboardScreen
 import com.ssafy.d101.ui.view.components.WeekRankingItem
+import com.ssafy.d101.ui.view.components.WeeklyNutritionChart
 import com.ssafy.d101.viewmodel.DietViewModel
 import com.ssafy.d101.viewmodel.UserViewModel
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalAdjusters
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.ssafy.d101.model.AnalysisDiet
+import com.ssafy.d101.model.CalAnnualNutrient
+import com.ssafy.d101.model.DietInfo
+import java.time.temporal.TemporalAdjusters
+import java.time.temporal.WeekFields
+import java.util.Locale
+
+fun generateTitles(): Triple<String, String, String> {
+    val today = LocalDate.now()
+    val month = today.month.value
+
+    val firstDayOfMonth = today.with(TemporalAdjusters.firstDayOfMonth())
+    val weekOfMonth = if (today.dayOfMonth < 7 && firstDayOfMonth.dayOfWeek > today.dayOfWeek) 1
+    else (today.dayOfMonth + firstDayOfMonth.dayOfWeek.value - today.dayOfWeek.value) / 7 + 1
+
+    // 오늘 날짜에 식단분석
+    val dateTitle = today.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")) + " 식단분석"
+    // 주간 식단분석
+    val weekTitle = "${month}월 ${weekOfMonth}째주 식단분석"
+    // 몇월 식단분석
+    val monthTitle = "${month}월 식단분석"
+
+    return Triple(dateTitle, weekTitle, monthTitle)
+}
 
 @Composable
-fun DietAnalysis(
-    dateTitle : String,
-    weekTitle : String,
-    monthTitle : String,
+fun DietAnalysis(navController: NavController
 ) {
+    val (dateTitle, weekTitle, monthTitle) = generateTitles()
+    val userViewModel :UserViewModel = hiltViewModel()
+    val dietViewModel :DietViewModel = hiltViewModel()
 
-    val userViewModel :UserViewModel = viewModel()
-    val dietViewModel :DietViewModel = viewModel()
-
-    val user by userViewModel.user.collectAsState()
-    val analysisDiet by dietViewModel.resultDiet.observeAsState()
+    val analysisDiet by dietViewModel.resultDiet.collectAsState()
+    val user by userViewModel.getUser().collectAsState(initial = null)
 
     LaunchedEffect(Unit) {
         dietViewModel.analysisDiet()
@@ -156,14 +176,19 @@ fun DietAnalysis(
                 when(selectedAnalysis) {
                     "today" -> {
                         Spacer(modifier = Modifier.size(15.dp))
-                        var userGender : Int = 5
+                        var userGender : Int
                         if(user?.userInfo?.gender == "MALE") userGender = 1
                         else userGender = 2
-                        ////////////////TODO: API 요청  user, 일일 식단 기록 필요
-                        user?.userSubInfo?.calorie?.let { CustomSemiCirclePieChart(consumedKcal = 1200, totalKcal = it, gender = userGender) }
+
+                        val dailyCal = analysisDiet?.let{ calculateTotalCalories(it) }
+                        if(user != null && dailyCal != null)
+                            CustomSemiCirclePieChart(consumedKcal = dailyCal, totalKcal = user!!.userSubInfo.calorie, gender = userGender)
                         Spacer(modifier = Modifier.size(15.dp))
-                        ////////////////TODO: API 요청   일일 식단 기록 필요
-                        DailyHorizontalBar(carbsPercentage = 30f, proteinPercentage = 30f, fatsPercentage = 40f) //합 100% 주의
+
+                        val nutri = analysisDiet?.let { calculateDailyNutrientRatios(it) }
+                        if (nutri != null) {
+                            DailyHorizontalBar(carbsPercentage = nutri.first, proteinPercentage = nutri.second, fatsPercentage = nutri.third)
+                        }
 
                     }
                 }
@@ -204,7 +229,7 @@ fun DietAnalysis(
                                 selectedMonthOption = if (selectedMonthOption == "diet") "ranking" else "diet"
                             }) {
                                 Text(
-                                    text = if (selectedMonthOption == "diet") "내 월간 랭킹 보기" else "월간 식단 분석 보기",
+                                    text = if (selectedMonthOption == "diet") "내 식단 랭킹 보기" else "월간 식단 분석 보기",
                                     color = Color.Red
                                 )
                             }
@@ -216,69 +241,38 @@ fun DietAnalysis(
                             when (selectedTimeline) {
                                 "weekly" -> {
                                     //주간 식단 분석
-                                    /////////TODO : api 필요    주간 식단 필요
-                                    WeeklyNutritionChart(
-                                        weeklyData = StackedBarItem(
-                                            data = listOf(
-                                                listOf(600f, 400f, 200f), // MON
-                                                listOf(500f, 300f, 200f), // TUE
-                                                listOf(700f, 300f, 300f), // WED
-                                                listOf(800f, 200f, 400f), // THU
-                                                listOf(450f, 550f, 250f), // FRI
-                                                listOf(400f, 600f, 400f), // SAT
-                                                listOf(500f, 500f, 500f)  // SUN
-                                            ),
-                                            maxValue = 2000f  // 총합 계산해서 넣어야 비율로 나옴
-                                        ),
-                                        title = "WEEKLY"
-                                    )
-                                    Spacer(modifier = Modifier.size(7.dp))
-
-                                    ///////TODO : api 필요    사용자 랭킹 상위 3개 필요
-                                    WeekLeaderboardScreen(
-                                        data = WeekRankingItem(
-                                            rank = listOf(1, 2, 3),
-                                            name = listOf("로제 떡볶이", "치킨", "김치찌개")
+                                    if(analysisDiet != null) {
+                                        WeeklyNutritionChart(
+                                            weeklyData = generateWeeklyData(analysisDiet!!.weeklyDiet),
+                                            title = "WEEKLY"
                                         )
-                                    )
-                                    Spacer(modifier = Modifier.size(6.dp))
+                                        Spacer(modifier = Modifier.size(7.dp))
+
+                                        WeekLeaderboardScreen(
+                                            data = generateWeekRankingItem(analysisDiet!!.weeklyDiet)
+                                        )
+                                        Spacer(modifier = Modifier.size(6.dp))
+                                    }
                                 }
 
                                 "monthly" -> {
                                     when(selectedMonthOption) {
                                         "diet" -> {
                                             //월간 식단 분석
-                                            //////////TODO : api 필요  월간 식단 필요
-                                            MonthlyNutritionChartHorizontal(
-                                                weeklyData = BarItem(
-                                                    data = listOf(
-                                                        listOf(600f, 400f, 200f),
-                                                        listOf(500f, 300f, 200f),
-                                                        listOf(700f, 300f, 300f),
-                                                        listOf(800f, 200f, 400f),
-                                                        listOf(450f, 550f, 250f),
-                                                        listOf(400f, 600f, 400f),
-                                                        listOf(500f, 500f, 500f),
-                                                        listOf(700f, 300f, 300f),
-                                                        listOf(800f, 200f, 400f),
-                                                        listOf(450f, 550f, 250f),
-                                                        listOf(400f, 600f, 400f),
-                                                        listOf(500f, 500f, 500f)
-                                                    ),
-                                                    maxValue = 2000f
-                                                ),
-                                                title = "MONTHLY"
-                                            )
+                                            if(analysisDiet != null) {
+                                                MonthlyNutritionChartHorizontal(
+                                                    monthlyData = generateMonthlyNutritionData(analysisDiet!!.annualNutrients),
+                                                            title = "MONTHLY"
+                                                )
+                                            }
                                         }
                                         "ranking" -> {
                                             // 월간 랭킹
-                                            ////// TODO : api 필요    월간 랭킹 상위 7개 필요
-                                            MonthLeaderboardScreen(
-                                                data = MonthRankingItem(
-                                                    rank = listOf(1,2,3,4,5,6,7),
-                                                    name = listOf("로제 떡볶이","치킨","김치찌개","된장찌개","피자","돌솥밥","감자탕")
+                                            if(analysisDiet != null) {
+                                                MonthLeaderboardScreen(
+                                                    data = generateMonthRankingItem(analysisDiet!!.totalRank)
                                                 )
-                                            )
+                                            }
                                         }
                                     }
                                 }
@@ -291,9 +285,134 @@ fun DietAnalysis(
     }
 }
 
+fun generateWeekRankingItem(weeklyData: List<DietInfo>): WeekRankingItem {
+    // 음식 이름별 출현 횟수를 계산
+    val foodCountMap = weeklyData.flatMap { it.intake }
+        .groupingBy { it.food.name }
+        .eachCount()
+        .toList()
+        .sortedByDescending { it.second } // 출현 횟수 기준 내림차순 정렬
+        .take(3) // 상위 3개 항목 선택
+
+    // 상위 3개 음식의 이름 추출
+    val topFoodNames = foodCountMap.map { it.first }
+
+    // 상위 3개 음식의 순위 생성 (1부터 시작)
+    val ranks = foodCountMap.indices.map { it + 1 }
+
+    return WeekRankingItem(rank = ranks, name = topFoodNames)
+}
+
+fun generateMonthRankingItem(totalRank: List<String>): MonthRankingItem {
+    // totalRank에서 최대 7개의 항목을 가져옴
+    val names = totalRank.take(7)
+    // 각 항목에 대한 순위를 생성
+    val ranks = names.indices.map { it + 1 }
+
+    return MonthRankingItem(rank = ranks, name = names)
+}
+
+fun generateWeeklyData(weeklyDiet: List<DietInfo>): StackedBarItem {
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val weekData = MutableList(7) { listOf(0f, 0f, 0f) } // 일주일 동안의 데이터 초기화
+    val dayOfWeekIndex = mapOf(
+        "MONDAY" to 0,
+        "TUESDAY" to 1,
+        "WEDNESDAY" to 2,
+        "THURSDAY" to 3,
+        "FRIDAY" to 4,
+        "SATURDAY" to 5,
+        "SUNDAY" to 6
+    )
+
+    weeklyDiet.forEach { dietInfo ->
+        val date = LocalDate.parse(dietInfo.time, formatter)
+        val dayIndex = dayOfWeekIndex[date.dayOfWeek.name] ?: return@forEach
+
+        var totalCarbs = 0f
+        var totalProtein = 0f
+        var totalFat = 0f
+
+        dietInfo.intake.forEach { intakeInfo ->
+            val intakeAmount = intakeInfo.amount / intakeInfo.food.portionSize.toDouble()
+            totalCarbs += (intakeInfo.food.carbohydrate * intakeAmount).toFloat() * 4 // 탄수화물 칼로리 계산
+            totalProtein += (intakeInfo.food.protein * intakeAmount).toFloat() * 4 // 단백질 칼로리 계산
+            totalFat += (intakeInfo.food.fat * intakeAmount).toFloat() * 9 // 지방 칼로리 계산
+        }
+
+        weekData[dayIndex] = listOf(totalCarbs, totalProtein, totalFat)
+    }
+
+    val maxValue = weekData.flatten().maxOrNull() ?: 0f
+
+    return StackedBarItem(data = weekData, maxValue = maxValue)
+}
+
+fun generateMonthlyNutritionData(annualNutrients: List<CalAnnualNutrient>): BarItem {
+    // 1월부터 12월까지 모든 달의 데이터를 저장할 리스트 초기화
+    val monthlyData = MutableList(12) { listOf(0f, 0f, 0f) }
+
+    // annualNutrients에서 각 달의 데이터를 처리
+    annualNutrients.forEach { nutrient ->
+        // 영양소 데이터를 리스트로 변환하여 해당 달에 저장
+        // 달의 인덱스는 0부터 시작하므로, month - 1을 인덱스로 사용
+        monthlyData[nutrient.month - 1] = listOf(
+            nutrient.totalCarbohydrate.toFloat(),
+            nutrient.totalProtein.toFloat(),
+            nutrient.totalFat.toFloat()
+        )
+    }
+
+    // 모든 데이터 중 최대값을 계산
+    val maxValue = monthlyData.flatten().maxOrNull() ?: 0f
+
+    return BarItem(data = monthlyData, maxValue = maxValue)
+}
+
+fun calculateDailyNutrientRatios(analysisDiet: AnalysisDiet): Triple<Float, Float, Float> {
+    var totalCarbs = 0.0
+    var totalProtein = 0.0
+    var totalFat = 0.0
+
+    analysisDiet.dailyDiet.forEach { dietInfo ->
+        dietInfo.intake.forEach { intakeInfo ->
+            val foodInfo = intakeInfo.food
+            val intakeAmount = intakeInfo.amount / foodInfo.portionSize.toDouble()
+
+            totalCarbs += foodInfo.carbohydrate * intakeAmount
+            totalProtein += foodInfo.protein * intakeAmount
+            totalFat += foodInfo.fat * intakeAmount
+        }
+    }
+
+    val totalCaloriesFromCarbs = totalCarbs * 4
+    val totalCaloriesFromProtein = totalProtein * 4
+    val totalCaloriesFromFat = totalFat * 9
+
+    val totalCalories = totalCaloriesFromCarbs + totalCaloriesFromProtein + totalCaloriesFromFat
+
+    val carbsPercentage = (totalCaloriesFromCarbs / totalCalories * 100).toFloat()
+    val proteinPercentage = (totalCaloriesFromProtein / totalCalories * 100).toFloat()
+    val fatPercentage = (totalCaloriesFromFat / totalCalories * 100).toFloat()
+
+    return Triple(carbsPercentage, proteinPercentage, fatPercentage)
+}
+
+fun calculateTotalCalories(analysisDiet: AnalysisDiet): Int {
+    return analysisDiet.dailyDiet.sumOf { dietInfo ->
+        dietInfo.intake.sumOf { intakeInfo ->
+            val foodInfo = intakeInfo.food
+            val intakeAmount = intakeInfo.amount
+
+            ((foodInfo.carbohydrate * 4 + foodInfo.protein * 4 + foodInfo.fat * 9) * intakeAmount).toInt()
+        }
+    }
+}
+
+
 @Preview(showBackground = true)
 @Composable
 fun PreviewDietAnalysis() {
     //dateTitle : 일별 날짜 제목, weekTitle : 주별 날짜 제목, monthTitle : 월별 날짜 제목
-    DietAnalysis(dateTitle = "2024 03 06 식단 분석",weekTitle = "3월 2째주 식단 분석", monthTitle = "3월 식단 분석")
+    DietAnalysis(navController = rememberNavController())
 }

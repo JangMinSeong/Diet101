@@ -1,5 +1,5 @@
 package com.d101.back.entity.enums;
 
 public enum Dunchfast {
-    BREAKFAST, LUNCH, DINNER
+    BREAKFAST, BRUNCH, LUNCH, LINNER, DINNER, NIGHT, SNACK, BEVERAGE, ALCOHOL
 }
