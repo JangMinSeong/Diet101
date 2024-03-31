@@ -1,5 +1,6 @@
 package com.ssafy.d101.di
 
+import com.ssafy.d101.api.FoodSearchService
 import com.ssafy.d101.api.UserLoginService
 import com.ssafy.d101.api.UserService
 import com.ssafy.d101.utils.AuthAuthenticator
@@ -38,7 +39,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080/api/")
+            .baseUrl("http://j10d101.p.ssafy.io:8000/api/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -48,7 +49,7 @@ object NetworkModule {
     @Named("auth")
     fun provideAuthRetrofit(): Retrofit =
         Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080/api/")
+            .baseUrl("http://j10d101.p.ssafy.io:8000/api/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -61,4 +62,9 @@ object NetworkModule {
     @Singleton
     fun provideUserService(retrofit: Retrofit): UserService =
         retrofit.create(UserService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideFoodSearchService(retrofit: Retrofit): FoodSearchService =
+        retrofit.create(FoodSearchService::class.java)
 }
