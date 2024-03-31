@@ -54,6 +54,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.ssafy.d101.model.FoodItem
 import com.ssafy.d101.viewmodel.FoodSearchViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -77,11 +78,18 @@ fun FoodSearchScreen(
 ) {
     var showDialog by remember { mutableStateOf(false) }  // 모달 카드 보여줄지 여부
     var selectedFoodItemName by remember { mutableStateOf<String?>(null) }
-    val viewModel: FoodSearchViewModel = viewModel()
+    val viewModel: FoodSearchViewModel = hiltViewModel()
     val foodItems by viewModel.foodItems.collectAsState()    // viewModel 사용하여 음식 목록 불러오기
+//    val foodItems = listOf("딸기", "바나나")
 
+    // 초기 데이터 로드
     LaunchedEffect(foodName) {
         viewModel.fetchFoodItems(foodName)
+        viewModel.viewModelScope.launch {
+            viewModel.foodItems.collect { foodItems ->
+                Log.d("FoodSearchScreen", "Food items: $foodItems")
+            }
+        }
     }
 
     // 화면 전체
@@ -130,7 +138,7 @@ fun FoodSearchScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 20.dp)
                 .clickable {
-                           navController.navigate("foodAddition")
+                    navController.navigate("foodAddition")
                 },
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -170,8 +178,8 @@ fun FoodSearchScreen(
                         .background(Color.White, shape = RoundedCornerShape(10.dp))
                         .border(3.dp, Color.Gray, shape = RoundedCornerShape(10.dp))
                         .clickable {
-                                   selectedFoodItemName = foodItem.name
-                                   showDialog = true
+                            selectedFoodItemName = foodName
+                            showDialog = true
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -217,14 +225,14 @@ fun FoodSearchScreen(
 
                             // 1인분 당 그램 수
                             Text(
-                                text = "${foodItem.portionSize}g",
+                                text = "100g",
                                 color = Color.Gray,
                                 fontSize = 14.sp
                             )
 
                             // 칼로리
                             Text(
-                                text = "${foodItem.calorie}kcal",
+                                text = "100kcal",
                                 color = Color.Gray,
                                 fontSize = 18.sp
                             )
@@ -253,6 +261,7 @@ fun FoodSearchScreen(
                             .padding(top = 10.dp)
                     )
                 },
+
                 text = {
                     Column {
                         Text(
@@ -346,28 +355,29 @@ fun FoodSearchScreen(
                 confirmButton = {
                     Button(
                         onClick = {
-                            val foodItem = FoodItem(
-                                id = 0,
-                                name = selectedFoodItemName ?: "",
-                                majorCategory = item.majorCategory,
-                                minorCategory = item.minorCategory,
-                                dbGroup = item.dbGroup,
-                                manufacturer = item.manufacturer,
-                                portionSize = item.portionSize,
-                                unit = item.unit,
-                                calorie = item.calorie,
-                                carbohydrate = item.carbohydrate,
-                                protein = item.protein,
-                                fat = item.fat,
-                                transFat = item.transFat,
-                                saturatedFat = item.saturatedFat,
-                                cholesterol = item.cholesterol,
-                                natrium = item.natrium,
-                                sugar = item.sugar
-                            )
-                            viewModel.addFoodItem(foodItem)
+//                            val foodItem = FoodItem(
+//                                id = 0,
+//                                name = selectedFoodItemName ?: "",
+//                                majorCategory = item.majorCategory,
+//                                minorCategory = item.minorCategory,
+//                                dbGroup = item.dbGroup,
+//                                manufacturer = item.manufacturer,
+//                                portionSize = item.portionSize,
+//                                unit = item.unit,
+//                                calorie = item.calorie,
+//                                carbohydrate = item.carbohydrate,
+//                                protein = item.protein,
+//                                fat = item.fat,
+//                                transFat = item.transFat,
+//                                saturatedFat = item.saturatedFat,
+//                                cholesterol = item.cholesterol,
+//                                natrium = item.natrium,
+//                                sugar = item.sugar
+//                            )
+//                            viewModel.addFoodItem(foodItem)
 
                             showDialog = false
+
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                         modifier = Modifier
@@ -382,6 +392,7 @@ fun FoodSearchScreen(
                         )
                     }
                 },
+
                 dismissButton = {
                     Button(
                         onClick = { selectedFoodItemName = null },
@@ -421,6 +432,7 @@ fun FilledButtonExample(onClick: () -> Unit) {
         }
     }
 }
+
 
 @Composable
 fun NutritionInfoFieldReadOnly(labelText: String, text: String) {

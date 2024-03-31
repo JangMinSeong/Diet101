@@ -48,14 +48,12 @@ import com.ssafy.d101.viewmodel.UserViewModel
 @Composable
 
 fun MyPageScreen(navController: NavHostController) {
-    val userViewModel: UserViewModel = hiltViewModel()
-
     Column( modifier = Modifier // 백그라운드
         .fillMaxSize()
         .background(Ivory)
     ) {
         MyPageHeader(navController)
-        MyProfile(userViewModel)
+        MyProfile()
         MyMenu(navController)
     }
 
@@ -88,8 +86,8 @@ fun MyPageHeader(navController: NavController) {
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun MyProfile(userViewModel: UserViewModel = hiltViewModel()) {
-
+fun MyProfile() {
+    val userViewModel: UserViewModel = hiltViewModel()
     val user by userViewModel.getUser().collectAsState(initial = null)
 
     Row( modifier = Modifier

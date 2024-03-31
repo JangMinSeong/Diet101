@@ -21,8 +21,3 @@ interface UserService {
     @PUT("user/info/profile")
     suspend fun updateUserSubInfo(@Body userSubInfo: UserSubInfo) : Response<Any>
 }
-
-interface UserAdditionFoodService {
-    @POST("food/insert")
-    suspend fun postUserAdditionFood(@Body foodInfo : FoodInfo): Response<FoodResponse>
-}

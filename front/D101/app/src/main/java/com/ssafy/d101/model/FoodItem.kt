@@ -17,6 +17,6 @@ data class FoodItem(
     val saturatedFat: Double,
     val cholesterol: Double,
     val natrium: Double,
-    val sugar: Double
+    val sugar: Double,
 )
 
