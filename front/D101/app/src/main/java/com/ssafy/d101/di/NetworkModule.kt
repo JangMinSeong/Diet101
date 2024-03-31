@@ -1,5 +1,7 @@
 package com.ssafy.d101.di
 
+
+import com.ssafy.d101.api.DietService
 import com.ssafy.d101.api.FoodSearchService
 import com.ssafy.d101.api.UserLoginService
 import com.ssafy.d101.api.UserService
@@ -65,6 +67,12 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideDietService(retrofit: Retrofit): DietService =
+        retrofit.create(DietService::class.java)
+
+    @Provides
+    @Singleton
     fun provideFoodSearchService(retrofit: Retrofit): FoodSearchService =
         retrofit.create(FoodSearchService::class.java)
+
 }
