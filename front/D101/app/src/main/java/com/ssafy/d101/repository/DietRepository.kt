@@ -45,7 +45,7 @@ class DietRepository @Inject constructor(private val dietService: DietService) {
         result.onSuccess { analysisDiet ->
             _analysisDiet.value = analysisDiet
         }.onFailure { exception ->
-            Log.e("DietRepository", "Failed to get day diet: ${exception.message}")
+            Log.e("DietRepository", "Failed to get analysis diet: ${exception.message}")
         }
         return analysisDiet
     }
