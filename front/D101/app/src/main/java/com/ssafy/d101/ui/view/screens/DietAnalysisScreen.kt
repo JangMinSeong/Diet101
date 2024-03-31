@@ -63,7 +63,7 @@ fun DietAnalysis(
     val analysisDiet by dietViewModel.resultDiet.observeAsState()
 
     LaunchedEffect(Unit) {
-        dietViewModel.analysisDiet()
+//        dietViewModel.analysisDiet()
     }
 
     // 선택된 분석 타입 (오늘의 분석, 과거 분석)을 추적하는 상태
