@@ -1,6 +1,7 @@
 package com.ssafy.d101.ui.view.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -64,14 +65,16 @@ fun UserInfoScreen(navController: NavController) {
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun UserInfo(userViewModel: UserViewModel) {
-    val user by userViewModel.getUser().collectAsState(initial = null)
-    val userInfo = user?.userInfo
-    val userSubInfo = user?.userSubInfo
-    var height = userSubInfo?.height.toString()
-    var weight = userSubInfo?.weight.toString()
+    val userInfo = userViewModel.getUserInfo().collectAsState()
+    val userSubInfo = userViewModel.getUserSubInfo().collectAsState()
+
+    Log.i("UserInfo", "userInfo: $userInfo")
+    Log.i("UserSubInfo", "userSubInfo: $userSubInfo")
+    var height = userSubInfo.value?.height.toString()
+    var weight = userSubInfo.value?.weight.toString()
     var activity by remember { mutableIntStateOf(0) }
-    var kcal = userSubInfo?.calorie.toString()
-    val age = userInfo?.age ?: 0
+    var kcal = userSubInfo.value?.calorie.toString()
+    val age = userInfo.value?.age ?: 0
 
     fun calculateCalories(height: Int, weight: Int): Int {
         val bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
@@ -134,12 +137,12 @@ fun UserInfo(userViewModel: UserViewModel) {
             Column(modifier= Modifier
                 .weight(1f)
                 .padding(0.dp, 20.dp, 0.dp, 0.dp)) {
-                InfoText("이름", userInfo?.username ?: "name")
-                InfoText(title = "성별", content = userInfo?.gender ?: "gender")
+                InfoText("이름", userInfo.value?.username ?: "name")
+                InfoText(title = "성별", content = userInfo.value?.gender ?: "gender")
             }
             Column(modifier = Modifier.padding(0.dp,0.dp,20.dp,0.dp)) {
                 AsyncImage(
-                    model = userInfo?.image ?: "https://d101-bucket.s3.ap-northeast-2.amazonaws.com/diet/%EB%96%A1%EB%B3%B6%EC%9D%B4.jpg",
+                    model = userInfo.value?.image ?: "https://d101-bucket.s3.ap-northeast-2.amazonaws.com/diet/%EB%96%A1%EB%B3%B6%EC%9D%B4.jpg",
                     contentDescription = "profileImage",
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.size(90.dp)
@@ -147,7 +150,7 @@ fun UserInfo(userViewModel: UserViewModel) {
             }
         }
         InfoText(title = "나이", content = age.toString()+"세")
-        InfoText("이메일", userInfo?.email ?: "null@naver.com")
+        InfoText("이메일", userInfo.value?.email ?: "null@naver.com")
         InfoInputField(title = "키", unit = "cm", value = height, onValueChange = { new -> height = new.filter { it.isDigit() } })
         InfoInputField(title = "몸무게", unit = "kg", value = weight, onValueChange = { new -> weight = new.filter { it.isDigit() } })
         InfoDropDownList(title = "활동량", activityIndex = activity, onItemClick = {activity = it})

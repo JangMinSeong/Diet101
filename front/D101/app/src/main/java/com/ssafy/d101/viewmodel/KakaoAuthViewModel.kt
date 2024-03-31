@@ -87,6 +87,8 @@ class KakaoAuthViewModel @Inject constructor(
 
                 // UserRepository를 통해 사용자 정보 저장
                 viewModelScope.launch {
+                    Log.i("KakaoAuthViewModel", "userInfo: $userInfo")
+                    userRepository.setUserInfo(userInfo)
                     userRepository.registerUser(userInfo)
                 }
                 continuation.resume(true)

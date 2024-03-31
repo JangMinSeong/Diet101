@@ -44,13 +44,13 @@ fun SetUpNavGraph(
     var isLoginChecked by remember { mutableStateOf(false) }
     var isLoggedIn by remember { mutableStateOf(false) }
 
-    LaunchedEffect(key1 = true) {
-        kakaoAuthViewModel.checkLogin()
-        kakaoAuthViewModel.isLoggedIn.collect { loginStatus ->
-            isLoggedIn = loginStatus
-            isLoginChecked = true
-        }
-    }
+//    LaunchedEffect(key1 = true) {
+//        kakaoAuthViewModel.checkLogin()
+//        kakaoAuthViewModel.isLoggedIn.collect { loginStatus ->
+//            isLoggedIn = loginStatus
+//            isLoginChecked = true
+//        }
+//    }
     val startDestination = if (isLoggedIn) Screens.Home.route else Screens.Start.route
     NavHost(
         navController = navController,

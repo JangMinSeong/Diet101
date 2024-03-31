@@ -1,20 +1,12 @@
 package com.ssafy.d101.viewmodel
 
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.ssafy.d101.api.UserService
-import com.ssafy.d101.model.User
-import com.ssafy.d101.model.UserInfo
 import com.ssafy.d101.model.UserSubInfo
 import com.ssafy.d101.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,14 +16,13 @@ class UserViewModel @Inject constructor(
 
     private val _hasUserSubInfo = MutableStateFlow<Boolean>(false)
     val hasUserSubInfo = _hasUserSubInfo.asStateFlow()
-    fun getUser() = userRepository.getUser()
+    fun getUserInfo() = userRepository.userInfo
+    fun getUserSubInfo() = userRepository.userSubInfo
 
-    suspend fun setUser(user: User) = userRepository.fetchAndStoreUser(user)
+    suspend fun setUserSubInfo(userSubInfo: UserSubInfo) = userRepository.setUserSubInfo(userSubInfo)
 
-    suspend fun setUserSubInfo(userSubInfo: UserSubInfo) = userRepository.fetchAndStoreUserSubInfo(userSubInfo)
-
-    suspend fun getUserSubInfo(): Result<UserSubInfo> {
-        val result = userRepository.getUserSubInfo()
+    suspend fun fetchUserSubInfo(): Result<UserSubInfo> {
+        val result = userRepository.fetchUserSubInfo()
         if (result.isSuccess) {
             _hasUserSubInfo.value = true
         }
@@ -53,9 +44,6 @@ class UserViewModel @Inject constructor(
     fun setActivityLevel(activityLevel: Int) {
         this.activityLevel.intValue = activityLevel
     }
-
-    private val _userSubInfo = MutableStateFlow<UserSubInfo?>(null)
-    val userSubInfo = _userSubInfo.asStateFlow()
 
 //    fun registerUser(userInfo: UserInfo) {
 //        viewModelScope.launch {

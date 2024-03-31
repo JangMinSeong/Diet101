@@ -59,7 +59,8 @@ fun DietAnalysis(
     val userViewModel :UserViewModel = viewModel()
     val dietViewModel :DietViewModel = viewModel()
 
-    val user by userViewModel.getUser().collectAsState(initial = null)
+    val userInfo by userViewModel.getUserInfo().collectAsState()
+    val userSubInfo by userViewModel.getUserSubInfo().collectAsState()
     val analysisDiet by dietViewModel.resultDiet.observeAsState()
 
     LaunchedEffect(Unit) {
@@ -150,10 +151,10 @@ fun DietAnalysis(
                     "today" -> {
                         Spacer(modifier = Modifier.size(15.dp))
                         var userGender : Int = 5
-                        if(user?.userInfo?.gender == "MALE") userGender = 1
+                        if(userInfo?.gender == "MALE") userGender = 1
                         else userGender = 2
                         ////////////////TODO: API 요청  user, 일일 식단 기록 필요
-                        user?.userSubInfo?.calorie?.let { CustomSemiCirclePieChart(consumedKcal = 1200, totalKcal = it, gender = userGender) }
+                        userSubInfo?.calorie?.let { CustomSemiCirclePieChart(consumedKcal = 1200, totalKcal = it, gender = userGender) }
                         Spacer(modifier = Modifier.size(15.dp))
                         ////////////////TODO: API 요청   일일 식단 기록 필요
                         DailyHorizontalBar(carbsPercentage = 30f, proteinPercentage = 30f, fatsPercentage = 40f) //합 100% 주의

@@ -1,31 +1,27 @@
 package com.ssafy.d101.repository
 
 import android.util.Log
-import com.google.gson.JsonObject
 import com.ssafy.d101.api.UserService
-import com.ssafy.d101.model.User
 import com.ssafy.d101.model.UserInfo
 import com.ssafy.d101.model.UserSubInfo
 import com.ssafy.d101.utils.TokenManager
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flow
-import retrofit2.Response
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(private val userService: UserService, private val tokenManager: TokenManager) {
-    private val _user = MutableStateFlow<User?>(null)
-    val user = _user.asStateFlow()
 
-    suspend fun fetchAndStoreUser(user: User) {
-        _user.emit(user)
+    private val _userInfo = MutableStateFlow<UserInfo?>(null)
+    val userInfo = _userInfo.asStateFlow()
+
+    private val _userSubInfo = MutableStateFlow<UserSubInfo?>(null)
+    val userSubInfo = _userSubInfo.asStateFlow()
+
+    suspend fun setUserInfo(userInfo: UserInfo) {
+        _userInfo.emit(userInfo)
     }
 
-    fun getUser(): Flow<User?> {
-        return user
-    }
-
+    // UserInfo를 받아서 백에 로그인 요청
     suspend fun registerUser(userInfo: UserInfo): Result<Boolean> {
         return try {
             val response = userService.registerUser(userInfo)
@@ -43,20 +39,18 @@ class UserRepository @Inject constructor(private val userService: UserService, p
         }
     }
 
-    suspend fun fetchAndStoreUserSubInfo(userSubInfo: UserSubInfo) {
-        val currentUser = _user.value
-        if (currentUser != null) {
-            val updateUser = currentUser.copy(userSubInfo = userSubInfo)
-            _user.emit(updateUser)
-        } else {
-            Log.e("User", "User is not available to update UserSubInfo")
-        }
+    // UserSubInfo를 Repository에 저장
+    suspend fun setUserSubInfo(userSubInfo: UserSubInfo) {
+        _userSubInfo.emit(userSubInfo)
     }
 
-    suspend fun getUserSubInfo(): Result<UserSubInfo> {
+    // 백에서 UserSubInfo 가져오기
+    suspend fun fetchUserSubInfo(): Result<UserSubInfo> {
         return try {
             val response = userService.getUserSubInfo()
             if (response.isSuccessful) {
+                Log.i("UserRepository", "UserSubInfo: ${response.body()}")
+                _userSubInfo.emit(response.body())
                 Result.success(response.body()!!)
             } else {
                 Log.e("User", "Failed to get user sub info")
