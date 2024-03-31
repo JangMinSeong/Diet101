@@ -18,15 +18,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ssafy.d101.model.FoodInfo
 
-data class FoodInfo(
-    val name: String, // 음식 이름
-    val weight: Int, // 음식 무게
-    val carbs: Float, // 탄수화물
-    val protein: Float, // 단백질
-    val fat: Float, // 지방
-    val calories: Float, // 칼로리
-)
 
 @Composable
 fun FoodItemCard(foodInfo: FoodInfo) {
@@ -36,13 +29,13 @@ fun FoodItemCard(foodInfo: FoodInfo) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(modifier = Modifier.padding(top = 5.dp)) {
-                Text(text = "${foodInfo.name}, ${foodInfo.weight} g")
+                Text(text = "${foodInfo.name}, ${foodInfo.totalSize} g")
                 Spacer(modifier = Modifier.width(40.dp))
-                Text(text = "칼로리: ${foodInfo.calories} kcal")
+                Text(text = "칼로리: ${foodInfo.calorie} kcal")
             }
-            var carbsPer = ((foodInfo.carbs * 4) / foodInfo.calories) * 100
-            var protePer = ((foodInfo.protein * 4) / foodInfo.calories) * 100
-            var fatPer = ((foodInfo.fat * 9) / foodInfo.calories) * 100
+            var carbsPer = ((foodInfo.carbohydrate * 4) / foodInfo.calorie) * 100
+            var protePer = ((foodInfo.protein * 4) / foodInfo.calorie) * 100
+            var fatPer = ((foodInfo.fat * 9) / foodInfo.calorie) * 100
 
             val formattedCarbsPer = String.format("%.1f", carbsPer)
             val formattedProtePer = String.format("%.1f", protePer)
@@ -58,8 +51,8 @@ fun FoodItemCard(foodInfo: FoodInfo) {
                 Column(modifier = Modifier.padding(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally ){
                     Text(text = "탄수화물")
-                    Text(text = "${foodInfo.carbs} g")
-                    Text(text = "${String.format("%.1f",foodInfo.carbs*4)} kcal")
+                    Text(text = "${foodInfo.carbohydrate} g")
+                    Text(text = "${String.format("%.1f",foodInfo.carbohydrate*4)} kcal")
                 }
                 VerticalDivider()
                 Column(modifier = Modifier.padding(8.dp),
@@ -93,5 +86,5 @@ fun VerticalDivider() {
 @Composable
 @Preview(showBackground = true)
 fun PreviewFoodItemCard() {
-    FoodItemCard(foodInfo = FoodInfo("등갈비 김치찜", 200, 25.5f, 32.0f,21.9f,427.1f))
+//    FoodItemCard(foodInfo = FoodInfo("등갈비 김치찜", 200, 25.5f, 32.0f,21.9f,427.1f))
 }
