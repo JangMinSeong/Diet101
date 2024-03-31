@@ -10,6 +10,7 @@ data class UserInfo(
 )
 
 data class UserSubInfo(
+    val activity : Int,
     val calorie : Int,
     val height : Int,
     val weight : Int
