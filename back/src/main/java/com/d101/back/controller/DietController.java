@@ -62,7 +62,11 @@ public class DietController {
 
 	@GetMapping("/analysis")
 	public ResponseEntity<?> getAnalysisDiet(@RequestParam(value = "date") String date, @RequestParam(value = "dateFrom") String dateFrom, @RequestParam(value = "dateTo") String dateTo, Authentication authentication) {
+		System.out.println("in controller");
+
 		ResAnalysisDiet result = dietService.analysisDiet(date,dateFrom,dateTo,authentication.getName());
+
+		System.out.println(authentication.getName());
 		return ResponseEntity.ok(result);
 	}
 }

@@ -13,7 +13,10 @@ import retrofit2.http.Query;
 
 interface DietService {
     @GET("diet/analysis")
-    fun getWeekDiet(@Query("date") date : String, @Query("dateFrom")dateFrom: String,
-                    @Query("dateTo")dateTo: String) : Call<AnalysisDiet>
+    suspend fun getWeekDiet(
+        @Query("date") date: String,
+        @Query("dateFrom") dateFrom: String,
+        @Query("dateTo") dateTo: String
+    ): AnalysisDiet
 
 }

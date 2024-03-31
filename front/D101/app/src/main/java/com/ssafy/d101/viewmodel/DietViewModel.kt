@@ -9,6 +9,8 @@ import com.ssafy.d101.api.DietService
 import com.ssafy.d101.api.UserService
 import com.ssafy.d101.model.AnalysisDiet
 import com.ssafy.d101.model.DietInfo
+import com.ssafy.d101.model.User
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -21,6 +23,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
 
+@HiltViewModel
 class DietViewModel @Inject constructor(private val dietService: DietService) : ViewModel() {
     fun getCurrentDate(): String {
         return LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
@@ -37,26 +40,22 @@ class DietViewModel @Inject constructor(private val dietService: DietService) : 
     }
 
 
-    private val _analysisDiet = MutableLiveData<AnalysisDiet>()
-    val resultDiet: LiveData<AnalysisDiet> = _analysisDiet
+    private val _analysisDiet = MutableStateFlow<AnalysisDiet?>(null)
+    val resultDiet = _analysisDiet.asStateFlow()
 
     fun analysisDiet() {
         val date = getCurrentDate()
         val dateFrom = getStartOfWeek()
         val dateTo = getEndOfWeek()
 
-        dietService.getWeekDiet(date, dateFrom, dateTo).enqueue(object : Callback<AnalysisDiet> {
-            override fun onResponse(call: Call<AnalysisDiet>, response: Response<AnalysisDiet>) {
-                if (response.isSuccessful) {
-                    _analysisDiet.postValue(response.body())
-                } else {
-                    Log.i("AnalysisDiet", "정보 가져 오기 실패" + response.errorBody().toString())
-                }
+        viewModelScope.launch {
+            try {
+                val analysisDiet = dietService.getWeekDiet(date, dateFrom, dateTo)
+                _analysisDiet.emit(analysisDiet) // 직접 StateFlow를 업데이트
+            } catch (e: Exception) {
+                Log.e("AnalysisDiet", "네트워크 요청 실패: $e")
+                _analysisDiet.emit(null) // 실패 시 null로 업데이트
             }
-
-            override fun onFailure(call: Call<AnalysisDiet>, t: Throwable) {
-                Log.i("AnalysisDiet", "에러 발생  $t")
-            }
-        })
+        }
     }
 }

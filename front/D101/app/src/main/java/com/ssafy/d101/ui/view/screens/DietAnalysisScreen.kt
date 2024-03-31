@@ -51,6 +51,7 @@ import com.ssafy.d101.viewmodel.UserViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ssafy.d101.model.AnalysisDiet
@@ -82,11 +83,11 @@ fun generateTitles(): Triple<String, String, String> {
 fun DietAnalysis(navController: NavController
 ) {
     val (dateTitle, weekTitle, monthTitle) = generateTitles()
-    val userViewModel :UserViewModel = viewModel()
-    val dietViewModel :DietViewModel = viewModel()
+    val userViewModel :UserViewModel = hiltViewModel()
+    val dietViewModel :DietViewModel = hiltViewModel()
 
     val user by userViewModel.user.collectAsState()
-    val analysisDiet by dietViewModel.resultDiet.observeAsState()
+    val analysisDiet by dietViewModel.resultDiet.collectAsState()
 
     LaunchedEffect(Unit) {
         dietViewModel.analysisDiet()

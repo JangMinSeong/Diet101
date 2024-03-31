@@ -36,7 +36,7 @@ class AuthInterceptor @Inject constructor(private val tokenManager: TokenManager
     private fun errorResponse(request: Request): Response = Response.Builder()
         .request(request)
         .protocol(Protocol.HTTP_2)
-        .code(100)
+        .code(102)
         .message("")
         .body("".toResponseBody(null))
         .build()
