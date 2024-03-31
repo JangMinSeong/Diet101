@@ -1,5 +1,6 @@
 package com.ssafy.d101.ui.view.screens
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -28,6 +29,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ssafy.d101.ui.theme.Ivory
@@ -52,11 +55,21 @@ import com.ssafy.d101.ui.theme.White
 import com.ssafy.d101.ui.view.components.BackHeader
 import com.ssafy.d101.ui.view.components.FoodInfo
 import com.ssafy.d101.ui.view.components.FoodList
+import com.ssafy.d101.viewmodel.DietViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @Composable
 fun RecommendScreen(navController: NavHostController) {
+
+    val dietViewModel: DietViewModel = hiltViewModel()
+    val diets by dietViewModel.dayDiet.collectAsState()
+    LaunchedEffect(Unit) {
+        dietViewModel.loadDayDiet("2024-01-03")
+    }
+
+    Log.i("DayDiet", diets.toString());
+
     val textStyle = TextStyle(
         fontWeight = FontWeight.Bold,
         fontSize = 18.sp,

@@ -40,7 +40,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder()
-            .baseUrl("http://j10d101.p.ssafy.io:8000/api/")
+            .baseUrl("http://localhost:8080/api/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -50,7 +50,7 @@ object NetworkModule {
     @Named("auth")
     fun provideAuthRetrofit(): Retrofit =
         Retrofit.Builder()
-            .baseUrl("http://j10d101.p.ssafy.io:8000/api/")
+            .baseUrl("http://localhost:8080/api/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -68,6 +68,10 @@ object NetworkModule {
     @Singleton
     fun provideDietService(retrofit: Retrofit): DietService =
         retrofit.create(DietService::class.java)
+
+    @Provides
+    @Singleton
     fun provideFoodSearchService(retrofit: Retrofit): FoodSearchService =
         retrofit.create(FoodSearchService::class.java)
+
 }
