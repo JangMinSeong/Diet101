@@ -43,14 +43,11 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
-import com.ssafy.d101.viewmodel.FoodSearchViewModel
 import com.ssafy.d101.viewmodel.UserViewModel
 
 @Composable
 
 fun MyPageScreen(navController: NavHostController) {
-    val userViewModel: UserViewModel = hiltViewModel()
-    userViewModel.getUserSubInfo()
     Column( modifier = Modifier // 백그라운드
         .fillMaxSize()
         .background(Ivory)

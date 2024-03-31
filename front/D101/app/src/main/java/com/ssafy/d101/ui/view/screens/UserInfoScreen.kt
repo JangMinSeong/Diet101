@@ -67,7 +67,7 @@ fun UserInfo() {
     val userViewModel: UserViewModel = hiltViewModel()
     val user by userViewModel.getUser().collectAsState(initial = null)
     val userInfo = user?.userInfo
-    val userSubInfo = userViewModel.userSubInfo.value
+    val userSubInfo = user?.userSubInfo
     var height by remember { mutableStateOf(userSubInfo?.height.toString()) }
     var weight by remember { mutableStateOf(userSubInfo?.weight.toString()) }
     var activity by remember { mutableIntStateOf(0) }

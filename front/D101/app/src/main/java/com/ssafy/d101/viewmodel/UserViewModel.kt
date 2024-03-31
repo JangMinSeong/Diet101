@@ -60,34 +60,22 @@ class UserViewModel @Inject constructor(
     private val _userSubInfo = MutableStateFlow<UserSubInfo?>(null)
     val userSubInfo = _userSubInfo.asStateFlow()
 
-    fun getUserSubInfo() {
-        viewModelScope.launch {
-            val response: Response<UserSubInfo>
-            try {
-                response = userService.getUserSubInfo()
-                if (response.isSuccessful && response.body() != null) {
-                    _userSubInfo.value = response.body()
-                    Log.d("UserViewModel", "getUserSubInfo - ${response.body()}")
-                } else {
-                    Log.e("UserViewModel", "Error getUserSubInfo - ${response.errorBody()}")
-                }
-            } catch (e: Exception) {
-                Log.e("UserViewModel", "Exception fetching userSubInfo")
-            }
-        }
-    }
-
 //    fun getUserSubInfo() {
 //        viewModelScope.launch {
-//            val response = withContext(Dispatchers.IO) {
-//                userService.getUserSubInfo()
-//            }
-//            if (response.isSuccessful) {
-//                _userSubInfo.value = response.body()
+//            val response: Response<UserSubInfo>
+//            try {
+//                response = userService.getUserSubInfo()
+//                if (response.isSuccessful && response.body() != null) {
+//                    _userSubInfo.value = response.body()
+//                    Log.d("UserViewModel", "getUserSubInfo - ${response.body()}")
+//                } else {
+//                    Log.e("UserViewModel", "Error getUserSubInfo - ${response.errorBody()}")
+//                }
+//            } catch (e: Exception) {
+//                Log.e("UserViewModel", "Exception fetching userSubInfo")
 //            }
 //        }
 //    }
-//
 //    fun updateUserInfo(userSubInfo: UserSubInfo) {
 //        viewModelScope.launch {
 //            withContext(Dispatchers.IO) {
