@@ -66,34 +66,40 @@ fun SetUpNavGraph(
         composable(Screens.SignUp.route) { SignUpScreen(navController) }
         composable(Screens.SignUpComplete.route) { SignUpCompleteScreen(navController) }
         composable(Screens.LoginSuccess.route) { LoginSuccessScreen(navController) }
-        composable(Screens.Recommend.route) { RecommendScreen(navController)}
+        composable(Screens.Recommend.route) { RecommendScreen(navController) }
         composable(Screens.UserInfo.route) { UserInfoScreen(navController) }
         composable(Screens.FoodResist.route) { FoodResistScreen(navController) }
         composable(Screens.FoodAddition.route) { FoodAdditionScreen(navController) }
         composable(Screens.Height.route) { SignUpHeightScreen(navController) }
         composable(Screens.Weight.route) { SignUpWeightScreen(navController) }
-        composable(Screens.Loading.route) { LoadingScreen(navController)}
-
-            composable(Screens.Landing.route) { LandingScreen(navController) }
-            composable(Screens.Home.route) { HomeScreen(navController) }
-            composable(Screens.MyPage.route) { MyPageScreen(navController) }
-            composable(Screens.BMI.route) { BMIScreen(navController) }
-            composable(Screens.Allergy.route) { AllergyScreen(navController) }
-            composable(Screens.Start.route) { StartScreen(navController) }
-            composable(Screens.SignUp.route) { SignUpScreen(navController) }
-            composable(Screens.SignUpComplete.route) { SignUpCompleteScreen(navController) }
-            composable(Screens.LoginSuccess.route) { LoginSuccessScreen(navController) }
-            composable(Screens.UserInfo.route) { UserInfoScreen(navController) }
-            composable(Screens.AnalysisDiet.route) { DietAnalysis(navController)}
-            composable(Screens.Recommend.route) { RecommendScreen(navController)}
-            composable(Screens.UserInfo.route) { UserInfoScreen(navController) }
-
-
+        composable(Screens.Loading.route) { LoadingScreen(navController) }
+        composable(
+            Screens.FoodSearch.route,
+            arguments = listOf(navArgument("foodName") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val foodName = backStackEntry.arguments?.getString("foodName") ?: ""
+            FoodSearchScreen(navController, foodName)
+        }
+        composable(Screens.Landing.route) { LandingScreen(navController) }
+        composable(Screens.Home.route) { HomeScreen(navController) }
+        composable(Screens.MyPage.route) { MyPageScreen(navController) }
+        composable(Screens.BMI.route) { BMIScreen(navController) }
+        composable(Screens.Allergy.route) { AllergyScreen(navController) }
+        composable(Screens.Start.route) { StartScreen(navController) }
+        composable(Screens.SignUp.route) { SignUpScreen(navController) }
+        composable(Screens.SignUpComplete.route) { SignUpCompleteScreen(navController) }
+        composable(Screens.LoginSuccess.route) { LoginSuccessScreen(navController) }
+        composable(Screens.UserInfo.route) { UserInfoScreen(navController) }
+        composable(Screens.AnalysisDiet.route) { DietAnalysis(navController) }
+        composable(Screens.Recommend.route) { RecommendScreen(navController) }
+        composable(Screens.UserInfo.route) { UserInfoScreen(navController) }
 
     }
+
+}
 
 //    kakaoAuthViewModel.checkLogin()
 //    val isLoggedIn = kakaoAuthViewModel.isLoggedIn.collectAsState()
 
-}
+
 
