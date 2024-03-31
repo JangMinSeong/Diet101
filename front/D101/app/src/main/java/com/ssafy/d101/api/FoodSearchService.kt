@@ -12,7 +12,7 @@ import retrofit2.http.Query
 interface FoodSearchService {
     // 음식 API 불러오는 로직
     @GET("food/search")
-    suspend fun fetchFoodItems(@Query("name") foodName: String): Response<List<FoodItem>>
+    suspend fun fetchFoodItems(@Query("name") foodName: String): Response<List<FoodInfo>>
 
     @GET("food/ranking")
     suspend fun testest()
