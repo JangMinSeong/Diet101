@@ -26,7 +26,6 @@ fun LoadingScreen(navController: NavHostController) {
 
     val isLoggedIn by kakaoAuthViewModel.isLoggedIn.collectAsState(initial = false)
     val loginChecked by kakaoAuthViewModel.loginChecked.collectAsState(initial = false)
-    val hasUserSubInfo by userViewModel.hasUserSubInfo.collectAsState(initial = false)
 
     // 로그인 상태가 변경될 때 마다 실행
     LaunchedEffect(loginChecked) {
@@ -34,7 +33,7 @@ fun LoadingScreen(navController: NavHostController) {
             if (isLoggedIn) {
                 Log.i("LoadingScreen", "isLoggedIn: $isLoggedIn")
                 // 로그인이 되었다면, 서버에 사용자 SubInfo 존재 여부를 확인
-                val result = userViewModel.getUserSubInfo()
+                val result = userViewModel.fetchUserSubInfo()
                 Log.i("LoadingScreen", "result: $result")
                 if (result.isSuccess) {
                     val userSubInfo = result.getOrNull()
@@ -47,6 +46,10 @@ fun LoadingScreen(navController: NavHostController) {
                         }
                     } else {
                         // SubInfo가 있다면 홈 화면으로 이동
+                        Log.i("LoadingScreen", "userSubInfo: $userSubInfo")
+                        if (userSubInfo != null) {
+                            userViewModel.setUserSubInfo(userSubInfo)
+                        }
                         navController.navigate(Screens.Home.route) {
                             popUpTo(navController.graph.startDestinationId) {
                                 inclusive = true
