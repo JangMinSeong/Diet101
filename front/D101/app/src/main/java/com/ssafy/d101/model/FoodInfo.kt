@@ -8,7 +8,7 @@ data class FoodInfo(
     val dbGroup: String,
     val manufacturer: String,
     val portionSize: Int,
-    val totalSize: Int,
+    val totalSize: Double,
     val unit: String,
     val calorie: Int,
     val carbohydrate: Double,

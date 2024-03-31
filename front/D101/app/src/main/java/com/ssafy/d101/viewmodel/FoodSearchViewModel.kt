@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.d101.api.FoodSearchService
+import com.ssafy.d101.model.FoodInfo
 import com.ssafy.d101.model.FoodItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,8 +18,8 @@ import javax.inject.Inject
 class FoodSearchViewModel @Inject constructor(
     private val foodSearchService: FoodSearchService
 ) : ViewModel() {
-    private val _foodItems = MutableStateFlow<List<FoodItem>>(emptyList())
-    val foodItems: StateFlow<List<FoodItem>> = _foodItems
+    private val _foodItems = MutableStateFlow<List<FoodInfo>>(emptyList())
+    val foodItems: StateFlow<List<FoodInfo>> = _foodItems
 
     // 서버에 해당 파라미터의 음식을 GET 요청하는 함수
     fun fetchFoodItems(foodName: String) {
