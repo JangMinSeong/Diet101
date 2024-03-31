@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ssafy.d101.navigation.Screens
 
@@ -64,13 +65,32 @@ fun BottomNavigationBar(navController: NavHostController) {
                 icon = { Icon(item.icon, contentDescription = null) }, // 이 부분은 각 항목에 맞는 아이콘으로 교체해야 할 수 있습니다.
                 selected = selectedItem == index,
                 onClick = {
+                    // 'addFood' 아이템이 클릭되었을 때의 로직 처리
                     if (item.route == "addFood") {
-                        println("AddFood")
-                        showDialog = true
+                        println("Navigate to foodResist Screen")
+                        // 'foodResist' 경로로 네비게이션
+                        navController.navigate("foodResist") {
+                            // 현재 네비게이션 스택의 시작 위치로 popUp하여 중복된 네비게이션을 방지
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            // 상태 복원을 위해 launchSingleTop 설정
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     } else {
-                        println(item.route)
+                        println("Navigate to ${item.route}")
                         selectedItem = index
-                        navController.navigate(item.route)
+                        // 다른 아이템 클릭 시 해당 경로로 네비게이션
+                        navController.navigate(item.route) {
+                            // 현재 네비게이션 스택의 시작 위치로 popUp하여 중복된 네비게이션을 방지
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            // 상태 복원을 위해 launchSingleTop 설정
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
                 }
             )

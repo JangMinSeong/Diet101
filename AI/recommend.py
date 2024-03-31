@@ -25,7 +25,7 @@ def getRecommendFoodList(kcal: int, user_id: int):
     user_preferences = preferences_pred_matrix.loc[user_id]
     user_preferences_sorted = user_preferences.sort_values(ascending=True)
     top_food_ids = user_preferences_sorted.index.tolist()
-    return top_food_ids
+    return {"foods": top_food_ids}
 
 def predicting_preferences(preferences_arr, item_sim_arr):
     sum_sr = preferences_arr @ item_sim_arr

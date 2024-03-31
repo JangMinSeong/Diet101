@@ -42,22 +42,55 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+import android.util.Log
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.ssafy.d101.model.FoodItem
+import com.ssafy.d101.viewmodel.FoodSearchViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collect
+import retrofit2.Call
+import retrofit2.Response
+import retrofit2.http.GET
+import retrofit2.http.Query
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.Callback
+
 
 @Preview(showBackground = true)
 @Composable
-fun FoodSearchScreen() {
-    val dummyData = listOf("Apple", "Applemango", "Banana", "Cherry", "Date", "Elderberry")
-    var searchText by remember { mutableStateOf("") }
-    val filteredItems = if (searchText.isEmpty()) {
-        dummyData // 검색 텍스트가 비어있다면 모든 데이터를 표시
-    } else {
-        dummyData.filter { it.startsWith(searchText, ignoreCase = true) }
-    }
-    var expanded by remember { mutableStateOf(false) }
+fun FoodSearchScreen(
+    navController: NavController,
+    foodName: String
+) {
     var showDialog by remember { mutableStateOf(false) }  // 모달 카드 보여줄지 여부
     var selectedFoodItemName by remember { mutableStateOf<String?>(null) }
+    val viewModel: FoodSearchViewModel = hiltViewModel()
+    val foodItems by viewModel.foodItems.collectAsState()    // viewModel 사용하여 음식 목록 불러오기
+//    val foodItems = listOf("딸기", "바나나")
+
+    // 초기 데이터 로드
+    LaunchedEffect(foodName) {
+        viewModel.fetchFoodItems(foodName)
+        viewModel.viewModelScope.launch {
+            viewModel.foodItems.collect { foodItems ->
+                Log.d("FoodSearchScreen", "Food items: $foodItems")
+            }
+        }
+    }
 
     // 화면 전체
     Column(
@@ -99,13 +132,15 @@ fun FoodSearchScreen() {
             Spacer(modifier = Modifier.weight(1f))
         }
 
-        // 음식명 검색
+        // 다시 검색하러가기
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 20.dp),
+                .padding(horizontal = 16.dp, vertical = 20.dp)
+                .clickable {
+                    navController.navigate("foodAddition")
+                },
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
         ) {
             // 돋보기 이미지
             Image(
@@ -113,21 +148,20 @@ fun FoodSearchScreen() {
                 contentDescription = "Search Image",
                 modifier = Modifier
                     .size(40.dp)
-                    .padding(end = 10.dp)
+                    .padding(end = 8.dp)
             )
 
-            // 검색창, 검색 로직
-            TextField(
-                value = searchText,
-                onValueChange = {
-                    searchText = it
-                    expanded = it.isNotEmpty()
+            // 다시 검색하러가기
+            Text(
+                buildAnnotatedString {
+                    withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline)) {
+                        append("다시 검색하러가기")
+                    }
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 8.dp),
-                placeholder = { Text("음식명 입력", fontSize = 14.sp) },
-                singleLine = true,
+                modifier = Modifier.padding(start = 8.dp),
+                textAlign = TextAlign.Left,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
             )
         }
 
@@ -135,15 +169,18 @@ fun FoodSearchScreen() {
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            items(filteredItems) {foodItem ->
+            items(foodItems) {foodItem ->
                 Box(
                     modifier = Modifier
-                        .clickable { selectedFoodItemName = foodItem }
                         .fillMaxWidth()
                         .height(120.dp)
                         .padding(vertical = 2.dp)
                         .background(Color.White, shape = RoundedCornerShape(10.dp))
-                        .border(3.dp, Color.Gray, shape = RoundedCornerShape(10.dp)),
+                        .border(3.dp, Color.Gray, shape = RoundedCornerShape(10.dp))
+                        .clickable {
+                            selectedFoodItemName = foodName
+                            showDialog = true
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     // Box 전체 화면 칼럼
@@ -161,7 +198,7 @@ fun FoodSearchScreen() {
                         ) {
                             // 음식명
                             Text(
-                                text = foodItem,
+                                text = foodItem.name,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier
@@ -170,13 +207,6 @@ fun FoodSearchScreen() {
                             )
 
                             Spacer(modifier = Modifier.weight(1f)) // Spacer 추가하여 버튼을 오른쪽으로 밀어냅니다.
-
-                            // 추가 버튼 - 오른쪽 정렬
-                            Image(
-                                painter = painterResource(id = R.drawable.plusbutton),
-                                contentDescription = "Add Button",
-                                modifier = Modifier.size(40.dp)
-                            )
                         }
 
                         // 회사명, 1인분 당 그램 수, 칼로리
@@ -189,20 +219,20 @@ fun FoodSearchScreen() {
                         ) {
                             // 회사명
                             Text(
-                                text = "오리온",
+                                text = foodItem.manufacturer,
                                 fontSize = 17.sp
                             )
 
                             // 1인분 당 그램 수
                             Text(
-                                text = "1인분(48g)",
+                                text = "100g",
                                 color = Color.Gray,
                                 fontSize = 14.sp
                             )
 
                             // 칼로리
                             Text(
-                                text = "192kcal",
+                                text = "100kcal",
                                 color = Color.Gray,
                                 fontSize = 18.sp
                             )
@@ -213,120 +243,174 @@ fun FoodSearchScreen() {
             }
         }
     }
-    selectedFoodItemName?.let { foodName ->
-        var text by remember { mutableStateOf("") }
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = {
-                Text(
-                    // 음식명
-                    text = foodName,
-                    fontWeight = FontWeight.Bold,
-                )
-            },
-            text = {
-                Column {
-                    Text(text = "제조사 : 오리온\n식품종류 : 가공식품\n식품대분류 : 과자\n식품상세분류 : 쿠키")
-                    Text(
-                        text = "1회 제공량 48(g, ml)",
-                        modifier = Modifier.padding(top = 10.dp),
-                        color = Color.Gray,
-                    )
-                    Text(
-                        text = "먹은 양",
-                        modifier = Modifier.padding(top = 10.dp),
-                        color = Color.Gray,
-                    )
+    selectedFoodItemName?.let { selectedName ->
+        val selectedItem = foodItems.firstOrNull { it.name == selectedName }
 
-                    // 먹은 양 입력 상자
-                    TextField(
-                        value = text,
-                        onValueChange = { text = it },
-                        modifier = Modifier
-                            .width(100.dp)
-                            .height(65.dp)
-                            .padding(bottom = 15.dp),
-                        singleLine = true,
-                        placeholder = { Text(text = "", fontSize = 10.sp) },
-                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-                    )
+        selectedItem?.let { item ->
+            var eatenAmount by remember { mutableStateOf("1.0") }
 
-                    // 영양정보 박스
-                    Box(
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = {
+                    Text(
+                        // 음식명
+                        text = item.name,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(160.dp)
-                            .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
-                            .padding(8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Top
+                            .padding(top = 10.dp)
+                    )
+                },
+
+                text = {
+                    Column {
+                        Text(
+                            text = "제조사 : ${item.manufacturer}"
+                        )
+                        Spacer(modifier = Modifier.height(3.dp))
+                        Text(
+                            text = "식품종류 : ${item.majorCategory}"
+                        )
+                        Spacer(modifier = Modifier.height(3.dp))
+                        Text(
+                            text = "식품대분류 : ${item.minorCategory}"
+                        )
+                        Spacer(modifier = Modifier.height(3.dp))
+                        Text(
+                            text = "식품상세분류 : ${item.dbGroup}"
+                        )
+
+                        Text(
+                            text = "1회 제공량 ${item.portionSize}${item.unit}",
+                            modifier = Modifier.padding(top = 10.dp),
+                            color = Color.Gray,
+                        )
+                        Text(
+                            text = "먹은 양",
+                            modifier = Modifier.padding(top = 10.dp, bottom = 5.dp),
+                            color = Color.Gray,
+                        )
+
+                        // 먹은 양 입력 상자
+                        TextField(
+                            value = eatenAmount,
+                            onValueChange = { newValue ->
+                                eatenAmount = newValue
+                            },
+                            modifier = Modifier
+                                .width(100.dp)
+                                .height(65.dp)
+                                .padding(bottom = 15.dp),
+                            singleLine = true,
+                            placeholder = { Text(text = "", fontSize = 10.sp) },
+                            textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                        )
+
+                        // 영양정보 박스
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(160.dp)
+                                .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
+                                .padding(8.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                "192kcal",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.align(Alignment.Start).padding(start = 35.dp)
-                            )
-                            Spacer(modifier = Modifier.height(5.dp))  // 텍스트와 선 사이 공간
-
-                            // 실선
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth(0.95f)
-                                    .height(3.dp)
-                                    .background(Color.Gray)
-                            )
-                            Spacer(modifier = Modifier.height(20.dp))
-                            // 영양소 정보 입력 필드
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Top
                             ) {
-                                NutritionInfoFieldReadOnly("탄수화물", "100g")
-                                NutritionInfoFieldReadOnly("단백질", "20g")
-                                NutritionInfoFieldReadOnly("지방", "10g")
+                                Text(
+                                    "${item.calorie}kcal",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier
+                                        .align(Alignment.Start)
+                                        .padding(start = 35.dp)
+                                )
+                                Spacer(modifier = Modifier.height(5.dp))  // 텍스트와 선 사이 공간
+
+                                // 실선
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth(0.95f)
+                                        .height(3.dp)
+                                        .background(Color.Gray)
+                                )
+                                Spacer(modifier = Modifier.height(20.dp))
+                                // 영양소 정보 입력 필드
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    NutritionInfoFieldReadOnly("탄수화물", "${item.carbohydrate}g")
+                                    NutritionInfoFieldReadOnly("단백질", "${item.protein}g")
+                                    NutritionInfoFieldReadOnly("지방", "${item.fat}g")
+                                }
                             }
                         }
                     }
+                },
+
+                confirmButton = {
+                    Button(
+                        onClick = {
+//                            val foodItem = FoodItem(
+//                                id = 0,
+//                                name = selectedFoodItemName ?: "",
+//                                majorCategory = item.majorCategory,
+//                                minorCategory = item.minorCategory,
+//                                dbGroup = item.dbGroup,
+//                                manufacturer = item.manufacturer,
+//                                portionSize = item.portionSize,
+//                                unit = item.unit,
+//                                calorie = item.calorie,
+//                                carbohydrate = item.carbohydrate,
+//                                protein = item.protein,
+//                                fat = item.fat,
+//                                transFat = item.transFat,
+//                                saturatedFat = item.saturatedFat,
+//                                cholesterol = item.cholesterol,
+//                                natrium = item.natrium,
+//                                sugar = item.sugar
+//                            )
+//                            viewModel.addFoodItem(foodItem)
+
+                            showDialog = false
+
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                        modifier = Modifier
+                            .width(80.dp)
+                            .height(60.dp)
+                            .padding(top = 20.dp),
+                    ) {
+                        Text(
+                            text = "추가",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                        )
+                    }
+                },
+
+                dismissButton = {
+                    Button(
+                        onClick = { selectedFoodItemName = null },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                        modifier = Modifier
+                            .width(80.dp)
+                            .height(60.dp)
+                            .padding(top = 20.dp),
+                    ) {
+                        Text(
+                            text = "취소",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                        )
+                    }
                 }
-            },
-            confirmButton = {
-                Button(
-                    onClick = { },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                    modifier = Modifier
-                        .width(80.dp)
-                        .height(60.dp)
-                        .padding(top = 20.dp),
-                ) {
-                    Text(
-                        text = "추가",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                    )
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = { selectedFoodItemName = null },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                    modifier = Modifier
-                        .width(80.dp)
-                        .height(60.dp)
-                        .padding(top = 20.dp),
-                ) {
-                    Text(
-                        text = "취소",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                    )
-                }
-            }
-        )
+            )
+        }
     }
 }
 
@@ -348,6 +432,7 @@ fun FilledButtonExample(onClick: () -> Unit) {
         }
     }
 }
+
 
 @Composable
 fun NutritionInfoFieldReadOnly(labelText: String, text: String) {

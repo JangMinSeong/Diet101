@@ -1,8 +1,5 @@
 package com.ssafy.d101.ui.view.screens
 
-import com.ssafy.d101.ui.view.components.StackedBarItem
-import com.ssafy.d101.ui.view.components.WeeklyNutritionChart
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,8 +42,10 @@ import com.ssafy.d101.ui.view.components.DailyHorizontalBar
 import com.ssafy.d101.ui.view.components.MonthLeaderboardScreen
 import com.ssafy.d101.ui.view.components.MonthRankingItem
 import com.ssafy.d101.ui.view.components.MonthlyNutritionChartHorizontal
+import com.ssafy.d101.ui.view.components.StackedBarItem
 import com.ssafy.d101.ui.view.components.WeekLeaderboardScreen
 import com.ssafy.d101.ui.view.components.WeekRankingItem
+import com.ssafy.d101.ui.view.components.WeeklyNutritionChart
 import com.ssafy.d101.viewmodel.DietViewModel
 import com.ssafy.d101.viewmodel.UserViewModel
 import java.time.LocalDate
@@ -86,8 +86,8 @@ fun DietAnalysis(navController: NavController
     val userViewModel :UserViewModel = hiltViewModel()
     val dietViewModel :DietViewModel = hiltViewModel()
 
-    val user by userViewModel.user.collectAsState()
     val analysisDiet by dietViewModel.resultDiet.collectAsState()
+    val user by userViewModel.getUser().collectAsState(initial = null)
 
     LaunchedEffect(Unit) {
         dietViewModel.analysisDiet()
