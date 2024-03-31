@@ -1,11 +1,15 @@
 package com.ssafy.d101.viewmodel;
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ssafy.d101.api.DietService
+import com.ssafy.d101.api.UserService
 import com.ssafy.d101.model.AnalysisDiet
 import com.ssafy.d101.model.DietInfo
+import com.ssafy.d101.model.User
 import com.ssafy.d101.repository.DietRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +26,7 @@ import javax.inject.Inject
 class DietViewModel @Inject constructor(
     private val dietRepository: DietRepository
 ) : ViewModel() {
+
     fun getCurrentDate(): String {
         return LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
     }
@@ -37,9 +42,24 @@ class DietViewModel @Inject constructor(
     }
 
 
-    private val _analysisDiet = MutableLiveData<AnalysisDiet>()
-    val resultDiet: LiveData<AnalysisDiet> = _analysisDiet
+    private val _analysisDiet = MutableStateFlow<AnalysisDiet?>(null)
+    val resultDiet = _analysisDiet.asStateFlow()
 
+    fun analysisDiet() {
+        val date = getCurrentDate()
+        val dateFrom = getStartOfWeek()
+        val dateTo = getEndOfWeek()
+
+        viewModelScope.launch {
+            try {
+                val analysisDiet = dietRepository.getAnalysisDiet(date, dateFrom, dateTo).first()
+                _analysisDiet.value = analysisDiet
+            } catch (e: Exception) {
+                Log.e("AnalysisDiet", "네트워크 요청 실패: $e")
+                _analysisDiet.emit(null) // 실패 시 null로 업데이트
+            }
+        }
+    }
 //    suspend fun analysisDiet() {
 //        val date = getCurrentDate()
 //        val dateFrom = getStartOfWeek()
