@@ -47,6 +47,10 @@ fun LoadingScreen(navController: NavHostController) {
                         }
                     } else {
                         // SubInfo가 있다면 홈 화면으로 이동
+                        Log.i("LoadingScreen", "userSubInfo: $userSubInfo")
+                        if (userSubInfo != null) {
+                            userViewModel.setUserSubInfo(userSubInfo)
+                        }
                         navController.navigate(Screens.Home.route) {
                             popUpTo(navController.graph.startDestinationId) {
                                 inclusive = true

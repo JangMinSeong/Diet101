@@ -48,8 +48,7 @@ class UserRepository @Inject constructor(private val userService: UserService, p
         if (currentUser != null) {
             val updateUser = currentUser.copy(userSubInfo = userSubInfo)
             _user.emit(updateUser)
-        }
-        else {
+        } else {
             Log.e("User", "User is not available to update UserSubInfo")
         }
     }

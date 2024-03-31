@@ -49,6 +49,9 @@ class KakaoAuthViewModel @Inject constructor(
     fun checkLogin() {
         viewModelScope.launch {
             _isLoggedIn.emit(hasToken())
+            if (_isLoggedIn.value) {
+                fetchAndSaveUserInfoFromKakao()
+            }
             _loginChecked.emit(true)
         }
     }
@@ -56,6 +59,38 @@ class KakaoAuthViewModel @Inject constructor(
     fun kakaoLogout() {
         viewModelScope.launch {
             _isLoggedIn.emit(handleKakaoLogout())
+        }
+    }
+
+    fun fetchAndSaveUserInfoFromKakao() {
+        viewModelScope.launch {
+            val isSuccessful = handleKakaoLoginAndFetchUserInfo()
+            _isLoggedIn.emit(isSuccessful)
+        }
+    }
+
+    private suspend fun handleKakaoLoginAndFetchUserInfo(): Boolean = suspendCoroutine { continuation ->
+        UserApiClient.instance.me { user, error ->
+            if (error != null) {
+                Log.e(TAG, "사용자 정보 요청 실패", error)
+                continuation.resume(false)
+            } else if (user != null) {
+                val userInfo = UserInfo(
+                    oauthId = user.id.toString(),
+                    email = user.kakaoAccount?.email ?: "",
+                    username = user.kakaoAccount?.profile?.nickname ?: "",
+                    age = calculateAge(user.kakaoAccount?.birthyear.toString() + user.kakaoAccount?.birthday.toString()),
+                    gender = user.kakaoAccount?.gender?.name ?: "",
+                    image = user.kakaoAccount?.profile?.profileImageUrl ?: ""
+                )
+                Log.i(TAG, "사용자 정보 요청 성공: \n${userInfo.toString()}")
+
+                // UserRepository를 통해 사용자 정보 저장
+                viewModelScope.launch {
+                    userRepository.registerUser(userInfo)
+                }
+                continuation.resume(true)
+            }
         }
     }
 
@@ -115,34 +150,7 @@ class KakaoAuthViewModel @Inject constructor(
                     continuation.resume(false)
                 } else if (token != null) {
                     Log.i(TAG, "카카오계정으로 로그인 성공 ${token.accessToken}")
-                    UserApiClient.instance.me {user, error ->
-                        if (error != null) {
-                            Log.e(TAG, "사용자 정보 요청 실패", error)
-                            continuation.resume(false)
-                        } else if (user != null) {
-                            val userInfo = UserInfo(
-                                oauthId = user.id.toString(),
-                                email = user.kakaoAccount?.email?: "",
-                                username = user.kakaoAccount?.profile?.nickname?: "",
-                                age = calculateAge(user.kakaoAccount?.birthyear.toString() + user.kakaoAccount?.birthday.toString()),
-                                gender = user.kakaoAccount?.gender?.name?: "",
-                                image = user.kakaoAccount?.profile?.profileImageUrl?: ""
-                            )
-                            Log.i(TAG, "사용자 정보 요청 성공" +
-                                    "\n${userInfo.toString()}"
-                            )
-
-                            viewModelScope.launch {
-                                val result = userRepository.registerUser(userInfo)
-                                if (result.isSuccess && result.getOrDefault(false)) {
-                                    continuation.resume(true)
-                                }
-                                else {
-                                    continuation.resume(false)
-                                }
-                            }
-                        }
-                    }
+                    fetchAndSaveUserInfoFromKakao()
                 }
             }
 
