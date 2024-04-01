@@ -1,5 +1,6 @@
 package com.ssafy.d101.ui.view.screens
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -28,6 +29,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -45,24 +47,47 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.ssafy.d101.model.FoodInfo
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
 import com.ssafy.d101.ui.view.components.BackHeader
-import com.ssafy.d101.ui.view.components.FoodInfo
 import com.ssafy.d101.ui.view.components.FoodList
+import com.ssafy.d101.viewmodel.DietViewModel
+import com.ssafy.d101.viewmodel.FoodViewModel
+import com.ssafy.d101.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @Composable
 fun RecommendScreen(navController: NavHostController) {
+
+    val dietViewModel: DietViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
+    val foodViewModel: FoodViewModel = hiltViewModel()
+    val diets by dietViewModel.dayDiet.collectAsState()
+    val foods by foodViewModel.recommendFood.collectAsState()
+    var rest by remember {mutableIntStateOf(0)}
+    var ggini by remember {mutableIntStateOf(1)}
+
+    val goal=2316
+    LaunchedEffect(Unit) {
+        dietViewModel.loadDayDiet(dietViewModel.getCurrentDate())
+//        foodViewModel.loadRecommendFoods(rest.toString())
+    }
+    Log.i("diets", diets.toString())
+    LaunchedEffect(diets) {
+        var sum = 0
+        diets?.forEach { i -> sum+=i.kcal }
+        rest = maxOf(goal - sum, 0)
+    }
+
     val textStyle = TextStyle(
         fontWeight = FontWeight.Bold,
         fontSize = 18.sp,
         color = Color.Black)
-    val goal_cal=2316;
-    val rest_cal=1620;
 
     Column( modifier = Modifier // 백그라운드
         .fillMaxSize()
@@ -72,9 +97,13 @@ fun RecommendScreen(navController: NavHostController) {
         var step by remember {mutableIntStateOf(0)};
         RecommendSteps(step)
         when (step) {
-            0 -> RecommendStepOne(goal_cal = goal_cal, rest_cal = rest_cal)
-            1 -> RecommendStepTwo()
-            2 -> RecommendStepThree()
+            0 -> RecommendStepOne(goal_cal = goal, rest_cal = rest,  onNumberSelected = {
+                    selectedNumber -> ggini = selectedNumber
+            })
+            1 -> RecommendStepTwo(rest = rest, onNumberSelected = {
+                    selectedNumber -> rest = selectedNumber
+            })
+            2 -> RecommendStepThree(foods = foods ?: emptyList())
             else -> { }
         }
 
@@ -87,7 +116,14 @@ fun RecommendScreen(navController: NavHostController) {
                     .weight(1f)
                     .fillMaxSize())
                 Button(
-                    onClick = {step+=1 },
+                    onClick = {
+                        if(step == 0){
+                            rest/=ggini
+                        } else if(step==1) {
+                            foodViewModel.loadRecommendFoods((rest*10).toString())
+                        }
+                        step+=1
+                              },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFB6B284), // 버튼 배경색
                         contentColor = Color.White // 버튼 텍스트색
@@ -112,20 +148,16 @@ fun RecommendScreen(navController: NavHostController) {
 
 }
 @Composable
-fun RecommendStepThree() {
+fun RecommendStepThree(foods: List<FoodInfo>) {
     Column(modifier = Modifier.padding(40.dp,10.dp,40.dp,100.dp)) {
         Text(text = "추천된 음식을 확인하고", style = textStyle)
         Text(text = "식단에 추가해 보세요", style = textStyle)
-        FoodList(foodInfos = listOf(
-            FoodInfo("등갈비 김치찜", 200, 25.5f, 32.0f,21.9f,427.1f),
-            FoodInfo("공깃밥",1,31.7f,2.7f,0.3f,140.3f),
-            FoodInfo("모코코",10,31.7f,2.7f,0.3f,140.3f)
-        ))
+        FoodList(foodInfos = foods)
     }
 }
 
 @Composable
-fun RecommendStepTwo() {
+fun RecommendStepTwo(rest: Int, onNumberSelected: (Int) -> Unit) {
     Column(modifier = Modifier.padding(40.dp)) {
         Text(text = "한 끼에 적당한 칼로리를 계산했어요", style = textStyle)
         Text(text = "가벼운 한 끼를 위해서 줄이거나", style = textStyle)
@@ -149,7 +181,7 @@ fun RecommendStepTwo() {
             )
         }
         Row(modifier= Modifier.padding(horizontal = 30.dp)) {
-            NumberPicker(current = (800 -1)/10, end = 1100, step = 10)
+            NumberPicker(current = (rest -1)/10, end = 1100, step = 10, onNumberSelected = onNumberSelected)
         }
     }
 }
@@ -214,7 +246,7 @@ fun Step(modifier: Modifier = Modifier, isCompete: Boolean, isCurrent: Boolean) 
 }
 
 @Composable
-fun RecommendStepOne(goal_cal: Int, rest_cal: Int) {
+fun RecommendStepOne(goal_cal: Int, rest_cal: Int, onNumberSelected: (Int) -> Unit) {
     Column(modifier = Modifier.padding(40.dp)) {
         Text(text = "남은 끼니 수를 알려 주시면", style = textStyle)
         Text(text = "적당한 한 끼를 추천해 드릴게요.", style = textStyle)
@@ -247,14 +279,14 @@ fun RecommendStepOne(goal_cal: Int, rest_cal: Int) {
             )
         }
         Row(modifier= Modifier.padding(horizontal = 30.dp)) {
-            NumberPicker(current = (1-1)/1, end = 5, step = 1)
+            NumberPicker(current = (1-1)/1, end = 5, step = 1, onNumberSelected = onNumberSelected)
         }
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun NumberPicker(modifier: Modifier = Modifier, current: Int, end: Int, step: Int) {
+fun NumberPicker(modifier: Modifier = Modifier, current: Int, end: Int, step: Int, onNumberSelected: (Int) -> Unit) {
     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
         val contentPadding = (maxWidth - 50.dp) / 2
         val offSet = maxWidth / 5
@@ -271,17 +303,9 @@ fun NumberPicker(modifier: Modifier = Modifier, current: Int, end: Int, step: In
         /** 이벤트 로직 **/
         LaunchedEffect(pagerState.currentPage) {
             val selectedNumber = pagerState.currentPage + 1
-            println("현재 선택된 숫자: $selectedNumber")
+            onNumberSelected(selectedNumber)
         }
-        /**
-        CenterCircle(
-            modifier = modifier
-                .size(50.dp)
-                .align(Alignment.Center),
-            fillColor = Color.Magenta,
-            strokeWidth = 2.dp
-        )
-        **/
+
         HorizontalPager(
             modifier = modifier,
             state = pagerState,

@@ -3,7 +3,6 @@ package com.d101.back.service;
 import com.d101.back.api.KakaoOAuthApi;
 import com.d101.back.api.OAuthApi;
 import com.d101.back.dto.LoginTokenDto;
-import com.d101.back.dto.UserDto;
 import com.d101.back.dto.oauth.OAuth2UserInfo;
 import com.d101.back.dto.oauth.OAuthLoginReq;
 import com.d101.back.dto.request.LoginReq;
@@ -14,7 +13,6 @@ import com.d101.back.entity.QAllergy;
 import com.d101.back.entity.User;
 import com.d101.back.entity.composite.UserAllergyKey;
 import com.d101.back.entity.enums.AllergyType;
-import com.d101.back.entity.enums.Provider;
 import com.d101.back.entity.enums.Role;
 import com.d101.back.exception.BadRequestException;
 import com.d101.back.exception.NoSuchDataException;
@@ -32,7 +30,6 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.HashMap;
@@ -83,7 +80,7 @@ public class UserService {
     }
 
     public User createNewUser(OAuth2UserInfo oAuth2UserInfo) {
-        User user = User.builder()
+        return User.builder()
                 .email(oAuth2UserInfo.getEmail())
                 .username(oAuth2UserInfo.getNickname())
                 .image(oAuth2UserInfo.getImageUrl())
@@ -91,7 +88,6 @@ public class UserService {
                 .oauthId(oAuth2UserInfo.getId())
                 .provider(oAuth2UserInfo.getProvider())
                 .build();
-        return user;
     }
 
     @Transactional
@@ -129,8 +125,7 @@ public class UserService {
     public void updateUserInfo(String email, ModifyUserReq req) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND));
-        user.setUsername(req.getUsername());
-        user.setGender(req.getGender());
+        user.setActivity(req.getActivity());
         user.setCalorie(req.getCalorie());
         user.setHeight(req.getHeight());
         user.setWeight(req.getWeight());
@@ -165,11 +160,12 @@ public class UserService {
         return  allergies.stream().map(AllergyType::name).toList();
     }
 
-    public UserDto getUserInfo(String email) {
+    public ModifyUserReq getUserInfo(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchDataException(ExceptionStatus.USER_NOT_FOUND));
 
-        UserDto result = new UserDto();
+        ModifyUserReq result = new ModifyUserReq();
+        result.setActivity(user.getActivity());
         result.setCalorie(user.getCalorie());
         result.setHeight(user.getHeight());
         result.setWeight(user.getWeight());

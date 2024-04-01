@@ -39,12 +39,15 @@ fun MyApp(kakaoAuthViewModel: KakaoAuthViewModel, userViewModel: UserViewModel) 
     D101Theme {
         val navController = rememberNavController()
         // 현재 라우트 상태를 기반으로 하단 네비게이션 바의 표시 여부를 결정
+
+
+
         Scaffold(
             bottomBar = {
                 // 현재 네비게이션 스택에서 가장 상위에 있는 라우트 정보
                 val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
                 // Landing 페이지가 아닐 때 하단 네비게이션 바 표시
-                if (currentRoute != null && currentRoute != Screens.Start.route && currentRoute != Screens.SignUp.route && currentRoute != Screens.SignUpComplete.route) {
+                if (currentRoute != null && showNavBar(currentRoute)) {
                     BottomNavigationBar(navController = navController)
                 }
             }
@@ -52,6 +55,13 @@ fun MyApp(kakaoAuthViewModel: KakaoAuthViewModel, userViewModel: UserViewModel) 
             SetUpNavGraph(navController = navController, kakaoAuthViewModel = kakaoAuthViewModel, userViewModel = userViewModel)
         }
     }
+}
+
+fun showNavBar(route: String): Boolean {
+    return route != Screens.Start.route &&
+            route != Screens.SignUp.route &&
+            route != Screens.SignUpComplete.route &&
+            route != Screens.Height.route
 }
 
 // 사용자 로그인 상태를 확인하는 함수 (예시 구현)

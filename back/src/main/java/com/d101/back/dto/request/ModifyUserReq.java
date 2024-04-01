@@ -1,16 +1,14 @@
 package com.d101.back.dto.request;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class ModifyUserReq {
-
-    private String username;
-    private String gender;
+    private int activity;
     private int calorie;
     private int height;
     private int weight;

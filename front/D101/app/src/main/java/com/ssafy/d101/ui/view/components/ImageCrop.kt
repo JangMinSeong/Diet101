@@ -89,7 +89,7 @@ fun DefaultPreview() {
 //        "height" to 0.2949396811240961 // 원본 이미지에 대한 비율 기반 높이
 //    )
     mapOf(
-        "image_filename" to "test3", // drawable에 test11111 이미지가 있어야 합니다.
+        "image_filename" to "test3", // drawable에 test3 이미지가 있어야 합니다.
         "tag" to "수박",
         "left_top" to listOf(0.6996849466581475, 0.006072836079873329), // 원본 이미지에 대한 비율 기반 좌표
         "width" to 0.26781160148989314, // 원본 이미지에 대한 비율 기반 너비
