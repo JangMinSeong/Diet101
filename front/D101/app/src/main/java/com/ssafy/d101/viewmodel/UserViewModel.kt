@@ -1,12 +1,14 @@
 package com.ssafy.d101.viewmodel
 
-import androidx.compose.runtime.mutableIntStateOf
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ssafy.d101.model.UserSubInfo
 import com.ssafy.d101.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -15,30 +17,79 @@ class UserViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _hasUserSubInfo = MutableStateFlow<Boolean>(false)
+    private val _height = MutableStateFlow<Int?>(null)
+    private val _weight = MutableStateFlow<Int?>(null)
+    private val _activityLevel = MutableStateFlow<Int?>(null)
+    private val _calorie = MutableStateFlow<Int?>(null)
 
-    private val height = mutableIntStateOf(0)
-    private val weight = mutableIntStateOf(0)
-    private val activityLevel = mutableIntStateOf(0)
+    init {
+        initializeUserSubInfo()
+    }
 
+    private fun initializeUserSubInfo() {
+        viewModelScope.launch {
+            userRepository.userSubInfo.collect { userSubInfo ->
+                userSubInfo?.let {
+                    _height.value = it.height
+                    _weight.value = it.weight
+                    _activityLevel.value = it.activity
+                    _calorie.value = it.calorie
+                    // 이곳에서 필요한 경우 _hasUserSubInfo 업데이트
+                    _hasUserSubInfo.value = true
+                } ?: run {
+                    // userSubInfo가 null일 경우의 처리
+                    _hasUserSubInfo.value = false
+                }
+            }
+        }
+    }
+
+    val height = _height.asStateFlow()
+    val weight = _weight.asStateFlow()
+    val activityLevel = _activityLevel.asStateFlow()
+    val calorie = _calorie.asStateFlow()
     val hasUserSubInfo = _hasUserSubInfo.asStateFlow()
+
+    private val _saveSuccess = MutableStateFlow<Boolean>(false)
+    val saveSuccess = _saveSuccess.asStateFlow()
+
     fun getUserInfo() = userRepository.userInfo
     fun getUserSubInfo() = userRepository.userSubInfo
 
     suspend fun setUserSubInfo() {
+        Log.i("UserViewModel", "height: ${_height.value}, weight: ${_weight.value}, activity: ${_activityLevel.value}")
         val userSubInfo = UserSubInfo(
-            height = height.intValue,
-            weight = weight.intValue,
-            activity = activityLevel.intValue,
+            height = _height.value ?: 0,
+            weight = _weight.value ?: 0,
+            activity = _activityLevel.value ?: -1,
             calorie = calculateCalories()
         )
-        if (userRepository.storeUserSubInfo(userSubInfo).isSuccess) {
-            userRepository.setUserSubInfo(userSubInfo)
+        viewModelScope.launch {
+            val result = userRepository.storeUserSubInfo(userSubInfo)
+            _saveSuccess.value = result.isSuccess
+        }
+    }
+
+    private fun caculateBMR(): Double {
+        Log.i("UserViewModel", "weight: ${_weight.value}, height: ${_height.value}, age: ${userRepository.userInfo.value?.age}")
+        return if (userRepository.userInfo.value?.gender == "MALE") {
+            66.47 + (13.75 * _weight.value!!) + (5.003 * _height.value!!) - (6.755 * userRepository.userInfo.value?.age!!)
+        } else {
+            655.1 + (9.563 * _weight.value!!) + (1.85 * _height.value!!) - (4.676 * userRepository.userInfo.value?.age!!)
         }
     }
 
     private fun calculateCalories(): Int {
-        // TODO: 공식 보고 계산해야함!
-        return 2000
+        val bmr = caculateBMR()
+        val activityLevel = userRepository.userSubInfo.value?.activity!!
+        val factor = when (activityLevel) {
+            0 -> 1.2
+            1 -> 1.375
+            2 -> 1.55
+            3 -> 1.725
+            else -> 1.9
+        }
+        return (bmr * factor).toInt()
     }
 
     suspend fun fetchUserSubInfo(): Result<UserSubInfo> {

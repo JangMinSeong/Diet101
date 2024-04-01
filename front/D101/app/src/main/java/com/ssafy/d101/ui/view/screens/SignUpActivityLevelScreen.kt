@@ -1,14 +1,12 @@
 package com.ssafy.d101.ui.view.screens
 
 import android.util.Log
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -20,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -27,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,7 +43,7 @@ fun SignUpActivityLevelScreen(navController: NavHostController) {
     val userViewModel: UserViewModel = hiltViewModel()
 
     var startUserSubInfoUpdate by remember { mutableStateOf(false) }
-    val isUpdatedComplete by remember { mutableStateOf(false) }
+    val saveState: Boolean by userViewModel.saveSuccess.collectAsState()
 
     val activityLevelList = listOf(
         "운동을 하지 않음",
@@ -58,7 +56,13 @@ fun SignUpActivityLevelScreen(navController: NavHostController) {
 
     LaunchedEffect(startUserSubInfoUpdate) {
         if (startUserSubInfoUpdate) {
+            Log.i("SignUpActivityLevelScreen", "startUserSubInfoUpdate: $startUserSubInfoUpdate")
             userViewModel.setUserSubInfo()
+        }
+    }
+
+    LaunchedEffect(saveState) {
+        if (saveState) {
             navController.navigate(Screens.Home.route)
         }
     }
@@ -117,7 +121,9 @@ fun SignUpActivityLevelScreen(navController: NavHostController) {
         }
 
         Button(
-            onClick = { startUserSubInfoUpdate = true },
+            onClick = {
+                userViewModel.setActivityLevel(activityLevel)
+                startUserSubInfoUpdate = true },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "시작하기")

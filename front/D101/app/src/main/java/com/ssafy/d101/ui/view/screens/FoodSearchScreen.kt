@@ -206,14 +206,14 @@ fun FoodSearchScreen(
 
                             // 1인분 당 그램 수
                             Text(
-                                text = "100g",
+                                text = "${foodItem.portionSize}g",
                                 color = Color.Gray,
                                 fontSize = 14.sp
                             )
 
                             // 칼로리
                             Text(
-                                text = "100kcal",
+                                text = "${foodItem.calorie}kcal",
                                 color = Color.Gray,
                                 fontSize = 18.sp
                             )
