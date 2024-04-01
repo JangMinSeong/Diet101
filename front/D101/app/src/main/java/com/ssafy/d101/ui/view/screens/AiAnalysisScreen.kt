@@ -1,4 +1,5 @@
 package com.ssafy.d101.ui.view.screens
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -28,10 +29,28 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.ssafy.d101.viewmodel.ModelViewModel
 
 @Preview(showBackground = true)
 @Composable
-fun AiAnalysisScreen() {
+fun AiAnalysisScreen(navController: NavController) {
+    val modelViewModel : ModelViewModel = hiltViewModel()
+    val analysisResult by modelViewModel.getYoloResponse().collectAsState(null)
+
+    LaunchedEffect(Unit) {
+
+    }
+    // 분석 결과가 준비되면 결과 화면으로 전환
+    LaunchedEffect(analysisResult) {
+        Log.d("in loading", "$analysisResult")
+        analysisResult?.let {
+            Log.d("in loading", "aaaaa")
+            navController.navigate("analysisResult")
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()

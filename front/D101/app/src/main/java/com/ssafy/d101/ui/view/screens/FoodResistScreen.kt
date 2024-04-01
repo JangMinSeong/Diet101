@@ -301,12 +301,20 @@ fun FoodResistScreen(navController: NavHostController) {
                     // "등록하기" 버튼 추가
                     Button(
                         onClick = {
-                            imageUri?.let { modelViewModel.setImageUri(it) }
-//                            val uri =modelViewModel.getImageUri().value
-//                            Log.d("modelView","$uri")
-
-                            ////TODO : 여기서 api 요청 쏘기
-                                  },
+                            imageUri?.let { uri ->
+                                // ViewModel을 통해 이미지 URI 설정
+                                modelViewModel.setImageUri(uri)
+                                // 이미지 분석 시작
+                                modelViewModel.transferImageToYolo(context) { isSuccess ->
+                                    if (isSuccess) {
+                                        // 분석 성공 시 로딩 화면으로 넘어감
+                                        navController.navigate("ailoading")
+                                    } else {
+                                        // 실패 처리 로직 (에러 메시지 표시 등)
+                                    }
+                                }
+                            }
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                         modifier = Modifier
                             .width(130.dp)
