@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FoodRepository extends JpaRepository<Food, Long> {
     List<Food> findByNameContainingOrderByNameAsc(String name, Pageable pageable);
@@ -17,5 +18,5 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
             "ORDER BY p.weight DESC")
     List<Food> rankingByEmail(@Param("email") String email, Pageable pageable);
 
-
+    Optional<Food> findByName(String name);
 }
