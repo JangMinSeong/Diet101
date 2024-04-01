@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder
 import com.ssafy.d101.api.DietService
 import com.ssafy.d101.api.FoodSearchService
 import com.ssafy.d101.api.FoodService
+import com.ssafy.d101.api.ModelService
 import com.ssafy.d101.api.UserLoginService
 import com.ssafy.d101.api.UserService
 import com.ssafy.d101.utils.AuthAuthenticator
@@ -86,5 +87,10 @@ object NetworkModule {
     @Singleton
     fun provideFoodService(retrofit: Retrofit): FoodService =
         retrofit.create(FoodService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideModelService(retrofit: Retrofit): ModelService =
+        retrofit.create(ModelService::class.java)
 
 }

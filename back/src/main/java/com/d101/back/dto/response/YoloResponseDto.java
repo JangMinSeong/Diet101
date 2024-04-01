@@ -15,5 +15,5 @@ public class YoloResponseDto {
     private List<Double> left_top;
     private Double width;
     private Double height;
-    private YoloFoodDto YoloFoodDto;
+    private YoloFoodDto yoloFoodDto;
 }
