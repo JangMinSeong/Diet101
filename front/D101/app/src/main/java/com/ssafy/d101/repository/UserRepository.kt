@@ -24,19 +24,27 @@ class UserRepository @Inject constructor(private val userService: UserService, p
     private val calorie = mutableIntStateOf(0)
 
     fun setHeight(height: Int) {
-        this.height.intValue = height
+        val currentInfo = _userSubInfo.value ?: UserSubInfo()
+        _userSubInfo.value = currentInfo.copy(height = height)
+//        this.height.intValue = height
     }
 
     fun setWeight(weight: Int) {
-        this.weight.intValue = weight
+        val currentInfo = _userSubInfo.value ?: UserSubInfo()
+        _userSubInfo.value = currentInfo.copy(weight = weight)
+//        this.weight.intValue = weight
     }
 
     fun setActivityLevel(activityLevel: Int) {
-        this.activityLevel.intValue = activityLevel
+        val currentInfo = _userSubInfo.value ?: UserSubInfo()
+        _userSubInfo.value = currentInfo.copy(activity = activityLevel)
+//        this.activityLevel.intValue = activityLevel
     }
 
     fun setCalorie(calorie: Int) {
-        this.calorie.intValue = calorie
+        val currentInfo = _userSubInfo.value ?: UserSubInfo()
+        _userSubInfo.value = currentInfo.copy(calorie = calorie)
+//        this.calorie.intValue = calorie
     }
 
     suspend fun setUserInfo(userInfo: UserInfo) {
@@ -65,7 +73,7 @@ class UserRepository @Inject constructor(private val userService: UserService, p
         return try {
             val response = userService.updateUserSubInfo(userSubInfo)
             if (response.isSuccessful) {
-                Log.i("UserRepository", "UserSubInfo: ${response.body()}")
+                setUserSubInfo(userSubInfo)
                 Result.success(true)
             } else {
                 Log.e("User", "Failed to store user sub info")
