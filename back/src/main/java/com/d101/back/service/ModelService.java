@@ -1,6 +1,7 @@
 package com.d101.back.service;
 
 
+import com.d101.back.dto.response.OcrResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -45,7 +46,7 @@ public class ModelService {
         return response.getBody();
     }
 
-    public String transmitImageToOCR(MultipartFile multipartFile) throws IOException {
+    public OcrResponse transmitImageToOCR(MultipartFile multipartFile) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -63,9 +64,8 @@ public class ModelService {
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-        ResponseEntity<String> response =
-                restTemplate.postForEntity(url + "/model/ocr", requestEntity, String.class);
-
+        ResponseEntity<OcrResponse> response =
+                restTemplate.postForEntity(url + "/model/ocr", requestEntity, OcrResponse.class);
         return response.getBody();
     }
 }
