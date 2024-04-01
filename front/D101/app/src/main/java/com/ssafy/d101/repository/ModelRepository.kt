@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 class ModelRepository @Inject constructor(private val modelService: ModelService) {
+    private val _imageUri = MutableStateFlow<Uri?>(null)
+    val imageUri = _imageUri.asStateFlow()
 
     private val _yoloInfo = MutableStateFlow<List<YoloResponse>?>(null)
     val yoloInfo = _yoloInfo.asStateFlow()
@@ -19,4 +21,7 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
 
     }
 
+    fun setImageUri(uri : Uri) {
+
+    }
 }

@@ -89,6 +89,7 @@ fun FoodResistScreen(navController: NavHostController) {
             // 사진 촬영이 성공했을 때, 이미 할당된 contentUri를 imageUri에 할당
             imageUri = contentUri
             Log.d("Camera", "Photo saved to $imageUri")
+
         } else {
             Log.e("Camera", "Failed to capture photo")
         }
