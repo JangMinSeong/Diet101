@@ -61,10 +61,6 @@ import com.ssafy.d101.viewmodel.FoodSearchViewModel
 @Composable
 fun FoodAdditionScreen(navController: NavHostController) {
     var showDialog by remember { mutableStateOf(false) }
-    var eatenAmount by remember { mutableStateOf("") }
-    var carbohydrate by remember { mutableStateOf("100g") }
-    var protein by remember { mutableStateOf("20g") }
-    var fat by remember { mutableStateOf("10g") }
     var searchText by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
     val viewModel: FoodSearchViewModel = hiltViewModel()
@@ -72,7 +68,7 @@ fun FoodAdditionScreen(navController: NavHostController) {
     var selectedFoodItem by remember { mutableStateOf<FoodAddInfo?>(null)}
 
     LaunchedEffect(selectedFoodItem) {
-        eatenAmount = selectedFoodItem?.eatenAmount.toString()
+
     }
 
     Column (
@@ -224,6 +220,13 @@ fun FoodAdditionScreen(navController: NavHostController) {
             // AlertDialog 로직
             var text by remember { mutableStateOf("") } // 사용자 입력 관리 상태 변수
             selectedFoodItem?.let { item ->
+                var eatenAmountText by remember { mutableStateOf("1.0") }
+                val eatenAmount = eatenAmountText.toDoubleOrNull() ?: 1.0
+
+                val carbohydrate = item.carbohydrate * eatenAmount
+                val protein = (item.protein) * eatenAmount
+                val fat = (item.fat) * eatenAmount
+                val calories = (carbohydrate * 4) + (protein * 4) + (fat * 9)
                 if (showDialog) {
                     AlertDialog(
                         onDismissRequest = { showDialog = false },
@@ -265,9 +268,9 @@ fun FoodAdditionScreen(navController: NavHostController) {
 
                                 // 먹은 양 입력 상자
                                 TextField(
-                                    value = eatenAmount,
+                                    value = eatenAmountText,
                                     onValueChange = { newValue ->
-                                        eatenAmount = newValue.filter { it.isDigit() || it == '.' }
+                                        eatenAmountText = newValue
                                     },
                                     modifier = Modifier
                                         .width(100.dp)
@@ -292,7 +295,7 @@ fun FoodAdditionScreen(navController: NavHostController) {
                                         verticalArrangement = Arrangement.Top
                                     ) {
                                         Text(
-                                            "${item.calorie}kcal",
+                                            "${calories}kcal",
                                             fontSize = 20.sp,
                                             fontWeight = FontWeight.Bold,
                                             modifier = Modifier
@@ -326,7 +329,6 @@ fun FoodAdditionScreen(navController: NavHostController) {
                         confirmButton = {
                             Button(
                                 onClick = {
-                                    Log.d("Update", "먹은 양: $text, 탄수화물: $carbohydrate, 단백질: $protein, 지방: $fat")
                                     showDialog = false
                                 },
                                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),

@@ -1,5 +1,6 @@
 package com.ssafy.d101.repository
 
+import android.util.Log
 import com.ssafy.d101.model.FoodAddInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,5 +27,18 @@ class FoodRepository @Inject constructor(
     suspend fun deleteFoodItem(foodAddInfo: FoodAddInfo) {
         val updatedList = _userAddedFoodItems.value.filterNot { it == foodAddInfo }
         _userAddedFoodItems.value = updatedList
+    }
+
+    // 음식 아이템 업데이트
+    suspend fun updateFoodItem(updatedFoodAddInfo: FoodAddInfo) {
+        val index = _userAddedFoodItems.value.indexOfFirst { it.id == updatedFoodAddInfo.id }
+        if (index != -1) {
+            val updatedList = _userAddedFoodItems.value.toMutableList().apply {
+                this[index] = updatedFoodAddInfo
+            }
+            _userAddedFoodItems.value = updatedList
+        } else {
+            Log.e("FoodRepository", "업데이트할 아이템 없음.")
+        }
     }
 }
