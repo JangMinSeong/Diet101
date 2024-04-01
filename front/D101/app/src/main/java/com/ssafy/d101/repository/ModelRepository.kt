@@ -1,6 +1,8 @@
 package com.ssafy.d101.repository
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import com.ssafy.d101.api.ModelService
@@ -42,15 +44,29 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
         return try {
             val imageUri = imageUri.value ?: return Result.failure(Exception("Image Uri is null"))
             val inputStream = context.contentResolver.openInputStream(imageUri) ?: return Result.failure(Exception("Failed to open image stream"))
-            val contentType = "image/jpeg".toMediaTypeOrNull()
 
-            // Buffer the inputStream into a temporary file
+            // 이미지 크기를 줄이기 위한 BitmapFactory.Options 설정
+            val options = BitmapFactory.Options().apply {
+                inJustDecodeBounds = true // 실제 Bitmap을 생성하지 않고, 이미지의 크기 정보만을 로드
+                BitmapFactory.decodeStream(inputStream, null, this)
+                inSampleSize = calculateInSampleSize(this, 800, 800) // 원하는 최대 너비와 높이
+                inJustDecodeBounds = false // Bitmap을 실제로 로드
+            }
+            inputStream.close()
+
+            // 크기가 조정된 Bitmap 로드
+            val resizedInputStream = context.contentResolver.openInputStream(imageUri) ?: return Result.failure(Exception("Failed to open image stream again"))
+            val bitmap = BitmapFactory.decodeStream(resizedInputStream, null, options)
+            resizedInputStream.close()
+
+            // Bitmap을 임시 파일로 저장
             val tempFile = File.createTempFile("upload", ".jpg", context.cacheDir).apply {
-                outputStream().use {
-                    inputStream.copyTo(it)
+                outputStream().use { out ->
+                    bitmap?.compress(Bitmap.CompressFormat.JPEG, 85, out) // JPEG 형식으로 압축. 품질은 85로 설정
                 }
             }
 
+            val contentType = "image/jpeg".toMediaTypeOrNull()
             val requestFile = tempFile.asRequestBody(contentType)
             val body = MultipartBody.Part.createFormData("file", tempFile.name, requestFile)
             val response = modelService.checkCal(body)
@@ -60,7 +76,6 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
             if (response.isSuccessful) {
                 _yoloInfo.emit(response.body())
                 Result.success(response.body()!!)
-
             } else {
                 Log.e("Model", "Failed to get YoloResponse")
                 Result.failure(Exception("Failed to get YoloResponse"))
@@ -73,5 +88,23 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
 
     suspend fun setImageUri(uri : Uri) {
         _imageUri.emit(uri)
+    }
+
+    // 비트맵의 샘플링 크기를 계산
+    fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+        val (height: Int, width: Int) = options.run { outHeight to outWidth }
+        var inSampleSize = 1
+
+        if (height > reqHeight || width > reqWidth) {
+            val halfHeight: Int = height / 2
+            val halfWidth: Int = width / 2
+
+            // 샘플링 사이즈를 계산. 이 값은 2의 거듭제곱이어야 합니다.
+            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2
+            }
+        }
+
+        return inSampleSize
     }
 }
