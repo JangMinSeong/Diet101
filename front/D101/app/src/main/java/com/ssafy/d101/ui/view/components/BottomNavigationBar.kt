@@ -1,5 +1,6 @@
 package com.ssafy.d101.ui.view.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
@@ -10,6 +11,8 @@ import androidx.compose.material.icons.*
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -24,11 +27,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.ssafy.d101.R
 import com.ssafy.d101.navigation.Screens
+import com.ssafy.d101.ui.view.screens.TextItem
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
@@ -49,14 +56,33 @@ fun BottomNavigationBar(navController: NavHostController) {
     selectedItem = items.indexOfFirst { it.route == currentRoute }.coerceAtLeast(0)
 
     if (showDialog) {
-        Dialog(onDismissRequest = { showDialog = false }) {
-            Surface (
-                modifier = Modifier.padding(8.dp),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Text(text = "AddFood", modifier = Modifier.padding(16.dp))
-            }
-        }
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = {
+                Text(
+                    "등록하기",
+                    modifier = Modifier
+                        .padding(top = 15.dp, start = 10.dp),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                )
+            },
+            text = {
+                Column {
+                    Divider(thickness = 3.dp)
+                    TextItem("일반 음식 등록하기", R.drawable.generalfood) {
+                        showDialog = false
+                        navController.navigate("foodResist")
+                    }
+                    TextItem("가공 음식 등록하기", R.drawable.processedfood) {
+                        showDialog = false
+                    }
+                }
+            },
+            confirmButton = {
+
+            },
+        )
     }
 
     NavigationBar {
@@ -67,17 +93,18 @@ fun BottomNavigationBar(navController: NavHostController) {
                 onClick = {
                     // 'addFood' 아이템이 클릭되었을 때의 로직 처리
                     if (item.route == "addFood") {
-                        println("Navigate to foodResist Screen")
+                       showDialog = true
+
                         // 'foodResist' 경로로 네비게이션
-                        navController.navigate("foodResist") {
-                            // 현재 네비게이션 스택의 시작 위치로 popUp하여 중복된 네비게이션을 방지
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            // 상태 복원을 위해 launchSingleTop 설정
-                            launchSingleTop = true
-                            restoreState = true
-                        }
+//                        navController.navigate("foodResist") {
+//                            // 현재 네비게이션 스택의 시작 위치로 popUp하여 중복된 네비게이션을 방지
+//                            popUpTo(navController.graph.startDestinationId) {
+//                                saveState = true
+//                            }
+//                            // 상태 복원을 위해 launchSingleTop 설정
+//                            launchSingleTop = true
+//                            restoreState = true
+//                        }
                     } else {
                         println("Navigate to ${item.route}")
                         selectedItem = index
