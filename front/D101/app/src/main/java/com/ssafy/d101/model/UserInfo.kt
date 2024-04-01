@@ -10,10 +10,10 @@ data class UserInfo(
 )
 
 data class UserSubInfo(
-    val activity : Int,
-    val calorie : Int,
-    val height : Int,
-    val weight : Int
+    val activity : Int = -1,
+    val calorie : Int = 0,
+    val height : Int = 0,
+    val weight : Int = 0
 )
 
 data class RegisterResponse(
