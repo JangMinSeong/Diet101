@@ -7,23 +7,35 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.ssafy.d101.navigation.Screens
+import com.ssafy.d101.viewmodel.UserViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpWeightScreen(navController: NavHostController) {
-    val weight = remember { mutableStateOf("") }
+
+    val userViewModel: UserViewModel = hiltViewModel()
+
+    val weight = remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -32,6 +44,15 @@ fun SignUpWeightScreen(navController: NavHostController) {
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.Start
     ) {
+        TopAppBar(
+            title = {},
+            navigationIcon = {
+                IconButton(onClick = {navController.popBackStack()}) {
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "back")
+                }
+            }
+        )
+
         Column {
             Spacer(Modifier.padding(16.dp))
             Text(
@@ -46,10 +67,10 @@ fun SignUpWeightScreen(navController: NavHostController) {
 
             Spacer(Modifier.padding(16.dp))
             TextField(
-                value = weight.value,
+                value = if (weight.intValue != 0) weight.intValue.toString() else "",
                 onValueChange = { newValue ->
                     // 입력 값이 변경될 때마다 height 상태를 업데이트합니다.
-                    weight.value = newValue
+                    weight.intValue = newValue.toInt()
                 },
                 label = { Text("몸무게") },
                 suffix = { Text("kg") },
@@ -60,7 +81,9 @@ fun SignUpWeightScreen(navController: NavHostController) {
         }
 
         Button(
-            onClick = { navController.navigate(Screens.ActivityLevel.route) },
+            onClick = {
+                userViewModel.setWeight(weight.intValue)
+                navController.navigate(Screens.ActivityLevel.route) },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "다음")

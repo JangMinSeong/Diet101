@@ -1,81 +1,143 @@
 package com.ssafy.d101.viewmodel
 
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssafy.d101.api.UserService
-import com.ssafy.d101.model.User
-import com.ssafy.d101.model.UserInfo
 import com.ssafy.d101.model.UserSubInfo
 import com.ssafy.d101.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
-    private val userService: UserService,
     private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _hasUserSubInfo = MutableStateFlow<Boolean>(false)
+    private val _height = MutableStateFlow<Int?>(null)
+    private val _weight = MutableStateFlow<Int?>(null)
+    private val _activityLevel = MutableStateFlow<Int?>(null)
+    private val _calorie = MutableStateFlow<Int?>(null)
+
+    init {
+        initializeUserSubInfo()
+    }
+
+    private fun initializeUserSubInfo() {
+        viewModelScope.launch {
+            userRepository.userSubInfo.collect { userSubInfo ->
+                userSubInfo?.let {
+                    _height.value = it.height
+                    _weight.value = it.weight
+                    _activityLevel.value = it.activity
+                    _calorie.value = it.calorie
+                    // 이곳에서 필요한 경우 _hasUserSubInfo 업데이트
+                    _hasUserSubInfo.value = true
+                } ?: run {
+                    // userSubInfo가 null일 경우의 처리
+                    _hasUserSubInfo.value = false
+                }
+            }
+        }
+    }
+
+    val height = _height.asStateFlow()
+    val weight = _weight.asStateFlow()
+    val activityLevel = _activityLevel.asStateFlow()
+    val calorie = _calorie.asStateFlow()
     val hasUserSubInfo = _hasUserSubInfo.asStateFlow()
-    fun getUser() = userRepository.getUser()
 
-    suspend fun setUser(user: User) = userRepository.fetchAndStoreUser(user)
+    private val _saveSuccess = MutableStateFlow<Boolean>(false)
+    val saveSuccess = _saveSuccess.asStateFlow()
 
-    suspend fun setUserSubInfo(userSubInfo: UserSubInfo) = userRepository.fetchAndStoreUserSubInfo(userSubInfo)
+    fun getUserInfo() = userRepository.userInfo
+    fun getUserSubInfo() = userRepository.userSubInfo
 
-    suspend fun getUserSubInfo(): Result<UserSubInfo> {
-        val result = userRepository.getUserSubInfo()
+    suspend fun setUserSubInfo() {
+        Log.i("UserViewModel", "height: ${_height.value}, weight: ${_weight.value}, activity: ${_activityLevel.value}")
+        val userSubInfo = UserSubInfo(
+            height = _height.value ?: 0,
+            weight = _weight.value ?: 0,
+            activity = _activityLevel.value ?: -1,
+            calorie = calculateCalories()
+        )
+        viewModelScope.launch {
+            val result = userRepository.storeUserSubInfo(userSubInfo)
+            _saveSuccess.value = result.isSuccess
+        }
+    }
+
+    private fun caculateBMR(): Double {
+        Log.i("UserViewModel", "weight: ${_weight.value}, height: ${_height.value}, age: ${userRepository.userInfo.value?.age}")
+        return if (userRepository.userInfo.value?.gender == "MALE") {
+            66.47 + (13.75 * _weight.value!!) + (5.003 * _height.value!!) - (6.755 * userRepository.userInfo.value?.age!!)
+        } else {
+            655.1 + (9.563 * _weight.value!!) + (1.85 * _height.value!!) - (4.676 * userRepository.userInfo.value?.age!!)
+        }
+    }
+
+    private fun calculateCalories(): Int {
+        val bmr = caculateBMR()
+        val activityLevel = userRepository.userSubInfo.value?.activity!!
+        val factor = when (activityLevel) {
+            0 -> 1.2
+            1 -> 1.375
+            2 -> 1.55
+            3 -> 1.725
+            else -> 1.9
+        }
+        return (bmr * factor).toInt()
+    }
+
+    suspend fun fetchUserSubInfo(): Result<UserSubInfo> {
+        val result = userRepository.fetchUserSubInfo()
         if (result.isSuccess) {
             _hasUserSubInfo.value = true
         }
         return result
     }
 
-    private val height = mutableIntStateOf(0)
-    private val weight = mutableIntStateOf(0)
-    private val activityLevel = mutableIntStateOf(0)
+
 
     fun setHeight(height: Int) {
-        this.height.intValue = height
+        userRepository.setHeight(height)
     }
 
     fun setWeight(weight: Int) {
-        this.weight.intValue = weight
+        userRepository.setWeight(weight)
     }
 
     fun setActivityLevel(activityLevel: Int) {
-        this.activityLevel.intValue = activityLevel
+        userRepository.setActivityLevel(activityLevel)
     }
 
-    private val _userSubInfo = MutableStateFlow<UserSubInfo?>(null)
-    val userSubInfo = _userSubInfo.asStateFlow()
+    fun setCalorie() {
+        userRepository.setCalorie(calculateCalories())
+    }
 
-//    fun getUserSubInfo() {
+//    fun registerUser(userInfo: UserInfo) {
 //        viewModelScope.launch {
-//            val response: Response<UserSubInfo>
-//            try {
-//                response = userService.getUserSubInfo()
-//                if (response.isSuccessful && response.body() != null) {
-//                    _userSubInfo.value = response.body()
-//                    Log.d("UserViewModel", "getUserSubInfo - ${response.body()}")
-//                } else {
-//                    Log.e("UserViewModel", "Error getUserSubInfo - ${response.errorBody()}")
-//                }
-//            } catch (e: Exception) {
-//                Log.e("UserViewModel", "Exception fetching userSubInfo")
+//            val result = userRepository.registerUser(userInfo)
+//            if (result.isSuccess && result.getOrDefault(false)) {
+//
 //            }
 //        }
 //    }
+
+//    fun getUserSubInfo() {
+//        viewModelScope.launch {
+//            val response = withContext(Dispatchers.IO) {
+//                userService.getUserSubInfo()
+//            }
+//            if (response.isSuccessful) {
+//                _userSubInfo.value = response.body()
+//            }
+//        }
+//    }
+//
 //    fun updateUserInfo(userSubInfo: UserSubInfo) {
 //        viewModelScope.launch {
 //            withContext(Dispatchers.IO) {

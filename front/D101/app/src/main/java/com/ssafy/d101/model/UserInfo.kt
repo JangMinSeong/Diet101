@@ -10,17 +10,10 @@ data class UserInfo(
 )
 
 data class UserSubInfo(
-    val activity : Int,
-    val calorie : Int,
-    val height : Int,
-    val weight : Int
-)
-
-data class User(
-    val userInfo: UserInfo,
-    val userSubInfo : UserSubInfo,
-    val accessToken: String,
-    val refreshToken: String,
+    val activity : Int = -1,
+    val calorie : Int = 0,
+    val height : Int = 0,
+    val weight : Int = 0
 )
 
 data class RegisterResponse(
