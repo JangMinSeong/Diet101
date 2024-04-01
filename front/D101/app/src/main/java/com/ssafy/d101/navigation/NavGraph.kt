@@ -98,10 +98,9 @@ fun SetUpNavGraph(
 
     }
 
-}
 
 //    kakaoAuthViewModel.checkLogin()
 //    val isLoggedIn = kakaoAuthViewModel.isLoggedIn.collectAsState()
 
-
+}
 
