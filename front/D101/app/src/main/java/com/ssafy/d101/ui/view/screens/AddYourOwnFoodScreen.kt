@@ -1,4 +1,5 @@
 package com.ssafy.d101.ui.view.screens
+
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -61,7 +62,7 @@ import kotlinx.coroutines.launch
 
 @Preview(showBackground = true)
 @Composable
-fun FoodAdditionScreen(navController: NavHostController) {
+fun AddYourOwnFoodScreen(navController: NavHostController) {
     var showDialog by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
@@ -164,39 +165,39 @@ fun FoodAdditionScreen(navController: NavHostController) {
             }
         }
 
-
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 40.dp, bottom = 10.dp, start = 25.dp, end = 20.dp)
+                .padding(top = 40.dp, bottom = 10.dp)
         ) {
+            // 내가 추가한 음식
             Text(
                 text = "내가 추가한 음식",
                 modifier = Modifier
-                    .weight(1f), // Text를 Row의 나머지 공간을 차지하도록 설정
+                    .padding(top = 40.dp, bottom = 10.dp, start = 30.dp)
+                    .fillMaxWidth(),
                 textAlign = TextAlign.Start,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
             )
 
-            if (userAddedFoodItems.isNotEmpty()) {
-                Button(
-                    onClick = {
-                        // 업로드 버튼 클릭 시 수행할 액션
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                    modifier = Modifier
-                        .height(50.dp) // 버튼 높이 설정
-                        .padding(start = 5.dp), // 텍스트와 버튼 사이의 간격
-                ) {
-                    Text(
-                        text = "업로드",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
+            Button(
+                onClick = {
+                    // TODO: 버튼 클릭시 수행할 동작
+                    navController.navigate("foodSearch/$searchText")
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                modifier = Modifier
+                    .height(50.dp)
+                    .padding(end = 16.dp), // 오른쪽 패딩 적용
+            ) {
+                Text(
+                    text = "업로드", // 버튼 텍스트
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                )
             }
         }
 
@@ -214,7 +215,7 @@ fun FoodAdditionScreen(navController: NavHostController) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp, bottom = 100.dp)
+                    .padding(horizontal = 20.dp)
                     .background(Color.White),
             ) {
                 items(userAddedFoodItems) { foodItem ->
@@ -237,14 +238,13 @@ fun FoodAdditionScreen(navController: NavHostController) {
                         SwitchWithIconExample()
 
 //                        // 삭제 버튼
-                        CancelButtonExample(onClick = {
+                        CancelButtonExample2(onClick = {
                             viewModel.deleteFoodItem(foodItem)
                         })
                     }
                     Divider(color = Color.Gray)
                 }
             }
-
             // AlertDialog 로직
             selectedFoodItem?.let { item ->
                 var eatenAmountText by remember { mutableStateOf(item.eatenAmount.toString()) }
@@ -358,9 +358,9 @@ fun FoodAdditionScreen(navController: NavHostController) {
                                             horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            NutritionInfoFieldRead("탄수화물", "${String.format("%.2f", adjustedCarbohydrate)}g")
-                                            NutritionInfoFieldRead("단백질", "${String.format("%.2f", adjustedProtein)}g")
-                                            NutritionInfoFieldRead("지방", "${String.format("%.2f", adjustedFat)}g")
+                                            NutritionInfoFieldReading("탄수화물", "${String.format("%.2f", adjustedCarbohydrate)}g")
+                                            NutritionInfoFieldReading("단백질", "${String.format("%.2f", adjustedProtein)}g")
+                                            NutritionInfoFieldReading("지방", "${String.format("%.2f", adjustedFat)}g")
                                         }
                                     }
                                 }
@@ -458,7 +458,7 @@ fun FoodAdditionScreen(navController: NavHostController) {
 
 @Composable
 // 음식 선택 유무
-fun SwitchWithIconExample() {
+fun SwitchWithIconExample2() {
     var checked by remember { mutableStateOf(true) }
 
     Switch(
@@ -482,7 +482,7 @@ fun SwitchWithIconExample() {
 
 @Composable
 // 취소 버튼
-fun CancelButtonExample(onClick: () -> Unit) {
+fun CancelButtonExample2(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier
@@ -497,7 +497,7 @@ fun CancelButtonExample(onClick: () -> Unit) {
 
 @Composable
 // 추가 버튼
-fun AdditionButtonExample(onClick: () -> Unit) {
+fun AdditionButtonExample2(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier
@@ -511,7 +511,7 @@ fun AdditionButtonExample(onClick: () -> Unit) {
 }
 
 @Composable
-fun NutritionInfoFieldRead(labelText: String, text: String) {
+fun NutritionInfoFieldReading(labelText: String, text: String) {
     Column(modifier = Modifier.padding(start = 15.dp, end = 15.dp)) {
         Text(
             text = labelText,

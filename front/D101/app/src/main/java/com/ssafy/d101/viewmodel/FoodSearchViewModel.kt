@@ -28,6 +28,9 @@ class FoodSearchViewModel @Inject constructor(
     private val _userAddedFoodItems = MutableStateFlow<List<FoodAddInfo>>(emptyList())
     val userAddedFoodItems: StateFlow<List<FoodAddInfo>> = foodRepository.userAddedFoodItems
 
+    // 선택된 음식의 최신 상태를 관리
+    private val _selectedFoodItem = MutableStateFlow<FoodAddInfo?>(null)
+    val selectedFoodItem: StateFlow<FoodAddInfo?> = _selectedFoodItem
 
     // 서버에 해당 파라미터의 음식을 GET 요청하는 함수
     fun fetchFoodItems(foodName: String) {
@@ -71,5 +74,18 @@ class FoodSearchViewModel @Inject constructor(
         viewModelScope.launch {
             foodRepository.deleteFoodItem(foodAddInfo)
         }
+    }
+
+    // 음식 아이템 수정 함수
+    fun updateFoodItem(updatedItem: FoodAddInfo) {
+        viewModelScope.launch {
+            foodRepository.updateFoodItem(updatedItem)
+            _selectedFoodItem.value = updatedItem
+        }
+    }
+
+    // 선택된 아이템을 설정하는 함수
+    fun setSelectedFoodItem(item: FoodAddInfo) {
+        _selectedFoodItem.value = item
     }
 }

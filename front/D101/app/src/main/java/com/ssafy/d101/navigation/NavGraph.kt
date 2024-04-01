@@ -81,6 +81,7 @@ fun SetUpNavGraph(
             FoodSearchScreen(navController, foodName) }
     }
 
+
 //    kakaoAuthViewModel.checkLogin()
 //    val isLoggedIn = kakaoAuthViewModel.isLoggedIn.collectAsState()
 
