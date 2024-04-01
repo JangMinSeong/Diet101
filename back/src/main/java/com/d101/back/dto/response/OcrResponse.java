@@ -13,6 +13,11 @@ import java.util.List;
 public class OcrResponse {
     private int calorie;
     private double carbohydrate;
+    private double sugar;
     private double protein;
     private double fat;
+    private double saturated;
+    private double trans;
+    private double cholesterol;
+    private double sodium;
 }
