@@ -1,6 +1,7 @@
 package com.ssafy.d101.repository
 
 import android.util.Log
+import androidx.compose.runtime.mutableIntStateOf
 import com.ssafy.d101.api.UserService
 import com.ssafy.d101.model.UserInfo
 import com.ssafy.d101.model.UserSubInfo
@@ -16,6 +17,27 @@ class UserRepository @Inject constructor(private val userService: UserService, p
 
     private val _userSubInfo = MutableStateFlow<UserSubInfo?>(null)
     val userSubInfo = _userSubInfo.asStateFlow()
+
+    private val height = mutableIntStateOf(0)
+    private val weight = mutableIntStateOf(0)
+    private val activityLevel = mutableIntStateOf(0)
+    private val calorie = mutableIntStateOf(0)
+
+    fun setHeight(height: Int) {
+        this.height.intValue = height
+    }
+
+    fun setWeight(weight: Int) {
+        this.weight.intValue = weight
+    }
+
+    fun setActivityLevel(activityLevel: Int) {
+        this.activityLevel.intValue = activityLevel
+    }
+
+    fun setCalorie(calorie: Int) {
+        this.calorie.intValue = calorie
+    }
 
     suspend fun setUserInfo(userInfo: UserInfo) {
         _userInfo.emit(userInfo)
@@ -35,6 +57,22 @@ class UserRepository @Inject constructor(private val userService: UserService, p
             }
         } catch (e: Exception) {
             Log.e("User", "Exception during user registration", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun storeUserSubInfo(userSubInfo: UserSubInfo): Result<Boolean> {
+        return try {
+            val response = userService.updateUserSubInfo(userSubInfo)
+            if (response.isSuccessful) {
+                Log.i("UserRepository", "UserSubInfo: ${response.body()}")
+                Result.success(true)
+            } else {
+                Log.e("User", "Failed to store user sub info")
+                Result.success(false)
+            }
+        } catch (e: Exception) {
+            Log.e("User", "Exception during user sub info storing", e)
             Result.failure(e)
         }
     }

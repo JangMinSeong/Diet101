@@ -15,11 +15,31 @@ class UserViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _hasUserSubInfo = MutableStateFlow<Boolean>(false)
+
+    private val height = mutableIntStateOf(0)
+    private val weight = mutableIntStateOf(0)
+    private val activityLevel = mutableIntStateOf(0)
+
     val hasUserSubInfo = _hasUserSubInfo.asStateFlow()
     fun getUserInfo() = userRepository.userInfo
     fun getUserSubInfo() = userRepository.userSubInfo
 
-    suspend fun setUserSubInfo(userSubInfo: UserSubInfo) = userRepository.setUserSubInfo(userSubInfo)
+    suspend fun setUserSubInfo() {
+        val userSubInfo = UserSubInfo(
+            height = height.intValue,
+            weight = weight.intValue,
+            activity = activityLevel.intValue,
+            calorie = calculateCalories()
+        )
+        if (userRepository.storeUserSubInfo(userSubInfo).isSuccess) {
+            userRepository.setUserSubInfo(userSubInfo)
+        }
+    }
+
+    private fun calculateCalories(): Int {
+        // TODO: 공식 보고 계산해야함!
+        return 2000
+    }
 
     suspend fun fetchUserSubInfo(): Result<UserSubInfo> {
         val result = userRepository.fetchUserSubInfo()
@@ -29,20 +49,22 @@ class UserViewModel @Inject constructor(
         return result
     }
 
-    private val height = mutableIntStateOf(0)
-    private val weight = mutableIntStateOf(0)
-    private val activityLevel = mutableIntStateOf(0)
+
 
     fun setHeight(height: Int) {
-        this.height.intValue = height
+        userRepository.setHeight(height)
     }
 
     fun setWeight(weight: Int) {
-        this.weight.intValue = weight
+        userRepository.setWeight(weight)
     }
 
     fun setActivityLevel(activityLevel: Int) {
-        this.activityLevel.intValue = activityLevel
+        userRepository.setActivityLevel(activityLevel)
+    }
+
+    fun setCalorie() {
+        userRepository.setCalorie(calculateCalories())
     }
 
 //    fun registerUser(userInfo: UserInfo) {

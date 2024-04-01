@@ -27,6 +27,7 @@ import com.ssafy.d101.ui.view.screens.LoadingScreen
 import com.ssafy.d101.ui.view.screens.LoginSuccessScreen
 import com.ssafy.d101.ui.view.screens.MyPageScreen
 import com.ssafy.d101.ui.view.screens.RecommendScreen
+import com.ssafy.d101.ui.view.screens.SignUpActivityLevelScreen
 import com.ssafy.d101.ui.view.screens.SignUpCompleteScreen
 import com.ssafy.d101.ui.view.screens.SignUpScreen
 import com.ssafy.d101.ui.view.screens.StartScreen
@@ -72,6 +73,7 @@ fun SetUpNavGraph(
         composable(Screens.FoodAddition.route) { FoodAdditionScreen(navController) }
         composable(Screens.Height.route) { SignUpHeightScreen(navController) }
         composable(Screens.Weight.route) { SignUpWeightScreen(navController) }
+        composable(Screens.ActivityLevel.route) { SignUpActivityLevelScreen(navController) }
         composable(Screens.Loading.route) { LoadingScreen(navController) }
         composable(
             Screens.FoodSearch.route,

@@ -184,7 +184,7 @@ fun DietAnalysis(navController: NavController
 
                         val dailyCal = analysisDiet?.let{ calculateTotalCalories(it) }
                         if(userSubInfo != null && dailyCal != null)
-                            CustomSemiCirclePieChart(consumedKcal = dailyCal, totalKcal = userSubInfo.value?.calorie, gender = userGender)
+                            CustomSemiCirclePieChart(consumedKcal = dailyCal, totalKcal = userSubInfo!!.calorie, gender = userGender)
                         Spacer(modifier = Modifier.size(15.dp))
 
                         val nutri = analysisDiet?.let { calculateDailyNutrientRatios(it) }

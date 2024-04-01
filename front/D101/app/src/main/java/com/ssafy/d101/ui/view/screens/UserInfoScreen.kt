@@ -151,7 +151,7 @@ fun UserInfo() {
         InfoText("이메일", userInfo.value?.email ?: "null@naver.com")
         InfoInputField(title = "키", unit = "cm", value = height, onValueChange = { new -> height = new.filter { it.isDigit() } })
         InfoInputField(title = "몸무게", unit = "kg", value = weight, onValueChange = { new -> weight = new.filter { it.isDigit() } })
-        InfoDropDownList(title = "활동량", activityIndex = activity, onItemClick = {activity = it})
+        InfoDropDownList(title = "활동량", activityIndex = activity ?: 0, onItemClick = {activity = it})
         Row (modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp)){// 목표 칼로리
             Box(modifier=Modifier.width(90.dp)){Text(text = "목표 칼로리", style = titleTextStyle)}
             InputField(kcal, onValueChange = { new -> kcal = new.filter { it.isDigit() } })

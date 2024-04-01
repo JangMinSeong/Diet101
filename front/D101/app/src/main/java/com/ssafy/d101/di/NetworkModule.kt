@@ -42,6 +42,7 @@ object NetworkModule {
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder()
             .baseUrl("http://j10d101.p.ssafy.io:8000/api/")
+//            .baseUrl("http://10.0.2.2:8080/api/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -52,6 +53,7 @@ object NetworkModule {
     fun provideAuthRetrofit(): Retrofit =
         Retrofit.Builder()
             .baseUrl("http://j10d101.p.ssafy.io:8000/api/")
+//            .baseUrl("http://10.0.2.2:8080/api/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
