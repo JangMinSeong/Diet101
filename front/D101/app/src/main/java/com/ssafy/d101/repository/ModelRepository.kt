@@ -17,11 +17,11 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
     private val _yoloInfo = MutableStateFlow<List<YoloResponse>?>(null)
     val yoloInfo = _yoloInfo.asStateFlow()
 
-    suspend fun TransferImageToYolo(fileUri: Uri) : List<YoloResponse> {
+//    suspend fun TransferImageToYolo(fileUri: Uri) : List<YoloResponse> {
+//
+//    }
 
-    }
-
-    fun setImageUri(uri : Uri) {
-
+    suspend fun setImageUri(uri : Uri) {
+        _imageUri.emit(uri)
     }
 }

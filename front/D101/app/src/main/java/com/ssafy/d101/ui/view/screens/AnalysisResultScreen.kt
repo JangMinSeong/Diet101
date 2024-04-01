@@ -41,6 +41,8 @@ fun AnalysisResultScreen() {
     val imageResources = listOf(R.drawable.fakefoodimage, R.drawable.image2, R.drawable.image3)
     val foodNames = listOf("월남쌈", "숙주무침", "잡채")
 
+
+
     Box(
         modifier = Modifier
             .fillMaxSize()
