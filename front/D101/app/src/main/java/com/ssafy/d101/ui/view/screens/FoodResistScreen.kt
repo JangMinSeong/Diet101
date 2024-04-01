@@ -1,7 +1,11 @@
 package com.ssafy.d101.ui.view.screens
 
 import android.app.Dialog
+import android.content.ContentValues
+import android.content.Context
 import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -50,7 +54,11 @@ import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.util.Date
+import java.util.Locale
 
 
 @Preview(showBackground = true)
@@ -70,7 +78,7 @@ fun FoodResistScreen(navController: NavHostController) {
     val context = LocalContext.current
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     val imageFile = File(context.getExternalFilesDir(null), "food_image_${System.currentTimeMillis()}.jpg")
-    val contentUri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", imageFile)
+    var contentUri by remember { mutableStateOf<Uri?>(null) }
 
     // 선택된 항목이 있는지 확인하는 함수
     val isItemSelected: (String) -> Boolean = { it == selectedMeal }
@@ -78,11 +86,11 @@ fun FoodResistScreen(navController: NavHostController) {
     //////음식 사진 카메라
     val launcherForCameraFood = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
-            Log.d("contentUri","$contentUri")
+            // 사진 촬영이 성공했을 때, 이미 할당된 contentUri를 imageUri에 할당
             imageUri = contentUri
-            Log.d("imageUri","$imageUri")
+            Log.d("Camera", "Photo saved to $imageUri")
         } else {
-            Log.d("????","$imageUri")
+            Log.e("Camera", "Failed to capture photo")
         }
     }
 //    val launcherForCameraFood = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
@@ -102,15 +110,20 @@ fun FoodResistScreen(navController: NavHostController) {
             Log.d("????","$imageUri")
         }
     }
-    ////// 영양 성분표 카메라
-    val launcherForCameraOCR = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-        // 카메라에서 받아온 이미지 처리. bitmap이 null일 수 있으니 null 체크 필요
 
-    }
-    ////// 영양 성분표 갤러리
-    val launcherForGalleryOCR = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        // 갤러리에서 선택한 이미지 처리. uri가 null일 수 있으니 null 체크 필요
+    val takePicture = {
+        val fileName = "IMG_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())}.jpg"
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + File.separator + "D101")
+        }
 
+        contentUri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+        contentUri?.let { uri ->
+            launcherForCameraFood.launch(uri)
+        }
     }
 
     // 화면 전체
@@ -184,7 +197,8 @@ fun FoodResistScreen(navController: NavHostController) {
                         TextItem("카메라", R.drawable.camera) {
                             // 카메라 로직
                             showDialog = false
-                            launcherForCameraFood.launch(contentUri)
+                          //  launcherForCameraFood.launch(contentUri)
+                            takePicture()
                         }
                         TextItem("갤러리", R.drawable.gallery) {
                             // 갤러리 아이템 클릭 시 수행할 로직
@@ -248,7 +262,7 @@ fun FoodResistScreen(navController: NavHostController) {
                         painter = if (imageUri != null) {
                             rememberAsyncImagePainter(model = imageUri)
                         } else {
-                            painterResource(id = R.drawable.file)
+                            painterResource(id = R.drawable.file) // 사진이 없을 때의 플레이스홀더
                         },
                         contentDescription = "섭취한 음식 사진",
                         modifier = Modifier
