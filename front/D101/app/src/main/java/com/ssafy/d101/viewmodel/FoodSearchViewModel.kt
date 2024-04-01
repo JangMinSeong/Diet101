@@ -4,8 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.d101.api.FoodSearchService
+import com.ssafy.d101.model.FoodAddInfo
 import com.ssafy.d101.model.FoodInfo
 import com.ssafy.d101.model.FoodItem
+import com.ssafy.d101.repository.FoodRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,10 +18,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FoodSearchViewModel @Inject constructor(
-    private val foodSearchService: FoodSearchService
+    private val foodSearchService: FoodSearchService,
+    private val foodRepository: FoodRepository
 ) : ViewModel() {
     private val _foodItems = MutableStateFlow<List<FoodInfo>>(emptyList())
     val foodItems: StateFlow<List<FoodInfo>> = _foodItems
+
+    // 사용자가 추가한 음식을 저장할 리스트
+    private val _userAddedFoodItems = MutableStateFlow<List<FoodAddInfo>>(emptyList())
+    val userAddedFoodItems: StateFlow<List<FoodAddInfo>> = foodRepository.userAddedFoodItems
+
 
     // 서버에 해당 파라미터의 음식을 GET 요청하는 함수
     fun fetchFoodItems(foodName: String) {
@@ -50,34 +58,18 @@ class FoodSearchViewModel @Inject constructor(
     }
 
 
-//    // 음식 항목 추가하는 함수
-//    fun addFoodItem(foodItem: FoodItem) {
-//        // 현재 리스트에 새로운 항목 추가
-//        val updateList = _foodItems.value.toMutableList().apply {
-//            add(foodItem)
-//        }
-//        // mutableStateFlow 업데이트
-//        _foodItems.value = updateList
-//
-//        Log.d("FoodSearchViewModel", "Updated list with ${updateList.size} items.")
-//        Log.d("FoodSearchViewModel", "Latest item: ${updateList.last().name}")
-//    }
+    // 음식 아이템 추가 함수
+    fun addUserAddedFoodItem(foodAddInfo: FoodAddInfo) {
+        viewModelScope.launch {
+            foodRepository.addUserAddedFoodItem(foodAddInfo)
+        }
+        Log.d("FoodSearchViewModel", "Added food item: $foodAddInfo")
+    }
 
-
-    // 서버에 음식 정보를 POST 요청하는 함수
-//    fun postFoodToServer(foodInfo: FoodInfo) {
-//        viewModelScope.launch {
-//            try {
-//                val response = userAdditionFoodService.postUserAdditionFood(foodInfo)
-//                if (response.isSuccessful) {
-//                    // 요청 성공
-//                    Log.d("PostFood", "Success: ${response.body()}")
-//                } else {
-//                    Log.e("PostFood", "Failed: ${response.errorBody()?.string()}")
-//                }
-//            } catch (e: Exception) {
-//                Log.e("PostFood", "Exception", e)
-//            }
-//        }
-//    }
+    // 음식 아이템 삭제 함수
+    fun deleteFoodItem(foodAddInfo: FoodAddInfo) {
+        viewModelScope.launch {
+            foodRepository.deleteFoodItem(foodAddInfo)
+        }
+    }
 }
