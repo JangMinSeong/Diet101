@@ -61,7 +61,10 @@ fun showNavBar(route: String): Boolean {
     return route != Screens.Start.route &&
             route != Screens.SignUp.route &&
             route != Screens.SignUpComplete.route &&
-            route != Screens.Height.route
+            route != Screens.Height.route &&
+            route != Screens.Weight.route &&
+            route != Screens.ActivityLevel.route &&
+            route != Screens.Loading.route
 }
 
 // 사용자 로그인 상태를 확인하는 함수 (예시 구현)

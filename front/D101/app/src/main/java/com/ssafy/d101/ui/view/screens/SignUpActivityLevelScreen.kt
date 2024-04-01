@@ -1,5 +1,6 @@
 package com.ssafy.d101.ui.view.screens
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,7 +19,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -27,15 +30,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ssafy.d101.navigation.Screens
+import com.ssafy.d101.viewmodel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpActivityLevelScreen(navController: NavHostController) {
-    var activityLevel by remember { mutableStateOf("") }
+    var activityLevel by remember { mutableIntStateOf(-1) }
     var showMenu by remember { mutableStateOf(false) }
+
+    val userViewModel: UserViewModel = hiltViewModel()
+
+    var startUserSubInfoUpdate by remember { mutableStateOf(false) }
+    val isUpdatedComplete by remember { mutableStateOf(false) }
 
     val activityLevelList = listOf(
         "운동을 하지 않음",
@@ -44,6 +54,14 @@ fun SignUpActivityLevelScreen(navController: NavHostController) {
         "적극적인 활동 및 운동(6 ~ 7일 / 주)",
         "매우 적극적인 활동 및 운동"
     )
+    val selectedText = if (activityLevel >= 0) activityLevelList[activityLevel] else "운동량 선택"
+
+    LaunchedEffect(startUserSubInfoUpdate) {
+        if (startUserSubInfoUpdate) {
+            userViewModel.setUserSubInfo()
+            navController.navigate(Screens.Home.route)
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -67,9 +85,10 @@ fun SignUpActivityLevelScreen(navController: NavHostController) {
             ExposedDropdownMenuBox(expanded = showMenu, onExpandedChange = { showMenu = !showMenu}) {
                 TextField(
                     readOnly = true,
-                    value = activityLevel,
-                    onValueChange = { newValue ->
-                        activityLevel = newValue
+                    value = selectedText,
+                    onValueChange = {
+//                        newValue ->
+//                        activityLevel = newValue
                     },
                     label = { Text("운동량") },
                     singleLine = true,
@@ -86,10 +105,10 @@ fun SignUpActivityLevelScreen(navController: NavHostController) {
                         showMenu = false
                     }
                 ) {
-                    activityLevelList.forEach { selectionOption ->
-                        DropdownMenuItem(text = { Text(selectionOption) },
+                    activityLevelList.forEachIndexed { index, level ->
+                        DropdownMenuItem(text = { Text(level) },
                             onClick = {
-                                activityLevel = selectionOption
+                                activityLevel = index
                                 showMenu = false
                             })
                     }
@@ -98,7 +117,7 @@ fun SignUpActivityLevelScreen(navController: NavHostController) {
         }
 
         Button(
-            onClick = { navController.navigate(Screens.Home.route)},
+            onClick = { startUserSubInfoUpdate = true },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "시작하기")
