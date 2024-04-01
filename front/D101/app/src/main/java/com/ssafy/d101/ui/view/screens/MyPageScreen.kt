@@ -89,7 +89,8 @@ fun MyPageHeader(navController: NavController) {
 @Composable
 fun MyProfile() {
     val userViewModel: UserViewModel = hiltViewModel()
-    val user by userViewModel.getUser().collectAsState(initial = null)
+
+    val userInfo by userViewModel.getUserInfo().collectAsState(initial = null)
 
     Row( modifier = Modifier
         .fillMaxWidth()
@@ -106,7 +107,7 @@ fun MyProfile() {
                     contentAlignment = Alignment.CenterStart
                 ){ // 닉네임 @!
                     Text(
-                        text = user?.userInfo?.username ?: "사용자 이름",
+                        text = userInfo?.username ?: "사용자 이름",
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -115,7 +116,7 @@ fun MyProfile() {
                     contentAlignment = Alignment.CenterEnd
                 ){ // 프로필 이미지 @!
                     AsyncImage(
-                        model = user?.userInfo?.image,
+                        model = userInfo?.image,
                         contentDescription = "profileImage",
                         contentScale = ContentScale.Fit,
                         modifier = Modifier.size(100.dp),

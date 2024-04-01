@@ -87,7 +87,9 @@ fun DietAnalysis(navController: NavController
     val dietViewModel :DietViewModel = hiltViewModel()
 
     val analysisDiet by dietViewModel.resultDiet.collectAsState()
-    val user by userViewModel.getUser().collectAsState(initial = null)
+
+    val userInfo by userViewModel.getUserInfo().collectAsState()
+    val userSubInfo by userViewModel.getUserSubInfo().collectAsState()
 
     LaunchedEffect(Unit) {
         dietViewModel.analysisDiet()
@@ -177,12 +179,12 @@ fun DietAnalysis(navController: NavController
                     "today" -> {
                         Spacer(modifier = Modifier.size(15.dp))
                         var userGender : Int
-                        if(user?.userInfo?.gender == "MALE") userGender = 1
+                        if(userInfo?.gender == "MALE") userGender = 1
                         else userGender = 2
 
                         val dailyCal = analysisDiet?.let{ calculateTotalCalories(it) }
-                        if(user != null && dailyCal != null)
-                            CustomSemiCirclePieChart(consumedKcal = dailyCal, totalKcal = user!!.userSubInfo.calorie, gender = userGender)
+                        if(userSubInfo != null && dailyCal != null)
+                            CustomSemiCirclePieChart(consumedKcal = dailyCal, totalKcal = userSubInfo!!.calorie, gender = userGender)
                         Spacer(modifier = Modifier.size(15.dp))
 
                         val nutri = analysisDiet?.let { calculateDailyNutrientRatios(it) }
