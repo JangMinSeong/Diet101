@@ -2,6 +2,11 @@ package com.d101.back.service;
 
 
 import com.d101.back.dto.response.OcrResponse;
+import com.d101.back.dto.response.YoloFoodDto;
+import com.d101.back.dto.response.YoloResponseDto;
+import com.d101.back.exception.NoSuchDataException;
+import com.d101.back.exception.response.ExceptionStatus;
+import com.d101.back.repository.FoodRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -15,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-
 @Service
 @RequiredArgsConstructor
 public class ModelService {
@@ -23,7 +27,9 @@ public class ModelService {
     @Value("${gpu.server.url}")
     private String url;
 
-    public String transmitImageToYolo(MultipartFile multipartFile) throws IOException {
+    private final FoodRepository foodRepository;
+
+    public YoloResponseDto[] transmitImageToYolo(MultipartFile multipartFile) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -41,7 +47,17 @@ public class ModelService {
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(url + "/model/checkcal", requestEntity, String.class);
+        ResponseEntity<YoloResponseDto[]> response = restTemplate.postForEntity(url + "/model/checkcal", requestEntity, YoloResponseDto[].class);
+
+        for (YoloResponseDto res : response.getBody()) {
+            try {
+                YoloFoodDto food = YoloFoodDto.fromEntity(foodRepository.findByName(res.getTag())
+                        .orElseThrow(() -> new NoSuchDataException(ExceptionStatus.FOOD_NOT_FOUND)));
+                res.setYoloFoodDto(food);
+            } catch (NoSuchDataException e) {
+
+            }
+        }
 
         return response.getBody();
     }

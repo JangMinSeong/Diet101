@@ -1,6 +1,8 @@
 package com.ssafy.d101.di
 
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.ssafy.d101.api.DietService
 import com.ssafy.d101.api.FoodSearchService
 import com.ssafy.d101.api.FoodService
@@ -38,6 +40,8 @@ object NetworkModule {
             .authenticator(authAuthenticator)
             .build()
 
+    private val gson : Gson = GsonBuilder().setLenient().create()
+
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
@@ -45,7 +49,7 @@ object NetworkModule {
             .baseUrl("http://j10d101.p.ssafy.io:8000/api/")
 //            .baseUrl("http://10.0.2.2:8080/api/")
             .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
 
     @Provides
@@ -55,7 +59,7 @@ object NetworkModule {
         Retrofit.Builder()
             .baseUrl("http://j10d101.p.ssafy.io:8000/api/")
 //            .baseUrl("http://10.0.2.2:8080/api/")
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
 
     @Provides
