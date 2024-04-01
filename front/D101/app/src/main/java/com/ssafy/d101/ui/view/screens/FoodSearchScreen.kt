@@ -1,11 +1,9 @@
 package com.ssafy.d101.ui.view.screens
-import android.app.Dialog
-import androidx.compose.foundation.BorderStroke
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.height
@@ -38,16 +36,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import android.util.Log
 import androidx.compose.ui.text.SpanStyle
@@ -55,19 +47,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.ssafy.d101.model.FoodItem
+import com.ssafy.d101.model.FoodAddInfo
 import com.ssafy.d101.viewmodel.FoodSearchViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.collect
-import retrofit2.Call
-import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Query
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.Callback
 
 
 @Preview(showBackground = true)
@@ -80,7 +62,6 @@ fun FoodSearchScreen(
     var selectedFoodItemName by remember { mutableStateOf<String?>(null) }
     val viewModel: FoodSearchViewModel = hiltViewModel()
     val foodItems by viewModel.foodItems.collectAsState()    // viewModel 사용하여 음식 목록 불러오기
-//    val foodItems = listOf("딸기", "바나나")
 
     // 초기 데이터 로드
     LaunchedEffect(foodName) {
@@ -178,7 +159,7 @@ fun FoodSearchScreen(
                         .background(Color.White, shape = RoundedCornerShape(10.dp))
                         .border(3.dp, Color.Gray, shape = RoundedCornerShape(10.dp))
                         .clickable {
-                            selectedFoodItemName = foodName
+                            selectedFoodItemName = foodItem.name
                             showDialog = true
                         },
                     contentAlignment = Alignment.Center
@@ -247,7 +228,16 @@ fun FoodSearchScreen(
         val selectedItem = foodItems.firstOrNull { it.name == selectedName }
 
         selectedItem?.let { item ->
-            var eatenAmount by remember { mutableStateOf("1.0") }
+            var eatenAmountText by remember { mutableStateOf("1.0") }
+            val eatenAmount = eatenAmountText.toDoubleOrNull() ?: 1.0
+
+            // 영양소(탄단지) 조절
+            val adjustedCarbohydrate = item.carbohydrate * eatenAmount
+            val adjustedProtein = item.protein * eatenAmount
+            val adjustedFat = item.fat * eatenAmount
+
+            // 총 칼로리 계산
+            val totalCalories = (adjustedCarbohydrate * 4 + adjustedProtein * 4 + adjustedFat * 9).toInt()
 
             AlertDialog(
                 onDismissRequest = { showDialog = false },
@@ -293,9 +283,9 @@ fun FoodSearchScreen(
 
                         // 먹은 양 입력 상자
                         TextField(
-                            value = eatenAmount,
+                            value = eatenAmountText,
                             onValueChange = { newValue ->
-                                eatenAmount = newValue
+                                eatenAmountText= newValue
                             },
                             modifier = Modifier
                                 .width(100.dp)
@@ -320,7 +310,7 @@ fun FoodSearchScreen(
                                 verticalArrangement = Arrangement.Top
                             ) {
                                 Text(
-                                    "${item.calorie}kcal",
+                                    "${totalCalories}kcal",
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier
@@ -343,9 +333,9 @@ fun FoodSearchScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    NutritionInfoFieldReadOnly("탄수화물", "${item.carbohydrate}g")
-                                    NutritionInfoFieldReadOnly("단백질", "${item.protein}g")
-                                    NutritionInfoFieldReadOnly("지방", "${item.fat}g")
+                                    NutritionInfoFieldReadOnly("탄수화물", "${String.format("%.2f", adjustedCarbohydrate)}g")
+                                    NutritionInfoFieldReadOnly("단백질", "${String.format("%.2f", adjustedProtein)}g")
+                                    NutritionInfoFieldReadOnly("지방", "${String.format("%.2f", adjustedFat)}g")
                                 }
                             }
                         }
@@ -355,29 +345,25 @@ fun FoodSearchScreen(
                 confirmButton = {
                     Button(
                         onClick = {
-//                            val foodItem = FoodItem(
-//                                id = 0,
-//                                name = selectedFoodItemName ?: "",
-//                                majorCategory = item.majorCategory,
-//                                minorCategory = item.minorCategory,
-//                                dbGroup = item.dbGroup,
-//                                manufacturer = item.manufacturer,
-//                                portionSize = item.portionSize,
-//                                unit = item.unit,
-//                                calorie = item.calorie,
-//                                carbohydrate = item.carbohydrate,
-//                                protein = item.protein,
-//                                fat = item.fat,
-//                                transFat = item.transFat,
-//                                saturatedFat = item.saturatedFat,
-//                                cholesterol = item.cholesterol,
-//                                natrium = item.natrium,
-//                                sugar = item.sugar
-//                            )
-//                            viewModel.addFoodItem(foodItem)
-
+                            val foodAddInfo = FoodAddInfo(
+                                id = item.id,
+                                name = item.name,
+                                manufacturer = item.manufacturer,
+                                majorCategory = item.majorCategory,
+                                minorCategory = item.minorCategory,
+                                dbGroup = item.dbGroup,
+                                portionSize = item.portionSize,
+                                totalSize = item.totalSize,
+                                unit = item.unit,
+                                eatenAmount = eatenAmount.toDouble(),
+                                calorie = totalCalories,
+                                carbohydrate = adjustedCarbohydrate,
+                                protein = adjustedProtein,
+                                fat = adjustedFat
+                            )
+                            viewModel.addUserAddedFoodItem(foodAddInfo)
                             showDialog = false
-
+                            selectedFoodItemName = null
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                         modifier = Modifier
