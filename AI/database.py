@@ -16,7 +16,7 @@ food_table = Table('Food', metadata, autoload_with=engine)
 preference_table = Table('Preference', metadata, autoload_with=engine)
 
 def getFoodListByKcal(kcal: int):
-    query = select(food_table.c.food_id).where(food_table.c.calorie <= kcal)
+    query = select(food_table.c.food_id).where(food_table.c.calorie <= kcal).where(food_table.c.dbGroup == '음식')
     return session.execute(query).fetchall()
 
 def getPreferenceList():

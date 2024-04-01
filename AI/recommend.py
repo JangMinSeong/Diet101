@@ -23,8 +23,8 @@ def getRecommendFoodList(kcal: int, user_id: int):
 
     # 사용자 ID에 해당하는 음식 선호도 순으로 정렬
     user_preferences = preferences_pred_matrix.loc[user_id]
-    user_preferences_sorted = user_preferences.sort_values(ascending=True)
-    top_food_ids = user_preferences_sorted.index.tolist()
+    user_preferences_sorted = user_preferences.sort_values(ascending=False)
+    top_food_ids = user_preferences_sorted.index.tolist()[:10]
     return {"foods": top_food_ids}
 
 def predicting_preferences(preferences_arr, item_sim_arr):
