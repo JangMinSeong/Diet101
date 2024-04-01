@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,20 +25,31 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.ssafy.d101.model.YoloFood
+import com.ssafy.d101.ui.view.components.CroppedImagesDisplay
+import com.ssafy.d101.ui.view.components.DailyHorizontalBar
+import com.ssafy.d101.viewmodel.ModelViewModel
 
-@Preview(showBackground = true)
 @Composable
-fun AnalysisResultScreen() {
+fun AnalysisResultScreen(navController: NavHostController) {
     var imageIndex by remember { mutableStateOf(0) }     // 현재 이미지 인덱스
     // 자른 이미지 리스트 (임시 데이터)
-    val imageResources = listOf(R.drawable.fakefoodimage, R.drawable.image2, R.drawable.image3)
-    val foodNames = listOf("월남쌈", "숙주무침", "잡채")
+    //val imageResources = listOf(R.drawable.fakefoodimage, R.drawable.image2, R.drawable.image3)
+
+
+    val modelViewModel : ModelViewModel = hiltViewModel()
+    val analysisResult by modelViewModel.getYoloResponse().collectAsState()
+
+    val imageUri by modelViewModel.getImageUri().collectAsState()
+
+    // YoloResponse에서 tag 리스트로 변환
+    val foodNames = analysisResult?.map { it.tag } ?: listOf()
 
     Box(
         modifier = Modifier
@@ -65,66 +75,107 @@ fun AnalysisResultScreen() {
             modifier = Modifier.padding(32.dp)
         ) {
             // 페이지 번호
-            Text(
-                text = "${imageIndex + 1}/${imageResources.size}",
-                fontSize = 25.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Gray,
-            )
-
-            Spacer(modifier = Modifier.height(50.dp))
-
-            // 음식 이름
-            Text(
-                text = foodNames[imageIndex],
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Red,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                if (imageIndex > 0) {
-                    // 이전 버튼
-                    Image(
-                        painter = painterResource(id = R.drawable.nextbutton),
-                        contentDescription = "이전 버튼",
-                        modifier = Modifier
-                            .size(40.dp)
-                            .graphicsLayer { scaleX = -1f }    // 수평 반전
-                            .clickable { if (imageIndex > 0) imageIndex-- }
-                    )
-                } else {
-                    Spacer(modifier = Modifier.size(40.dp))
-                }
-
-                // 분석 결과 이미지
-                Image(
-                    painter = painterResource(id = imageResources[imageIndex]),
-                    contentDescription = "잘못 인식된 월남쌈 사진",
-                    modifier = Modifier.size(200.dp)
+            if(foodNames.isNotEmpty()) {
+                Text(
+                    text = "${imageIndex + 1}/${foodNames.size}",
+                    fontSize = 25.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Gray,
                 )
 
-                if (imageIndex < imageResources.size - 1) {
-                    // 다음 버튼
-                    Image(
-                        painter = painterResource(id = R.drawable.nextbutton),
-                        contentDescription = "다음 버튼",
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clickable { if (imageIndex < imageResources.size - 1) imageIndex++ }
-                    )
-                } else {
-                    Spacer(modifier = Modifier.size(40.dp))
+                Spacer(modifier = Modifier.height(50.dp))
+
+                // 음식 이름
+                Text(
+                    text = foodNames[imageIndex],
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Red,
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    if (imageIndex > 0) {
+                        // 이전 버튼
+                        Image(
+                            painter = painterResource(id = R.drawable.nextbutton),
+                            contentDescription = "이전 버튼",
+                            modifier = Modifier
+                                .size(40.dp)
+                                .graphicsLayer { scaleX = -1f }    // 수평 반전
+                                .clickable { if (imageIndex > 0) imageIndex-- }
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.size(40.dp))
+                    }
+
+                    analysisResult?.let { results ->
+                        if (results.isNotEmpty() && imageIndex in results.indices) {
+                            val currentItem = results[imageIndex]
+
+                            // 현재 선택된 항목으로부터 imageInfo 맵 생성
+                            val imageInfo = mapOf(
+                                "tag" to currentItem.tag,
+                                "left_top" to currentItem.left_top,
+                                "width" to currentItem.width,
+                                "height" to currentItem.height
+                            )
+
+                            // CroppedImagesDisplay 컴포넌트에 imageInfo와 imageUri 넘기기
+                            imageUri?.let { uri ->
+                                CroppedImagesDisplay(
+                                    imageInfo = imageInfo,
+                                    imageUri!!,
+                                    modifier = Modifier.size(300.dp, 300.dp)
+                                )
+                            }
+                        }
+                    }
+
+                    if (imageIndex < foodNames.size - 1) {
+                        // 다음 버튼
+                        Image(
+                            painter = painterResource(id = R.drawable.nextbutton),
+                            contentDescription = "다음 버튼",
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clickable { if (imageIndex < foodNames.size - 1) imageIndex++ }
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.size(40.dp))
+                    }
                 }
+
+                Spacer(modifier = Modifier.height(40.dp))
+
+                analysisResult?.let { results ->
+                    if (results.isNotEmpty() && imageIndex in results.indices) {
+                        val currentItem = results[imageIndex]
+                        if (currentItem.yoloFoodDto != null) {
+                            Text(
+                                text = currentItem.yoloFoodDto.calorie.toString() + " Kcal",
+                                fontSize = 25.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            val nutri = calNutri(currentItem.yoloFoodDto)
+                            DailyHorizontalBar(
+                                carbsPercentage = nutri.first.toFloat(),
+                                proteinPercentage = nutri.second.toFloat(),
+                                fatsPercentage = nutri.third.toFloat()
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(20.dp))
             }
-
-            Spacer(modifier = Modifier.height(100.dp))
-
+            else {
+                Text(text="음식이 확인 되지 않습니다",fontSize=30.sp,fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(20.dp))
+            }
             // 음식 직접 등록 버튼
             Button(
                 onClick = { /* TODO: 버튼 클릭 이벤트 처리 */ },
@@ -144,3 +195,16 @@ fun AnalysisResultScreen() {
     }
 }
 
+fun calNutri(foodInfo : YoloFood) : Triple<Double,Double,Double> {
+    val carb : Double = foodInfo.carbohydrate*4
+    val prot : Double = foodInfo.protein*4
+    val fat : Double = foodInfo.fat*9
+
+    return Triple(carb*100/foodInfo.calorie, prot*100/foodInfo.calorie, fat*100/foodInfo.calorie)
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewAnalysisResultScreen() {
+    AnalysisResultScreen(navController = rememberNavController())
+}

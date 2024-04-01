@@ -51,8 +51,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.core.content.FileProvider
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import com.ssafy.d101.viewmodel.ModelViewModel
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -74,6 +76,9 @@ fun FoodResistScreen(navController: NavHostController) {
     val onMealSelected: (String) -> Unit = { meal ->
         selectedMeal = if (selectedMeal == meal) null else meal
     }
+
+    val modelViewModel : ModelViewModel = hiltViewModel()
+
 
     val context = LocalContext.current
     var imageUri by remember { mutableStateOf<Uri?>(null) }
@@ -295,7 +300,21 @@ fun FoodResistScreen(navController: NavHostController) {
 
                     // "등록하기" 버튼 추가
                     Button(
-                        onClick = { /* TODO: 버튼 클릭 이벤트 처리 */ },
+                        onClick = {
+                            imageUri?.let { uri ->
+                                // ViewModel을 통해 이미지 URI 설정
+                                modelViewModel.setImageUri(uri)
+                                // 이미지 분석 시작
+                                modelViewModel.transferImageToYolo(context) { isSuccess ->
+                                    if (isSuccess) {
+                                        // 분석 성공 시 로딩 화면으로 넘어감
+                                        navController.navigate("ailoading")
+                                    } else {
+                                        // 실패 처리 로직 (에러 메시지 표시 등)
+                                    }
+                                }
+                            }
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                         modifier = Modifier
                             .width(130.dp)
