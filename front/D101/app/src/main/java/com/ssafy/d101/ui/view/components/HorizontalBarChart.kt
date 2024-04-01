@@ -28,7 +28,7 @@ data class BarItem(
 
 @Composable
 fun HorizontalBarChart(
-    weeklyData: BarItem,
+    monthlyData: BarItem,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -40,14 +40,14 @@ fun HorizontalBarChart(
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             val chartWidth = size.width - 90.dp.toPx() // 가로 길이 조정
-            val barHeight = (size.height - 120.dp.toPx()) / weeklyData.days.size.toFloat() // 바의 높이 계산
+            val barHeight = (size.height - 120.dp.toPx()) / monthlyData.days.size.toFloat() // 바의 높이 계산
             val spaceBetweenBars = 8.dp.toPx() // 바 사이 간격
             val guideLineColor = Color.LightGray // 가이드라인 및 축 색상
 
             val offsetBars = spaceBetweenBars * 2
 
             // y축 가이드라인 및 숫자 라벨 그리기
-            val maxValue = weeklyData.maxValue
+            val maxValue = monthlyData.maxValue
             val guideLineSteps = listOf((maxValue / 4).toInt(), (maxValue * 2 / 4).toInt(), (maxValue * 3 / 4).toInt(), (maxValue * 4 / 4).toInt())
 
             guideLineSteps.forEach { step ->
@@ -76,14 +76,14 @@ fun HorizontalBarChart(
             }
 
 
-            weeklyData.days.forEachIndexed { index, day ->
+            monthlyData.days.forEachIndexed { index, day ->
                 val barY = barHeight * index + spaceBetweenBars * index
                 var startX = 0.dp.toPx()
-                weeklyData.data[index].forEachIndexed { valueIndex, value ->
-                    val barWidth = (value / weeklyData.maxValue) * chartWidth
+                monthlyData.data[index].forEachIndexed { valueIndex, value ->
+                    val barWidth = (value / monthlyData.maxValue) * chartWidth
 
                     drawRoundRect(
-                        color = weeklyData.colors[valueIndex],
+                        color = monthlyData.colors[valueIndex],
                         topLeft = Offset(x = startX + 60.dp.toPx(), y = barY),
                         size = Size(barWidth, barHeight - spaceBetweenBars - 10),
                         cornerRadius = CornerRadius(4.dp.toPx())
@@ -123,7 +123,7 @@ fun HorizontalBarChart(
 
 @Composable
 fun MonthlyNutritionChartHorizontal(
-    weeklyData: BarItem,
+    monthlyData: BarItem,
     title: String,
     colors: List<Color> = listOf(Color(0xFFA62D2D), Color(0xFFF28888), Color(0xFFF2C9C9)),
     nutritionNames: List<String> = listOf("탄수화물", "단백질", "지방")
@@ -178,7 +178,7 @@ fun MonthlyNutritionChartHorizontal(
 
         // 가로 바 차트 호출
         HorizontalBarChart(
-            weeklyData = weeklyData,
+            monthlyData = monthlyData,
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
@@ -191,7 +191,7 @@ fun MonthlyNutritionChartHorizontal(
 @Composable
 fun PreviewMonthlyHorizontalBarChart() {
     MonthlyNutritionChartHorizontal(
-        weeklyData = BarItem(
+        monthlyData = BarItem(
             data = listOf(
                 listOf(600f, 400f, 200f),
                 listOf(500f, 300f, 200f),
