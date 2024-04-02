@@ -92,5 +92,9 @@ class ModelViewModel @Inject constructor(
         }
     }
 
-
+    fun updateFoodItem(index: Int, newName: String, newCarbs: Double, newProtein: Double, newFat: Double, newCal : Int) {
+        viewModelScope.launch{
+            modelRepository.updateFoodItem(index,newName, newCarbs, newProtein, newFat, newCal)
+        }
+    }
 }

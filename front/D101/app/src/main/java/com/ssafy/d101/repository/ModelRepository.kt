@@ -198,4 +198,32 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
             }
         }
     }
+
+    fun updateFoodItem(index: Int, newName: String, newCarbs: Double, newProtein: Double, newFat: Double, newCal : Int) {
+        _yoloInfo.value?.let { foodList ->
+            if (index in foodList.indices) {
+                val updatedItem = foodList[index].yoloFoodDto?.copy(
+                    carbohydrate = newCarbs,
+                    protein = newProtein,
+                    fat = newFat,
+                    calorie = newCal
+                )?.let {
+                    foodList[index].copy(
+                        tag = newName,
+                        yoloFoodDto = it
+                    )
+                }
+                // 업데이트된 아이템으로 리스트를 갱신
+                val updatedList = foodList.toMutableList().apply {
+                    if (updatedItem != null) {
+                        this[index] = updatedItem
+                    }
+                }
+                _yoloInfo.value = updatedList
+            } else {
+                Log.e("ModelViewModel", "Invalid index for updating food item.")
+            }
+        }
+    }
+
 }

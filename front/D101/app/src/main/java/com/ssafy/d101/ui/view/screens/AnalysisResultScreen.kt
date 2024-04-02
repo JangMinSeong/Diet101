@@ -35,11 +35,15 @@ import androidx.navigation.compose.rememberNavController
 import com.ssafy.d101.model.YoloFood
 import com.ssafy.d101.ui.view.components.CroppedImagesDisplay
 import com.ssafy.d101.ui.view.components.DailyHorizontalBar
+import com.ssafy.d101.ui.view.components.EditFoodDialog
 import com.ssafy.d101.viewmodel.ModelViewModel
 
 @Composable
 fun AnalysisResultScreen(navController: NavHostController) {
     var imageIndex by remember { mutableStateOf(0) }     // 현재 이미지 인덱스
+
+    var showDialog by remember { mutableStateOf(false) } // 수정을 위한 모달
+
     // 자른 이미지 리스트 (임시 데이터)
     //val imageResources = listOf(R.drawable.fakefoodimage, R.drawable.image2, R.drawable.image3)
 
@@ -172,9 +176,8 @@ fun AnalysisResultScreen(navController: NavHostController) {
                 }
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // 음식 직접 등록 버튼
                 Button(
-                    onClick = { /* TODO: 버튼 클릭 이벤트 처리 */ },
+                    onClick = { showDialog = true },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                     modifier = Modifier
                         .width(160.dp)
@@ -187,6 +190,11 @@ fun AnalysisResultScreen(navController: NavHostController) {
                         fontWeight = FontWeight.Bold,
                     )
                 }
+                // 모달 창 표시
+                if (showDialog) {
+                    EditFoodDialog(showDialog = showDialog, onDismiss = { showDialog = false }, modelViewModel = modelViewModel, imageIndex = imageIndex)
+                }
+
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(
                     onClick = {
@@ -207,9 +215,9 @@ fun AnalysisResultScreen(navController: NavHostController) {
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(
                     onClick = {
-                       //
+                       navController.navigate("foodResistList")
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                     modifier = Modifier
                         .width(160.dp)
                         .height(40.dp)
