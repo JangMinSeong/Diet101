@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.ssafy.d101.model.Dunchfast
 import com.ssafy.d101.model.FoodAddInfo
 import com.ssafy.d101.model.IntakeReq
 import com.ssafy.d101.model.YoloFood
@@ -64,8 +65,11 @@ fun FoodListResultScreen(navController: NavHostController) {
     val intakeReqs = yoloResult?.let { createIntakeReqList(uploadedFoodItems, it) } ?: emptyList()
 
     var selectedMeal by remember { mutableStateOf<String?>(null) }
+    var dunchfastType by remember {mutableStateOf<Dunchfast?>(Dunchfast.BREAKFAST)}
+
     // 사용자가 항목을 선택하거나 선택을 취소하는 로직
     val onMealSelected: (String) -> Unit = { meal ->
+        dunchfastType = getDunchfastType(meal)
         selectedMeal = if (selectedMeal == meal) null else meal
     }
     // 선택된 항목이 있는지 확인하는 함수
@@ -233,8 +237,10 @@ fun FoodListResultScreen(navController: NavHostController) {
                                 amount = eatenAmounts[intakeReq.food_id] ?: intakeReq.amount
                             )
                         }
+                        dunchfastType?.let { dietViewModel.setDietType(it) }
                         dietViewModel.setTakeReqList(updatedIntakeReqs)
-                        Log.d("in Result screen","$updatedIntakeReqs")
+                        Log.d("in Result screen","$updatedIntakeReqs, $dunchfastType")
+
                         navController.navigate("dietAiAnalysisResult")
                     }
                 },
@@ -312,4 +318,19 @@ fun createIntakeReqList(uploadedFoodItems: List<FoodAddInfo>, yoloResult: List<Y
     }
 
     return intakeReqs
+}
+
+fun getDunchfastType(selectedMeal: String): Dunchfast {
+    return when(selectedMeal) {
+        "아침" -> Dunchfast.BREAKFAST
+        "아점" -> Dunchfast.BRUNCH
+        "점심" -> Dunchfast.LUNCH
+        "점저" -> Dunchfast.LINNER
+        "저녁" -> Dunchfast.DINNER
+        "야식" -> Dunchfast.MIDNIGHT
+        "간식" -> Dunchfast.SNACK
+        "음료" -> Dunchfast.DRINK
+        "주류" -> Dunchfast.ALCOHOL
+        else -> Dunchfast.BREAKFAST // 선택한 항목이 매핑되지 않는 경우 아침으로 고정
+    }
 }
