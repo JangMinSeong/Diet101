@@ -72,7 +72,7 @@ fun FoodListResultScreen(navController: NavHostController) {
     val isItemSelected: (String) -> Boolean = { it == selectedMeal }
     val scrollState = rememberScrollState()
     // 각 음식 아이템의 먹은 양을 저장하는 상태
-    val eatenAmounts = remember { mutableStateMapOf<Long, String>() }
+    var eatenAmounts = remember { mutableStateMapOf<Long, Double>() }
 
     Box(
         modifier = Modifier
@@ -160,7 +160,8 @@ fun FoodListResultScreen(navController: NavHostController) {
                                 value = eatenAmount,
                                 onValueChange = { newValue ->
                                     eatenAmount = newValue
-                                    eatenAmounts[foodItem.food_id] = newValue
+                                    eatenAmounts[foodItem.food_id] = newValue.toDoubleOrNull() ?: 1.0
+                                    //여기야
                                 },
                                 modifier = Modifier
                                     .width(100.dp)
@@ -176,28 +177,28 @@ fun FoodListResultScreen(navController: NavHostController) {
                 }
             }
 
-            // 먹은 양 수정 완료
-            Button(
-                onClick = {
-                    intakeReqs.forEach { item ->
-                        val newEatenAmount = eatenAmounts[item.food_id]?.toDoubleOrNull() ?: 1.0
-                        val updatedItem = item.copy(amount = newEatenAmount)
-                        foodViewModel.updateEatenAmount(updatedItem)
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF12369)),
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(40.dp)
-            ) {
-                Text(
-                    text = "먹은 양 수정 완료",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-            Spacer(modifier = Modifier.padding(top = 15.dp, bottom = 40.dp))
+//            // 먹은 양 수정 완료
+//            Button(
+//                onClick = {
+//                    intakeReqs.forEach { item ->
+//                        val newEatenAmount = eatenAmounts[item.food_id]?.toDoubleOrNull() ?: 1.0
+//                        val updatedItem = item.copy(amount = newEatenAmount)
+//                    //    foodViewModel.updateEatenAmount(updatedItem)
+//                    }
+//                },
+//                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF12369)),
+//                modifier = Modifier
+//                    .width(200.dp)
+//                    .height(40.dp)
+//            ) {
+//                Text(
+//                    text = "먹은 양 수정 완료",
+//                    color = Color.White,
+//                    fontSize = 16.sp,
+//                    fontWeight = FontWeight.Bold,
+//                )
+//            }
+//            Spacer(modifier = Modifier.padding(top = 15.dp, bottom = 40.dp))
 
 
             Text("분류", fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier
@@ -226,7 +227,14 @@ fun FoodListResultScreen(navController: NavHostController) {
             Button(
                 onClick = {
                     if (intakeReqs != null) {
-                        dietViewModel.setTakeReqList(intakeReqs)
+                        // intakeReqs 업데이트
+                        val updatedIntakeReqs = intakeReqs.map { intakeReq ->
+                            intakeReq.copy(
+                                amount = eatenAmounts[intakeReq.food_id] ?: intakeReq.amount
+                            )
+                        }
+                        dietViewModel.setTakeReqList(updatedIntakeReqs)
+                        Log.d("in Result screen","$updatedIntakeReqs")
                         navController.navigate("dietAiAnalysisResult")
                     }
                 },
