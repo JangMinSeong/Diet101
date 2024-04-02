@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import javax.inject.Inject
 
 class DietRepository @Inject constructor(private val dietService: DietService) {
@@ -72,7 +73,7 @@ class DietRepository @Inject constructor(private val dietService: DietService) {
         }
     }
 
-    suspend fun saveMeal(file: MultipartBody.Part, createMealReq: CreateMealReq): Result<Boolean> {
+    suspend fun saveMeal(file: MultipartBody.Part, createMealReq: RequestBody): Result<Boolean> {
         return try {
             val response = dietService.saveMeal(file, createMealReq)
             if (response.isSuccessful) {

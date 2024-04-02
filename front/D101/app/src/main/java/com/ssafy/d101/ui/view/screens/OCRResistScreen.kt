@@ -63,7 +63,6 @@ import java.util.Date
 import java.util.Locale
 
 
-@Preview(showBackground = true)
 @Composable
 fun OCRResistScreen(navController: NavHostController) {
     val currentDate = remember { LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")) }
