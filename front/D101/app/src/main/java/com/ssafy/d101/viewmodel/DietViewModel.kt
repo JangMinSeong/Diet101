@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.d101.api.DietService
 import com.ssafy.d101.api.UserService
 import com.ssafy.d101.model.AnalysisDiet
+import com.ssafy.d101.model.CreateMealReq
 import com.ssafy.d101.model.DietInfo
 import com.ssafy.d101.model.Dunchfast
 import com.ssafy.d101.model.IntakeReq
@@ -93,9 +94,10 @@ class DietViewModel @Inject constructor(
     }
 
     suspend fun saveMeal() {
-        val file = modelRepository.prepareImageForUpload(modelRepository.context.value!!)
+        val file = modelRepository.prepareImageForUpload(modelRepository.context.value!!).getOrThrow()
+        val createMealReq = CreateMealReq(getDietType(), getCurrentDate(), getTakeReqList())
         viewModelScope.launch {
-            //        dietRepository.saveMeal(file, )
+            dietRepository.saveMeal(file, createMealReq)
         }
     }
 
@@ -111,8 +113,10 @@ class DietViewModel @Inject constructor(
         }
     }
 
-    fun getTakeReqList() {
-        dietRepository.takeReqList
+    fun getTakeReqList(): List<IntakeReq> {
+        return dietRepository.takeReqList.value!!
     }
-
+    fun getDietType(): Dunchfast {
+        return dietRepository.dietType.value!!
+    }
 }

@@ -229,6 +229,7 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
             // 이미지 스트림을 열어 이미지 크기를 줄이기 위한 설정
             val imageUri = imageUri.value ?: return Result.failure(Exception("Image Uri is null"))
             val inputStream = context.contentResolver.openInputStream(imageUri) ?: return Result.failure(Exception("Failed to open image stream"))
+
             val options = BitmapFactory.Options().apply {
                 inJustDecodeBounds = true
                 BitmapFactory.decodeStream(inputStream, null, this)
