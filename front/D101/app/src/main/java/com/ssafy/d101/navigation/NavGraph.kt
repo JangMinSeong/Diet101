@@ -1,21 +1,18 @@
 package com.ssafy.d101.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.ssafy.d101.ui.view.screens.AiAnalysisScreen
 import com.ssafy.d101.ui.view.screens.AllergyScreen
+import com.ssafy.d101.ui.view.screens.AnalysisResultScreen
 import com.ssafy.d101.ui.view.screens.BMIScreen
 import com.ssafy.d101.ui.view.screens.DietAnalysis
 import com.ssafy.d101.ui.view.screens.FoodAdditionScreen
@@ -26,6 +23,7 @@ import com.ssafy.d101.ui.view.screens.LandingScreen
 import com.ssafy.d101.ui.view.screens.LoadingScreen
 import com.ssafy.d101.ui.view.screens.LoginSuccessScreen
 import com.ssafy.d101.ui.view.screens.MyPageScreen
+import com.ssafy.d101.ui.view.screens.OCRResistScreen
 import com.ssafy.d101.ui.view.screens.RecommendScreen
 import com.ssafy.d101.ui.view.screens.SignUpActivityLevelScreen
 import com.ssafy.d101.ui.view.screens.SignUpCompleteScreen
@@ -95,13 +93,15 @@ fun SetUpNavGraph(
         composable(Screens.AnalysisDiet.route) { DietAnalysis(navController) }
         composable(Screens.Recommend.route) { RecommendScreen(navController) }
         composable(Screens.UserInfo.route) { UserInfoScreen(navController) }
+        composable(Screens.AiLoading.route) { AiAnalysisScreen(navController) }
+        composable(Screens.AnalysisResult.route) { AnalysisResultScreen(navController) }
+        composable(Screens.OCRResist.route) { OCRResistScreen(navController)}
 
     }
 
-}
 
 //    kakaoAuthViewModel.checkLogin()
 //    val isLoggedIn = kakaoAuthViewModel.isLoggedIn.collectAsState()
 
-
+}
 

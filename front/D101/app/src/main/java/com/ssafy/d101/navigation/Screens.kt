@@ -22,4 +22,7 @@ sealed class Screens(val route: String) {
     data object Weight : Screens("weight")
     data object ActivityLevel : Screens("activityLevel")
     data object Loading: Screens("loading")
+    data object AiLoading : Screens("ailoading")
+    data object AnalysisResult : Screens("analysisResult")
+    data object OCRResist : Screens("ocrResist")
 }

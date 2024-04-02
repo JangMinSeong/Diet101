@@ -66,7 +66,14 @@ class FoodRepository @Inject constructor(private val foodService: FoodService) {
             }
             _userAddedFoodItems.value = updatedList
         } else {
-            Log.e("FoodRepository", "업데이트할 아이템 없음.")
+            Log.e("FoodRepository", "업데이트 할 아이템 없음.")
+        }
+    }
+
+    // 선택된 음식 아이템 업로드
+    suspend fun uploadSelectedItems(selectedPostItems: List<FoodAddInfo>) {
+        selectedPostItems.forEach { selectedPostItems ->
+            addUserAddedFoodItem(selectedPostItems)
         }
     }
 }

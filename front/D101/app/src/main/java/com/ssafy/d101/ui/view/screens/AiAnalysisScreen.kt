@@ -1,4 +1,5 @@
 package com.ssafy.d101.ui.view.screens
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -28,10 +29,64 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.ssafy.d101.viewmodel.ModelViewModel
 
 @Preview(showBackground = true)
 @Composable
-fun AiAnalysisScreen() {
+fun AiAnalysisScreen(navController: NavController) {
+    val modelViewModel : ModelViewModel = hiltViewModel()
+    val analysisYoloResult by modelViewModel.getYoloResponse().collectAsState(null)
+    val analysisOCRResult by modelViewModel.getOCRResponse().collectAsState(null)
+    val option by modelViewModel.getOption().collectAsState()
+    val context by modelViewModel.getContext().collectAsState(null)
+
+    LaunchedEffect(option) {
+        if(option == true) { //yolo
+            // 이미지 분석 시작
+            context?.let {
+                modelViewModel.transferImageToYolo(it) { isSuccess ->
+                    if (isSuccess) {
+
+                    } else {
+                    }
+                }
+            }
+        }
+        else { //ocr
+            // 이미지 분석 시작
+            context?.let {
+                modelViewModel.transferImageToOCR(it) { isSuccess ->
+                    if (isSuccess) {
+                    } else {
+                    }
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(analysisOCRResult) {
+        if(option == false) {
+            Log.d("in loading", "$analysisOCRResult")
+            analysisOCRResult?.let {
+                Log.d("in loading", "aaaaa")
+                ////TODO : ocr 수정페이지로 이동
+                // navController.navigate("")
+            }
+        }
+    }
+    // 분석 결과가 준비되면 결과 화면으로 전환
+    LaunchedEffect(analysisYoloResult) {
+        if(option == true) {
+            Log.d("in loading", "$analysisYoloResult")
+            analysisYoloResult?.let {
+                Log.d("in loading", "aaaaa")
+                navController.navigate("analysisResult")
+            }
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()

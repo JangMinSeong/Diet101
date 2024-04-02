@@ -3,6 +3,7 @@ package com.ssafy.d101.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ssafy.d101.api.FoodSearchService
 import com.ssafy.d101.model.FoodAddInfo
 import com.ssafy.d101.model.FoodInfo
@@ -28,6 +29,9 @@ class FoodSearchViewModel @Inject constructor(
     private val _userAddedFoodItems = MutableStateFlow<List<FoodAddInfo>>(emptyList())
     val userAddedFoodItems: StateFlow<List<FoodAddInfo>> = foodRepository.userAddedFoodItems
 
+    // 선택된 음식의 최신 상태를 관리
+    private val _selectedFoodItem = MutableStateFlow<FoodAddInfo?>(null)
+    val selectedFoodItem: StateFlow<FoodAddInfo?> = _selectedFoodItem
 
     // 서버에 해당 파라미터의 음식을 GET 요청하는 함수
     fun fetchFoodItems(foodName: String) {
@@ -70,6 +74,34 @@ class FoodSearchViewModel @Inject constructor(
     fun deleteFoodItem(foodAddInfo: FoodAddInfo) {
         viewModelScope.launch {
             foodRepository.deleteFoodItem(foodAddInfo)
+        }
+    }
+
+    // 음식 아이템 수정 함수
+    fun updateFoodItem(updatedItem: FoodAddInfo) {
+        viewModelScope.launch {
+            foodRepository.updateFoodItem(updatedItem)
+            _selectedFoodItem.value = updatedItem
+        }
+    }
+
+    // 선택된 아이템을 설정하는 함수
+    fun setSelectedFoodItem(item: FoodAddInfo) {
+        _selectedFoodItem.value = item
+    }
+
+    // 선택된 아이템을 업로드 하는 함수
+    fun uploadSelectedItems(selectedPostItems: List<FoodAddInfo>) {
+        viewModelScope.launch {
+            Log.d(
+                "FoodSearchViewModel",
+                "Uploading selected items: ${selectedPostItems.joinToString { it.name }}"
+            )
+
+            // 선택된 아이템들을 업로드하는 로직 (레퍼지토리 호출)
+            selectedPostItems.forEach { selectedItem ->
+                foodRepository.addUserAddedFoodItem(selectedItem)
+            }
         }
     }
 }
