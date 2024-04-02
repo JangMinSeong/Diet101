@@ -15,6 +15,6 @@ public class Intake {
 	@EmbeddedId
 	private FoodMealKey key;
 	
-	private int amount;
+	private Double amount;
 	
 }
