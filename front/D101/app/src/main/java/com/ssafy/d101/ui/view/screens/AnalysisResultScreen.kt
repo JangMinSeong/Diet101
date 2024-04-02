@@ -199,6 +199,8 @@ fun AnalysisResultScreen(navController: NavHostController) {
                 Button(
                     onClick = {
                         modelViewModel.deleteYoloResponseItem(imageIndex)
+                        if(imageIndex != 0)
+                            imageIndex--
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                     modifier = Modifier

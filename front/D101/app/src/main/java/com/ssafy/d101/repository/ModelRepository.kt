@@ -81,9 +81,8 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
             val contentType = "image/jpeg".toMediaTypeOrNull()
             val requestFile = tempFile.asRequestBody(contentType)
             val body = MultipartBody.Part.createFormData("file", tempFile.name, requestFile)
-            val response = modelService.checkCal(body)
 
-            tempFile.delete() // Clean up the temporary file
+            val response = modelService.checkCal(body)
 
             if (response.isSuccessful) {
                 _yoloInfo.emit(response.body())
@@ -138,9 +137,8 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
             val contentType = "image/jpeg".toMediaTypeOrNull()
             val requestFile = tempFile.asRequestBody(contentType)
             val body = MultipartBody.Part.createFormData("file", tempFile.name, requestFile)
-            val response = modelService.checkOCR(body)
 
-            tempFile.delete() // Clean up the temporary file
+            val response = modelService.checkOCR(body)
 
             if (response.isSuccessful) {
                 _ocrInfo.emit(response.body())
@@ -226,4 +224,42 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
         }
     }
 
+    suspend fun prepareImageForUpload(context: Context): Result<MultipartBody.Part> {
+        return try {
+            // 이미지 스트림을 열어 이미지 크기를 줄이기 위한 설정
+            val imageUri = imageUri.value ?: return Result.failure(Exception("Image Uri is null"))
+            val inputStream = context.contentResolver.openInputStream(imageUri) ?: return Result.failure(Exception("Failed to open image stream"))
+            val options = BitmapFactory.Options().apply {
+                inJustDecodeBounds = true
+                BitmapFactory.decodeStream(inputStream, null, this)
+                inSampleSize = calculateInSampleSize(this, 800, 800)
+                inJustDecodeBounds = false
+            }
+            inputStream.close()
+
+            // 크기가 조정된 Bitmap 로드
+            val resizedInputStream = context.contentResolver.openInputStream(imageUri) ?: return Result.failure(Exception("Failed to open image stream again"))
+            val bitmap = BitmapFactory.decodeStream(resizedInputStream, null, options)
+            resizedInputStream.close()
+
+            // Bitmap을 임시 파일로 저장
+            val tempFile = File.createTempFile("upload", ".jpg", context.cacheDir).apply {
+                outputStream().use { out ->
+                    bitmap?.compress(Bitmap.CompressFormat.JPEG, 85, out)
+                }
+            }
+
+            // MultipartBody.Part 객체 생성
+            val contentType = "image/jpeg".toMediaTypeOrNull()
+            val requestFile = tempFile.asRequestBody(contentType)
+            val body = MultipartBody.Part.createFormData("file", tempFile.name, requestFile)
+
+            tempFile.delete() // 임시 파일 삭제
+
+            Result.success(body)
+        } catch (e: Exception) {
+            Log.e("Model", "Exception during preparing image for upload", e)
+            Result.failure(e)
+        }
+    }
 }

@@ -35,9 +35,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ssafy.d101.model.FoodAddInfo
+import com.ssafy.d101.model.IntakeReq
 import com.ssafy.d101.model.YoloFood
+import com.ssafy.d101.model.YoloResponse
 import com.ssafy.d101.ui.view.components.CroppedImagesDisplay
 import com.ssafy.d101.ui.view.components.DailyHorizontalBar
+import com.ssafy.d101.viewmodel.DietViewModel
 import com.ssafy.d101.viewmodel.FoodSearchViewModel
 import com.ssafy.d101.viewmodel.ModelViewModel
 
@@ -48,6 +51,9 @@ fun FoodListResultScreen(navController: NavHostController) {
 
     val modelViewModel : ModelViewModel = hiltViewModel()
     val yoloResult by  modelViewModel.getYoloResponse().collectAsState()
+
+    val dietViewModel : DietViewModel = hiltViewModel()
+    val intakeReqs = yoloResult?.let { createIntakeReqList(uploadedFoodItems, it) } ?: emptyList()
 
     Box(
         modifier = Modifier
@@ -74,7 +80,7 @@ fun FoodListResultScreen(navController: NavHostController) {
         ) {
             // 업로드된 음식 목록 표시
             LazyColumn {
-                items(uploadedFoodItems) { foodItem ->
+                items(intakeReqs) { foodItem ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -88,14 +94,20 @@ fun FoodListResultScreen(navController: NavHostController) {
                             modifier = Modifier.weight(1f)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "${foodItem.calorie}kcal")
+                        Text(text = "${foodItem.kcal}kcal")
                     }
                 }
             }
 
             // 식단 분석 하러 가기 버튼
             Button(
-                onClick = { /* TODO: 버튼 클릭 이벤트 처리 */ },
+                onClick = {
+                    if (intakeReqs != null) {
+                        dietViewModel.setTakeReqList(intakeReqs)
+                        //TODO : 화면이동
+                        //navController.navigate("")
+                    }
+                          },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                 modifier = Modifier
                     .width(160.dp)
@@ -245,3 +257,44 @@ fun FoodListResultScreen(navController: NavHostController) {
 //fun PreviewAnalysisResultScreen2() {
 //    FoodListResultScreen(navController = rememberNavController())
 //}
+
+
+fun createIntakeReqList(uploadedFoodItems: List<FoodAddInfo>, yoloResult: List<YoloResponse>): List<IntakeReq> {
+    val intakeReqs = mutableListOf<IntakeReq>()
+
+    if(uploadedFoodItems.isNotEmpty()) {
+        // uploadedFoodItems로부터 IntakeReq 리스트 생성
+        uploadedFoodItems.forEach { foodItem ->
+            intakeReqs.add(
+                IntakeReq(
+                    food_id = foodItem.id.toLong(),
+                    amount = 1.0,
+                    name = foodItem.name,
+                    kcal = foodItem.calorie,
+                    carbohydrate = foodItem.carbohydrate,
+                    protein = foodItem.protein,
+                    fat = foodItem.fat
+                )
+            )
+            // yoloResponse를 사용하는 로직도 여기에 추가
+            // 예: yoloResponse.forEach { ... }
+        }
+    }
+    if(yoloResult.isNotEmpty()) {
+        yoloResult.forEach { foodItem ->
+            intakeReqs.add(
+                IntakeReq(
+                    food_id = foodItem.yoloFoodDto.id.toLong(),
+                    amount = 1.0,
+                    name = foodItem.tag,
+                    kcal = foodItem.yoloFoodDto.calorie,
+                    carbohydrate = foodItem.yoloFoodDto.carbohydrate,
+                    protein = foodItem.yoloFoodDto.protein,
+                    fat = foodItem.yoloFoodDto.fat
+                )
+            )
+        }
+    }
+
+    return intakeReqs
+}
