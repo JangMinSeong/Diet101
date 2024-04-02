@@ -68,11 +68,7 @@ fun FoodAdditionScreen(navController: NavHostController) {
     val viewModel: FoodSearchViewModel = hiltViewModel()
     val userAddedFoodItems by viewModel.userAddedFoodItems.collectAsState()
     var selectedFoodItem by remember { mutableStateOf<FoodAddInfo?>(null)}
-    val selectedFoodPostItem = remember { mutableStateListOf<FoodAddInfo>() }  // 선택한 음식 저장할 리스트
-
-    LaunchedEffect(selectedFoodItem) {
-
-    }
+    val selectedFoodPostItems = remember { mutableStateListOf<FoodAddInfo>() }  // 선택한 음식 저장할 최종 리스트
 
     Column (
         modifier = Modifier
@@ -147,7 +143,6 @@ fun FoodAdditionScreen(navController: NavHostController) {
 
             Button(
                 onClick = {
-//                    viewModel.fetchFoodItems(searchText)
                     // searchText를 파라미터로 넘기면서 FoodSearchScreen으로 이동하는 로직
                     navController.navigate("foodSearch/${searchText}")
                 },
@@ -184,7 +179,7 @@ fun FoodAdditionScreen(navController: NavHostController) {
             if (userAddedFoodItems.isNotEmpty()) {
                 Button(
                     onClick = {
-                        viewModel.uploadSelectedItems(selectedFoodPostItem)
+                        viewModel.uploadSelectedItems(selectedFoodPostItems)
                         navController.navigate("foodResistList")
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
@@ -225,7 +220,7 @@ fun FoodAdditionScreen(navController: NavHostController) {
                         modifier = Modifier
                             .padding(vertical = 8.dp)
                             .clickable {
-                                selectedFoodItem  = foodItem
+                                selectedFoodItem = foodItem
                                 showDialog = true
                             }
                     ) {
@@ -237,18 +232,17 @@ fun FoodAdditionScreen(navController: NavHostController) {
                         )
                         // 선택 유무
                         SwitchWithIconExample(
-                            checked = selectedFoodPostItem.contains(foodItem),
+                            checked = selectedFoodPostItems.contains(foodItem),
                             foodItem = foodItem,
                             onCheckedChange = { isChecked ->
                                 if (isChecked) {
-                                    selectedFoodPostItem.add(foodItem)
+                                    selectedFoodPostItems.add(foodItem)
                                 } else {
-                                    selectedFoodPostItem.remove(foodItem)
+                                    selectedFoodPostItems.remove(foodItem)
                                 }
                             }
                         )
-
-//                        // 삭제 버튼
+                        // 삭제 버튼
                         CancelButtonExample(onClick = {
                             viewModel.deleteFoodItem(foodItem)
                         })
@@ -261,19 +255,6 @@ fun FoodAdditionScreen(navController: NavHostController) {
             selectedFoodItem?.let { item ->
                 var eatenAmountText by remember { mutableStateOf(item.eatenAmount.toString()) }
                 val eatenAmount = eatenAmountText.toDoubleOrNull() ?: item.eatenAmount
-
-                // 원본 아이템 정보를 기준으로 재계산
-                val originalCarbohydrate = item.carbohydrate / item.eatenAmount
-                val originalProtein = item.protein / item.eatenAmount
-                val originalFat = item.fat / item.eatenAmount
-
-                // 영양소(탄단지) 조절
-                val adjustedCarbohydrate = originalCarbohydrate * eatenAmount
-                val adjustedProtein = originalProtein * eatenAmount
-                val adjustedFat = originalFat * eatenAmount
-
-                // 총 칼로리 계산
-                val totalCalories = ((adjustedCarbohydrate * 4) + (adjustedProtein * 4) + (adjustedFat * 9)).toInt()
 
                 if (showDialog) {
                     AlertDialog(
@@ -321,9 +302,7 @@ fun FoodAdditionScreen(navController: NavHostController) {
                                 // 먹은 양 입력 상자
                                 TextField(
                                     value = eatenAmountText,
-                                    onValueChange = { newValue ->
-                                        eatenAmountText = newValue
-                                    },
+                                    onValueChange = {},
                                     modifier = Modifier
                                         .width(100.dp)
                                         .height(65.dp)
@@ -338,7 +317,10 @@ fun FoodAdditionScreen(navController: NavHostController) {
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(160.dp)
-                                        .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
+                                        .background(
+                                            Color.LightGray,
+                                            shape = RoundedCornerShape(8.dp)
+                                        )
                                         .padding(8.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -347,7 +329,7 @@ fun FoodAdditionScreen(navController: NavHostController) {
                                         verticalArrangement = Arrangement.Top
                                     ) {
                                         Text(
-                                            "${totalCalories}kcal",
+                                            "${item.calorie}kcal",
                                             fontSize = 20.sp,
                                             fontWeight = FontWeight.Bold,
                                             modifier = Modifier
@@ -370,9 +352,9 @@ fun FoodAdditionScreen(navController: NavHostController) {
                                             horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            NutritionInfoFieldRead("탄수화물", "${String.format("%.2f", adjustedCarbohydrate)}g")
-                                            NutritionInfoFieldRead("단백질", "${String.format("%.2f", adjustedProtein)}g")
-                                            NutritionInfoFieldRead("지방", "${String.format("%.2f", adjustedFat)}g")
+                                            NutritionInfoFieldRead("탄수화물", "${item.carbohydrate}g")
+                                            NutritionInfoFieldRead("단백질", "${item.protein}g")
+                                            NutritionInfoFieldRead("지방", "${item.fat}g")
                                         }
                                     }
                                 }
@@ -392,13 +374,13 @@ fun FoodAdditionScreen(navController: NavHostController) {
                                         totalSize = item.totalSize,
                                         unit = item.unit,
                                         eatenAmount = eatenAmount.toDouble(),
-                                        calorie = totalCalories,
-                                        carbohydrate = adjustedCarbohydrate,
-                                        protein = adjustedProtein,
-                                        fat = adjustedFat
+                                        calorie = item.calorie,
+                                        carbohydrate = item.carbohydrate,
+                                        protein = item.protein,
+                                        fat = item.fat,
                                     )
                                     showDialog = false
-                                    viewModel.updateFoodItem(updatedFoodItem)
+                                    viewModel.deleteFoodItem(updatedFoodItem)
                                 },
                                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                                 modifier = Modifier
@@ -407,7 +389,7 @@ fun FoodAdditionScreen(navController: NavHostController) {
                                     .padding(top = 20.dp),
                             ) {
                                 Text(
-                                    text = "수정",
+                                    text = "삭제",
                                     color = Color.White,
                                     fontSize = 16.sp,
                                 )
