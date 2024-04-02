@@ -8,13 +8,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -29,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.ssafy.d101.model.FoodInfo
 import com.ssafy.d101.viewmodel.FoodSearchViewModel
 import com.ssafy.d101.viewmodel.ModelViewModel
 
@@ -50,7 +56,7 @@ fun EditFoodDialog(showDialog: Boolean, onDismiss: () -> Unit, modelViewModel: M
     // 검색을 위한 상태 변수
     var searchQuery by remember { mutableStateOf("") }
     var searchResult by remember { mutableStateOf(currentItem) }
-    var showResults by remember { mutableStateOf(false) }
+    var showDropdown by remember { mutableStateOf(false) }
 
     val foodLists by foodSearchViewModel.foodItems.collectAsState()
 
@@ -67,20 +73,19 @@ fun EditFoodDialog(showDialog: Boolean, onDismiss: () -> Unit, modelViewModel: M
                         trailingIcon = {
                             IconButton(onClick = {
                                 foodSearchViewModel.fetchFoodItems(searchQuery)
-                                showResults = true
+                                if(foodLists.isEmpty())
+                                    showDropdown = false
+                                else
+                                    showDropdown = true
                             }) {
                                 Icon(Icons.Default.Search, contentDescription = "검색")
                             }
                         }
                     )
-                    if (showResults) {
-                        LazyColumn(modifier = Modifier.fillMaxHeight(0.5f).padding(top = 8.dp)) {
-                            items(foodLists) { food ->
-                                Text(
-                                    text = food.name, // 'name'은 검색 결과 항목의 이름 필드를 가정합니다.
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
+                    if (showDropdown && foodLists.isNotEmpty()) {
+                        // 검색 결과가 있고, 드롭다운을 보여줘야 할 경우
+                        ShowDropdownMenu(foodLists, onItemSelected = { food ->
+                            // 선택한 음식으로 필드 업데이트
                                             // 아이템 클릭 시 필드 업데이트
                                             searchQuery = food.name // 실제 음식 이름으로 검색 쿼리 업데이트
                                             foodName = food.name
@@ -88,32 +93,30 @@ fun EditFoodDialog(showDialog: Boolean, onDismiss: () -> Unit, modelViewModel: M
                                             protein = food.protein.toString()
                                             fat = food.fat.toString()
                                             calorie = food.calorie.toString()
-                                            showResults = false // 검색 결과 숨김
+                                            showDropdown = false // 검색 결과 숨김
                                         }
-                                        .padding(8.dp)
-                                )
-                            }
-                        }
+                                    )
+
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     // 검색 결과 기반으로 필드 업데이트
                     Text("음식 이름: ${foodName}")
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(13.dp))
                     Text("칼로리(kcal): ${calorie}")
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(13.dp))
                     Row(
                     ) {
                         Column() {
                             Text("탄수화물(g)")
                             Text("${carbs}")
                         }
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.padding(15.dp))
                         Column() {
                             Text("단백질(g)")
                             Text("${protein}")
                         }
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.padding(15.dp))
                         Column() {
                             Text("지방(g)")
                             Text("${fat}")
@@ -135,5 +138,22 @@ fun EditFoodDialog(showDialog: Boolean, onDismiss: () -> Unit, modelViewModel: M
                 }
             }
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShowDropdownMenu(foodLists: List<FoodInfo>, onItemSelected: (FoodInfo) -> Unit) {
+    DropdownMenu(
+        expanded = true,
+        onDismissRequest = { /* 드롭다운 메뉴 닫기 처리 */ },
+        modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp)
+    ) {
+        foodLists.forEach { food ->
+            DropdownMenuItem(
+                text = { Text(food.name) },
+                onClick = { onItemSelected(food) }
+            )
+        }
     }
 }

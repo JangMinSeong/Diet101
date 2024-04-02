@@ -43,8 +43,11 @@ import com.ssafy.d101.viewmodel.ModelViewModel
 
 @Composable
 fun FoodListResultScreen(navController: NavHostController) {
-    val modelViewModel : FoodSearchViewModel = hiltViewModel()
-    val uploadedFoodItems by modelViewModel.userAddedFoodItems.collectAsState()
+    val foodViewModel : FoodSearchViewModel = hiltViewModel()
+    val uploadedFoodItems by foodViewModel.userAddedFoodItems.collectAsState()
+
+    val modelViewModel : ModelViewModel = hiltViewModel()
+    val yoloResult by  modelViewModel.getYoloResponse().collectAsState()
 
     Box(
         modifier = Modifier
