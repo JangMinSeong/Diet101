@@ -10,6 +10,7 @@ data class YoloResponse(
 
 
 data class YoloFood(
+    val id: Long,
     val calorie: Int,
     val carbohydrate: Double,
     val protein: Double,

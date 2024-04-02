@@ -3,10 +3,12 @@ package com.ssafy.d101.repository
 import android.util.Log
 import com.ssafy.d101.api.DietService
 import com.ssafy.d101.model.AnalysisDiet
+import com.ssafy.d101.model.CreateMealReq
 import com.ssafy.d101.model.DietInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import okhttp3.MultipartBody
 import javax.inject.Inject
 
 class DietRepository @Inject constructor(private val dietService: DietService) {
@@ -58,6 +60,22 @@ class DietRepository @Inject constructor(private val dietService: DietService) {
                 Result.failure(Exception("Failed to get AnalysisDiet"))
             }
         } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun saveMeal(file: MultipartBody.Part, createMealReq: CreateMealReq): Result<Boolean> {
+        return try {
+            val response = dietService.saveMeal(file, createMealReq)
+            if (response.isSuccessful) {
+
+                Result.success(true)
+            } else {
+                Log.e("Diet", "Failed to ")
+                Result.success(false)
+            }
+        } catch (e: Exception) {
+            Log.e("Diet", "Exception during ", e)
             Result.failure(e)
         }
     }
