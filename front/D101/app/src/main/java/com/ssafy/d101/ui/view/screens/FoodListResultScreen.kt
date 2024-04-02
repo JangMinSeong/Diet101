@@ -182,7 +182,7 @@ fun FoodListResultScreen(navController: NavHostController) {
                     intakeReqs.forEach { item ->
                         val newEatenAmount = eatenAmounts[item.food_id]?.toDoubleOrNull() ?: 1.0
                         val updatedItem = item.copy(amount = newEatenAmount)
-                        foodViewModel.updateEatenAmount(updatedItem)
+//                        foodViewModel.updateEatenAmount(updatedItem)
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF12369)),
