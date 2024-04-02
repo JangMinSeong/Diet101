@@ -1,21 +1,28 @@
-package com.ssafy.d101.viewmodel;
+package com.ssafy.d101.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.ssafy.d101.api.DietService
 import com.ssafy.d101.api.UserService
 import com.ssafy.d101.model.AnalysisDiet
+import com.ssafy.d101.model.CreateMealReq
 import com.ssafy.d101.model.DietInfo
+import com.ssafy.d101.model.Dunchfast
+import com.ssafy.d101.model.IntakeReq
 import com.ssafy.d101.repository.DietRepository
+import com.ssafy.d101.repository.ModelRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
@@ -23,7 +30,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DietViewModel @Inject constructor(
-    private val dietRepository: DietRepository
+    private val dietRepository: DietRepository,
+    private val modelRepository: ModelRepository
 ) : ViewModel() {
 
     fun getCurrentDate(): String {
@@ -86,5 +94,40 @@ class DietViewModel @Inject constructor(
             val result = dietRepository.getDayDiet(date).first()
             _dayDiet.value = result
         }
+    }
+
+    suspend fun saveMeal() {
+        val file = modelRepository.prepareImageForUpload(modelRepository.context.value!!).getOrThrow()
+
+        val createMealReq = CreateMealReq(dietRepository.dietType.value!!, getCurrentDate(), dietRepository.takeReqList.value!!)
+        val gson = Gson()
+        val createMealReqJson = gson.toJson(createMealReq)
+        val createMealReqBody = createMealReqJson.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+
+        viewModelScope.launch {
+            dietRepository.saveMeal(file, createMealReqBody)
+        }
+    }
+
+    fun setDietType(type : Dunchfast) {
+        viewModelScope.launch{
+            dietRepository.setDietType(type)
+        }
+    }
+
+    fun setTakeReqList(takeReqList : List<IntakeReq>) {
+        viewModelScope.launch{
+            dietRepository.setTakeReqList(takeReqList)
+        }
+    }
+
+    fun getTakeReqs() = dietRepository.takeReqList
+    fun getType() = dietRepository.dietType
+
+    fun getTakeReqList(): List<IntakeReq> {
+        return dietRepository.takeReqList.value!!
+    }
+    fun getDietType(): Dunchfast {
+        return dietRepository.dietType.value!!
     }
 }

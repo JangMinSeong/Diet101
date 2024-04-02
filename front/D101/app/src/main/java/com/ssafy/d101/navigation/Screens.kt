@@ -26,4 +26,6 @@ sealed class Screens(val route: String) {
     data object AnalysisResult : Screens("analysisResult")
     data object OCRResist : Screens("ocrResist")
     data object OCRResult : Screens("ocrResult")
+    data object FoodResistList : Screens("foodResistList")
+    data object DietAiAnalysisResult : Screens("dietAiAnalysisResult")
 }

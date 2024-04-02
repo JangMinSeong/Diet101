@@ -99,10 +99,6 @@ fun FoodResistScreen(navController: NavHostController) {
             Log.e("Camera", "Failed to capture photo")
         }
     }
-//    val launcherForCameraFood = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-//        // 카메라에서 받아온 이미지 처리. bitmap이 null일 수 있으니 null 체크 필요
-//
-//    }
 
     //////음식 사진 갤러리
     val launcherForGalleryFood = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -173,17 +169,6 @@ fun FoodResistScreen(navController: NavHostController) {
                 .padding(bottom = 10.dp))
         }
 
-        // 오늘은 어떤 음식을 드셨나요?
-        Text(
-            text = "오늘은 어떤 음식을 드셨나요?",
-            modifier = Modifier
-                .weight(2f)
-                .padding(start = 10.dp),
-            textAlign = TextAlign.Center,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF004D40),
-        )
 
         // 섭취한 음식 사진 첨부 AlertDialog 표시 로직
         if (showDialog) {
@@ -238,7 +223,7 @@ fun FoodResistScreen(navController: NavHostController) {
                     .padding(vertical = 8.dp,)
                     .background(Color(0x3700897B), RoundedCornerShape(10.dp))
                     .width(200.dp)
-                    .height(600.dp),
+                    .height(450.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Column (
@@ -277,26 +262,6 @@ fun FoodResistScreen(navController: NavHostController) {
                             .clickable(onClick = { showDialog = true })
                     )
 
-
-                    Text("분류", fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier
-                        .align(Alignment.Start)
-                        .padding(start = 35.dp, top = 10.dp))
-                    listOf("아침", "아점", "점심", "점저", "저녁", "야식", "간식", "음료", "주류").chunked(3).forEach { chunk ->
-                        Row(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-                            chunk.forEach { meal ->
-                                OutlinedButton(
-                                    onClick = { onMealSelected(meal) },
-                                    border = BorderStroke(if (isItemSelected(meal)) 4.dp else 1.dp, Color.Black),
-                                    modifier = Modifier
-                                        .width(90.dp)
-                                ) {
-                                    Text(meal, fontWeight = FontWeight.Bold, color = if (isItemSelected(meal)) Color.Black else Color.Black)
-                                }
-                            }
-                        }
-                    }
 
                     // "등록하기" 버튼 추가
                     Button(
