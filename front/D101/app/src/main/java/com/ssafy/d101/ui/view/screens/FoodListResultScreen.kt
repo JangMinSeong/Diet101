@@ -52,6 +52,7 @@ import com.ssafy.d101.ui.view.components.DailyHorizontalBar
 import com.ssafy.d101.viewmodel.DietViewModel
 import com.ssafy.d101.viewmodel.FoodSearchViewModel
 import com.ssafy.d101.viewmodel.ModelViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun FoodListResultScreen(navController: NavHostController) {
@@ -77,6 +78,8 @@ fun FoodListResultScreen(navController: NavHostController) {
     val scrollState = rememberScrollState()
     // 각 음식 아이템의 먹은 양을 저장하는 상태
     var eatenAmounts = remember { mutableStateMapOf<Long, Double>() }
+
+    val scope = rememberCoroutineScope()
 
     Box(
         modifier = Modifier
@@ -242,6 +245,10 @@ fun FoodListResultScreen(navController: NavHostController) {
                         Log.d("in Result screen","$updatedIntakeReqs, $dunchfastType")
 
                         navController.navigate("dietAiAnalysisResult")
+
+                        scope.launch {
+                            dietViewModel.saveMeal()
+                        }
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
