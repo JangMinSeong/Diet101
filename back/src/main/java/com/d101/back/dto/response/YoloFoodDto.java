@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class YoloFoodDto {
+    private Long food_id;
     private int calorie;
     private double carbohydrate;
     private double protein;
@@ -17,6 +18,7 @@ public class YoloFoodDto {
 
     public static YoloFoodDto fromEntity (Food food) {
         return new YoloFoodDto(
+                food.getId(),
                 food.getCalorie(),
                 food.getCarbohydrate(),
                 food.getProtein(),

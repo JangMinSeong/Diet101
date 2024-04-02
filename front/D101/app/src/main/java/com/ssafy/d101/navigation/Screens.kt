@@ -24,4 +24,8 @@ sealed class Screens(val route: String) {
     data object Loading: Screens("loading")
     data object AiLoading : Screens("ailoading")
     data object AnalysisResult : Screens("analysisResult")
+    data object OCRResist : Screens("ocrResist")
+    data object FoodResistList : Screens("foodResistList")
+
+    data object DietAiAnalysisResult : Screens("dietAiAnalysisResult")
 }

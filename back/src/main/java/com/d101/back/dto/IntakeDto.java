@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @Data
 public class IntakeDto {
     private FoodDto food;
-    private int amount;
+    private Double amount;
 
     @QueryProjection
-    public IntakeDto(Food food, int amount) {
+    public IntakeDto(Food food, Double amount) {
         this.food = FoodDto.fromEntity(food);
         this.amount=amount;
     }

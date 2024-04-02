@@ -3,6 +3,7 @@ package com.ssafy.d101.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ssafy.d101.api.FoodSearchService
 import com.ssafy.d101.model.FoodAddInfo
 import com.ssafy.d101.model.FoodInfo
@@ -25,9 +26,14 @@ class FoodSearchViewModel @Inject constructor(
     val foodItems: StateFlow<List<FoodInfo>> = _foodItems
 
     // 사용자가 추가한 음식을 저장할 리스트
-    private val _userAddedFoodItems = MutableStateFlow<List<FoodAddInfo>>(emptyList())
     val userAddedFoodItems: StateFlow<List<FoodAddInfo>> = foodRepository.userAddedFoodItems
 
+    // 선택된 음식의 최신 상태를 관리
+    private val _selectedFoodItem = MutableStateFlow<FoodAddInfo?>(null)
+    val selectedFoodItem: StateFlow<FoodAddInfo?> = _selectedFoodItem
+
+    // 사용자가 선택한 음식을 저장할 리스트
+    val uploadedPostItems: StateFlow<List<FoodAddInfo>> = foodRepository.selectedFoodItems
 
     // 서버에 해당 파라미터의 음식을 GET 요청하는 함수
     fun fetchFoodItems(foodName: String) {
@@ -57,7 +63,6 @@ class FoodSearchViewModel @Inject constructor(
         }
     }
 
-
     // 음식 아이템 추가 함수
     fun addUserAddedFoodItem(foodAddInfo: FoodAddInfo) {
         viewModelScope.launch {
@@ -66,10 +71,30 @@ class FoodSearchViewModel @Inject constructor(
         Log.d("FoodSearchViewModel", "Added food item: $foodAddInfo")
     }
 
-    // 음식 아이템 삭제 함수
+    // 음식 아이템
     fun deleteFoodItem(foodAddInfo: FoodAddInfo) {
         viewModelScope.launch {
             foodRepository.deleteFoodItem(foodAddInfo)
+        }
+    }
+
+    // 선택된 아이템을 설정하는 함수
+    fun setSelectedFoodItem(item: FoodAddInfo) {
+        _selectedFoodItem.value = item
+    }
+
+    // 선택된 음식 아이템들을 레퍼지토리에 저장하는 함수
+    fun uploadSelectedItems(selectedItems: List<FoodAddInfo>) {
+        viewModelScope.launch {
+            foodRepository.uploadSelectedFoodItems(selectedItems)
+        }
+    }
+
+    // 먹은 양 입력 값에 따라 업데이트하는 함수
+    fun updateEatenAmount(updateFoodAddInfo: FoodAddInfo) {
+        viewModelScope.launch {
+            foodRepository.updateEatenAmount(updateFoodAddInfo)
+            Log.d("UpdateEatenAmount", "Updated: $updateFoodAddInfo")
         }
     }
 }

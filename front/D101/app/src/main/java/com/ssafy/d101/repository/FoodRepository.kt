@@ -17,6 +17,11 @@ class FoodRepository @Inject constructor(private val foodService: FoodService) {
     private val _userAddedFoodItems = MutableStateFlow<List<FoodAddInfo>>(emptyList())
     val userAddedFoodItems: StateFlow<List<FoodAddInfo>> = _userAddedFoodItems
 
+    // 사용자가 선택한 음식 항목들을 저장할 리스트
+    private val _selectedFoodItems = MutableStateFlow<List<FoodAddInfo>>(emptyList())
+    val selectedFoodItems: StateFlow<List<FoodAddInfo>> = _selectedFoodItems.asStateFlow()
+
+
     suspend fun getRecommendFoods(kcal: String): StateFlow<List<FoodInfo>?> {
         val result = getRecommendFoodFromBack(kcal)
         result.onSuccess { foods ->
@@ -57,16 +62,19 @@ class FoodRepository @Inject constructor(private val foodService: FoodService) {
         _userAddedFoodItems.value = updatedList
     }
 
-    // 음식 아이템 업데이트
-    suspend fun updateFoodItem(updatedFoodAddInfo: FoodAddInfo) {
-        val index = _userAddedFoodItems.value.indexOfFirst { it.id == updatedFoodAddInfo.id }
-        if (index != -1) {
-            val updatedList = _userAddedFoodItems.value.toMutableList().apply {
-                this[index] = updatedFoodAddInfo
+    // 선택한 음식 아이템 추가
+    suspend fun uploadSelectedFoodItems(selectedFoods: List<FoodAddInfo>) {
+        _selectedFoodItems.value = selectedFoods
+    }
+
+    // 먹은 양 업데이트
+    suspend fun updateEatenAmount(updatedFoodAddInfo: FoodAddInfo) {
+        val currentIndex = _userAddedFoodItems.value.indexOfFirst { it.id == updatedFoodAddInfo.id }
+        if (currentIndex != -1) {
+            val newList = _userAddedFoodItems.value.toMutableList().apply {
+                this[currentIndex] = updatedFoodAddInfo
             }
-            _userAddedFoodItems.value = updatedList
-        } else {
-            Log.e("FoodRepository", "업데이트할 아이템 없음.")
+            _userAddedFoodItems.value = newList
         }
     }
 }
