@@ -5,6 +5,8 @@ import com.ssafy.d101.api.DietService
 import com.ssafy.d101.model.AnalysisDiet
 import com.ssafy.d101.model.CreateMealReq
 import com.ssafy.d101.model.DietInfo
+import com.ssafy.d101.model.Dunchfast
+import com.ssafy.d101.model.IntakeReq
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,6 +20,12 @@ class DietRepository @Inject constructor(private val dietService: DietService) {
 
     private val _diets = MutableStateFlow<List<DietInfo>?>(null)
     private val diets = _diets.asStateFlow()
+
+    private val _dietType = MutableStateFlow<Dunchfast?>(null)
+    val dietType = _dietType.asStateFlow()
+
+    private val _takeReqList = MutableStateFlow<List<IntakeReq>?>(null)
+    val takeReqList = _takeReqList.asStateFlow()
 
     suspend fun getDayDiet(date: String): StateFlow<List<DietInfo>?> {
         val result = getDayDietFromBack(date)
@@ -77,5 +85,13 @@ class DietRepository @Inject constructor(private val dietService: DietService) {
             Log.e("Diet", "Exception during ", e)
             Result.failure(e)
         }
+    }
+
+    suspend fun setDietType(type : Dunchfast) {
+        _dietType.emit(type)
+    }
+
+    suspend fun setTakeReqList(takeReqList : List<IntakeReq>) {
+        _takeReqList.emit(takeReqList)
     }
 }

@@ -45,6 +45,7 @@ data class CreateMealReq(
 
 data class IntakeReq(
     val food_id: Long,
+    val name : String,
     val amount: Double,
     val kcal: Int,
     val carbohydrate: Double,

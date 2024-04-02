@@ -35,16 +35,25 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ssafy.d101.model.FoodAddInfo
+import com.ssafy.d101.model.IntakeReq
 import com.ssafy.d101.model.YoloFood
+import com.ssafy.d101.model.YoloResponse
 import com.ssafy.d101.ui.view.components.CroppedImagesDisplay
 import com.ssafy.d101.ui.view.components.DailyHorizontalBar
+import com.ssafy.d101.viewmodel.DietViewModel
 import com.ssafy.d101.viewmodel.FoodSearchViewModel
 import com.ssafy.d101.viewmodel.ModelViewModel
 
 @Composable
 fun FoodListResultScreen(navController: NavHostController) {
-    val modelViewModel : FoodSearchViewModel = hiltViewModel()
-    val uploadedFoodItems by modelViewModel.userAddedFoodItems.collectAsState()
+    val foodViewModel : FoodSearchViewModel = hiltViewModel()
+    val uploadedFoodItems by foodViewModel.userAddedFoodItems.collectAsState()
+
+    val modelViewModel : ModelViewModel = hiltViewModel()
+    val yoloResult by  modelViewModel.getYoloResponse().collectAsState()
+
+    val dietViewModel : DietViewModel = hiltViewModel()
+    val intakeReqs = yoloResult?.let { createIntakeReqList(uploadedFoodItems, it) } ?: emptyList()
 
     Box(
         modifier = Modifier
@@ -71,7 +80,7 @@ fun FoodListResultScreen(navController: NavHostController) {
         ) {
             // 업로드된 음식 목록 표시
             LazyColumn {
-                items(uploadedFoodItems) { foodItem ->
+                items(intakeReqs) { foodItem ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -85,7 +94,7 @@ fun FoodListResultScreen(navController: NavHostController) {
                             modifier = Modifier.weight(1f)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "${foodItem.calorie}kcal")
+                        Text(text = "${foodItem.kcal}kcal")
                     }
                 }
             }
@@ -93,8 +102,13 @@ fun FoodListResultScreen(navController: NavHostController) {
             // 식단 분석 하러 가기 버튼
             Button(
                 onClick = {
+                    if (intakeReqs != null) {
+                        dietViewModel.setTakeReqList(intakeReqs)
+                        //TODO : 화면이동
+                        //navController.navigate("")
+                    }
                     navController.navigate("dietAiAnalysisResult")
-                },
+                          },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                 modifier = Modifier
                     .width(160.dp)

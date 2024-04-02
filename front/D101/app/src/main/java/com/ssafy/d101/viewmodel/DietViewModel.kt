@@ -9,6 +9,8 @@ import com.ssafy.d101.api.DietService
 import com.ssafy.d101.api.UserService
 import com.ssafy.d101.model.AnalysisDiet
 import com.ssafy.d101.model.DietInfo
+import com.ssafy.d101.model.Dunchfast
+import com.ssafy.d101.model.IntakeReq
 import com.ssafy.d101.repository.DietRepository
 import com.ssafy.d101.repository.ModelRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -95,6 +97,22 @@ class DietViewModel @Inject constructor(
         viewModelScope.launch {
             //        dietRepository.saveMeal(file, )
         }
+    }
+
+    fun setDietType(type : Dunchfast) {
+        viewModelScope.launch{
+            dietRepository.setDietType(type)
+        }
+    }
+
+    fun setTakeReqList(takeReqList : List<IntakeReq>) {
+        viewModelScope.launch{
+            dietRepository.setTakeReqList(takeReqList)
+        }
+    }
+
+    fun getTakeReqList() {
+        dietRepository.takeReqList
     }
 
 }
