@@ -245,11 +245,10 @@ fun FoodListResultScreen(navController: NavHostController) {
                         Log.d("in Result screen","$updatedIntakeReqs, $dunchfastType")
 
                         navController.navigate("dietAiAnalysisResult")
-                        dietViewModel.setTakeReqList(intakeReqs)
+
                         scope.launch {
                             dietViewModel.saveMeal()
                         }
-//                        navController.navigate("dietAiAnalysisResultScreen")
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
