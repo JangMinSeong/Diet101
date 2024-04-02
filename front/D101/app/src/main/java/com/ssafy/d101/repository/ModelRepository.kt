@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.viewModelScope
 import com.ssafy.d101.api.ModelService
 import com.ssafy.d101.api.UserService
 import com.ssafy.d101.model.OCRResponse
@@ -15,6 +16,7 @@ import com.ssafy.d101.utils.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -79,9 +81,8 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
             val contentType = "image/jpeg".toMediaTypeOrNull()
             val requestFile = tempFile.asRequestBody(contentType)
             val body = MultipartBody.Part.createFormData("file", tempFile.name, requestFile)
-            val response = modelService.checkCal(body)
 
-            tempFile.delete() // Clean up the temporary file
+            val response = modelService.checkCal(body)
 
             if (response.isSuccessful) {
                 _yoloInfo.emit(response.body())
@@ -136,9 +137,8 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
             val contentType = "image/jpeg".toMediaTypeOrNull()
             val requestFile = tempFile.asRequestBody(contentType)
             val body = MultipartBody.Part.createFormData("file", tempFile.name, requestFile)
-            val response = modelService.checkOCR(body)
 
-            tempFile.delete() // Clean up the temporary file
+            val response = modelService.checkOCR(body)
 
             if (response.isSuccessful) {
                 _ocrInfo.emit(response.body())
@@ -163,6 +163,10 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
         _context.emit(context)
     }
 
+    suspend fun setYoloinfo(yoloInfo : List<YoloResponse>) {
+        _yoloInfo.emit(yoloInfo)
+    }
+
     // 비트맵의 샘플링 크기를 계산
     fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
         val (height: Int, width: Int) = options.run { outHeight to outWidth }
@@ -179,5 +183,83 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
         }
 
         return inSampleSize
+    }
+
+    fun deleteYoloResponseItem(index: Int) {
+        val updatedList = _yoloInfo.value?.toMutableList() // 현재 상태를 가변 리스트로 변환
+        if (updatedList != null) {
+            if (index in updatedList.indices) {
+                updatedList.removeAt(index) // 인덱스에 해당하는 항목 삭제
+                _yoloInfo.value = updatedList // 업데이트된 리스트로 상태 변경
+
+                Log.d("update","$updatedList")
+            }
+        }
+    }
+
+    fun updateFoodItem(index: Int, newName: String, newCarbs: Double, newProtein: Double, newFat: Double, newCal : Int) {
+        _yoloInfo.value?.let { foodList ->
+            if (index in foodList.indices) {
+                val updatedItem = foodList[index].yoloFoodDto?.copy(
+                    carbohydrate = newCarbs,
+                    protein = newProtein,
+                    fat = newFat,
+                    calorie = newCal
+                )?.let {
+                    foodList[index].copy(
+                        tag = newName,
+                        yoloFoodDto = it
+                    )
+                }
+                // 업데이트된 아이템으로 리스트를 갱신
+                val updatedList = foodList.toMutableList().apply {
+                    if (updatedItem != null) {
+                        this[index] = updatedItem
+                    }
+                }
+                _yoloInfo.value = updatedList
+            } else {
+                Log.e("ModelViewModel", "Invalid index for updating food item.")
+            }
+        }
+    }
+
+    suspend fun prepareImageForUpload(context: Context): Result<MultipartBody.Part> {
+        return try {
+            // 이미지 스트림을 열어 이미지 크기를 줄이기 위한 설정
+            val imageUri = imageUri.value ?: return Result.failure(Exception("Image Uri is null"))
+            val inputStream = context.contentResolver.openInputStream(imageUri) ?: return Result.failure(Exception("Failed to open image stream"))
+            val options = BitmapFactory.Options().apply {
+                inJustDecodeBounds = true
+                BitmapFactory.decodeStream(inputStream, null, this)
+                inSampleSize = calculateInSampleSize(this, 800, 800)
+                inJustDecodeBounds = false
+            }
+            inputStream.close()
+
+            // 크기가 조정된 Bitmap 로드
+            val resizedInputStream = context.contentResolver.openInputStream(imageUri) ?: return Result.failure(Exception("Failed to open image stream again"))
+            val bitmap = BitmapFactory.decodeStream(resizedInputStream, null, options)
+            resizedInputStream.close()
+
+            // Bitmap을 임시 파일로 저장
+            val tempFile = File.createTempFile("upload", ".jpg", context.cacheDir).apply {
+                outputStream().use { out ->
+                    bitmap?.compress(Bitmap.CompressFormat.JPEG, 85, out)
+                }
+            }
+
+            // MultipartBody.Part 객체 생성
+            val contentType = "image/jpeg".toMediaTypeOrNull()
+            val requestFile = tempFile.asRequestBody(contentType)
+            val body = MultipartBody.Part.createFormData("file", tempFile.name, requestFile)
+
+            tempFile.delete() // 임시 파일 삭제
+
+            Result.success(body)
+        } catch (e: Exception) {
+            Log.e("Model", "Exception during preparing image for upload", e)
+            Result.failure(e)
+        }
     }
 }

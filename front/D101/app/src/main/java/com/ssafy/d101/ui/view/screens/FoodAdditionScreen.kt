@@ -185,6 +185,7 @@ fun FoodAdditionScreen(navController: NavHostController) {
                 Button(
                     onClick = {
                         viewModel.uploadSelectedItems(selectedFoodPostItem)
+                        navController.navigate("foodResistList")
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                     modifier = Modifier

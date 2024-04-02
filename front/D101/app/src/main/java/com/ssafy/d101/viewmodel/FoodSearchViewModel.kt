@@ -98,7 +98,7 @@ class FoodSearchViewModel @Inject constructor(
                 "Uploading selected items: ${selectedPostItems.joinToString { it.name }}"
             )
 
-            // 선택된 아이템들을 업로드하는 로직 (레퍼지토리 호출)
+            // 선택된 아이템들을 업로드하는 로직
             selectedPostItems.forEach { selectedItem ->
                 foodRepository.addUserAddedFoodItem(selectedItem)
             }
