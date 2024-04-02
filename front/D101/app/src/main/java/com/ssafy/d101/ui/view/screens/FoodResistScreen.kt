@@ -278,25 +278,25 @@ fun FoodResistScreen(navController: NavHostController) {
                     )
 
 
-                    Text("분류", fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier
-                        .align(Alignment.Start)
-                        .padding(start = 35.dp, top = 10.dp))
-                    listOf("아침", "아점", "점심", "점저", "저녁", "야식", "간식", "음료", "주류").chunked(3).forEach { chunk ->
-                        Row(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-                            chunk.forEach { meal ->
-                                OutlinedButton(
-                                    onClick = { onMealSelected(meal) },
-                                    border = BorderStroke(if (isItemSelected(meal)) 4.dp else 1.dp, Color.Black),
-                                    modifier = Modifier
-                                        .width(90.dp)
-                                ) {
-                                    Text(meal, fontWeight = FontWeight.Bold, color = if (isItemSelected(meal)) Color.Black else Color.Black)
-                                }
-                            }
-                        }
-                    }
+//                    Text("분류", fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier
+//                        .align(Alignment.Start)
+//                        .padding(start = 35.dp, top = 10.dp))
+//                    listOf("아침", "아점", "점심", "점저", "저녁", "야식", "간식", "음료", "주류").chunked(3).forEach { chunk ->
+//                        Row(modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
+//                            chunk.forEach { meal ->
+//                                OutlinedButton(
+//                                    onClick = { onMealSelected(meal) },
+//                                    border = BorderStroke(if (isItemSelected(meal)) 4.dp else 1.dp, Color.Black),
+//                                    modifier = Modifier
+//                                        .width(90.dp)
+//                                ) {
+//                                    Text(meal, fontWeight = FontWeight.Bold, color = if (isItemSelected(meal)) Color.Black else Color.Black)
+//                                }
+//                            }
+//                        }
+//                    }
 
                     // "등록하기" 버튼 추가
                     Button(
