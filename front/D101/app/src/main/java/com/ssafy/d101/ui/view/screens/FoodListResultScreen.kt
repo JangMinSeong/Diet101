@@ -104,11 +104,9 @@ fun FoodListResultScreen(navController: NavHostController) {
                 onClick = {
                     if (intakeReqs != null) {
                         dietViewModel.setTakeReqList(intakeReqs)
-                        //TODO : 화면이동
-                        //navController.navigate("")
+                        navController.navigate("dietAiAnalysisResult")
                     }
-                    navController.navigate("dietAiAnalysisResult")
-                          },
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                 modifier = Modifier
                     .width(160.dp)
@@ -121,7 +119,7 @@ fun FoodListResultScreen(navController: NavHostController) {
                     fontWeight = FontWeight.Bold,
                 )
             }
-            
+
             Spacer(modifier = Modifier.padding(20.dp))
             // 식사 추가 하러 가기 버튼
             Button(
@@ -258,3 +256,44 @@ fun FoodListResultScreen(navController: NavHostController) {
 //fun PreviewAnalysisResultScreen2() {
 //    FoodListResultScreen(navController = rememberNavController())
 //}
+
+
+fun createIntakeReqList(uploadedFoodItems: List<FoodAddInfo>, yoloResult: List<YoloResponse>): List<IntakeReq> {
+    val intakeReqs = mutableListOf<IntakeReq>()
+
+    if(uploadedFoodItems.isNotEmpty()) {
+        // uploadedFoodItems로부터 IntakeReq 리스트 생성
+        uploadedFoodItems.forEach { foodItem ->
+            intakeReqs.add(
+                IntakeReq(
+                    food_id = foodItem.id.toLong(),
+                    amount = 1.0,
+                    name = foodItem.name,
+                    kcal = foodItem.calorie,
+                    carbohydrate = foodItem.carbohydrate,
+                    protein = foodItem.protein,
+                    fat = foodItem.fat
+                )
+            )
+            // yoloResponse를 사용하는 로직도 여기에 추가
+            // 예: yoloResponse.forEach { ... }
+        }
+    }
+    if(yoloResult.isNotEmpty()) {
+        yoloResult.forEach { foodItem ->
+            intakeReqs.add(
+                IntakeReq(
+                    food_id = foodItem.yoloFoodDto.id.toLong(),
+                    amount = 1.0,
+                    name = foodItem.tag,
+                    kcal = foodItem.yoloFoodDto.calorie,
+                    carbohydrate = foodItem.yoloFoodDto.carbohydrate,
+                    protein = foodItem.yoloFoodDto.protein,
+                    fat = foodItem.yoloFoodDto.fat
+                )
+            )
+        }
+    }
+
+    return intakeReqs
+}
