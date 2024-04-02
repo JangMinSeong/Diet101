@@ -14,6 +14,7 @@ import com.ssafy.d101.ui.view.screens.AiAnalysisScreen
 import com.ssafy.d101.ui.view.screens.AllergyScreen
 import com.ssafy.d101.ui.view.screens.AnalysisResultScreen
 import com.ssafy.d101.ui.view.screens.BMIScreen
+import com.ssafy.d101.ui.view.screens.DietAiAnalysisResult
 import com.ssafy.d101.ui.view.screens.DietAnalysis
 import com.ssafy.d101.ui.view.screens.FoodAdditionScreen
 import com.ssafy.d101.ui.view.screens.FoodListResultScreen
@@ -98,6 +99,7 @@ fun SetUpNavGraph(
         composable(Screens.AnalysisResult.route) { AnalysisResultScreen(navController) }
         composable(Screens.OCRResist.route) { OCRResistScreen(navController)}
         composable(Screens.FoodResistList.route) { FoodListResultScreen(navController)}
+        composable(Screens.DietAiAnalysisResult.route) { DietAiAnalysisResult(navController)}
     }
 
 

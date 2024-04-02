@@ -92,7 +92,9 @@ fun FoodListResultScreen(navController: NavHostController) {
 
             // 식단 분석 하러 가기 버튼
             Button(
-                onClick = { /* TODO: 버튼 클릭 이벤트 처리 */ },
+                onClick = {
+                    navController.navigate("dietAiAnalysisResult")
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                 modifier = Modifier
                     .width(160.dp)
