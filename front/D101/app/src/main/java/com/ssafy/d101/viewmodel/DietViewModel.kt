@@ -1,12 +1,8 @@
 package com.ssafy.d101.viewmodel;
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssafy.d101.api.DietService
-import com.ssafy.d101.api.UserService
 import com.ssafy.d101.model.AnalysisDiet
 import com.ssafy.d101.model.DietInfo
 import com.ssafy.d101.repository.DietRepository
@@ -81,6 +77,7 @@ class DietViewModel @Inject constructor(
 
     private val _dayDiet = MutableStateFlow<List<DietInfo>?>(null)
     val dayDiet: StateFlow<List<DietInfo>?> = _dayDiet.asStateFlow()
+
     fun loadDayDiet(date: String) {
         viewModelScope.launch {
             val result = dietRepository.getDayDiet(date).first()
