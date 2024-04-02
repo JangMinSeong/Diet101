@@ -76,6 +76,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                     }
                     TextItem("가공 음식 등록하기", R.drawable.processedfood) {
                         showDialog = false
+                        navController.navigate("ocrResist")
                     }
                 }
             },
