@@ -68,6 +68,7 @@ fun FoodAdditionScreen(navController: NavHostController) {
     val viewModel: FoodSearchViewModel = hiltViewModel()
     val userAddedFoodItems by viewModel.userAddedFoodItems.collectAsState()
     var selectedFoodItem by remember { mutableStateOf<FoodAddInfo?>(null)}
+    val selectedFoodPostItem = remember { mutableStateListOf<FoodAddInfo>() }  // 선택한 음식 저장할 리스트
 
     LaunchedEffect(selectedFoodItem) {
 
@@ -183,7 +184,7 @@ fun FoodAdditionScreen(navController: NavHostController) {
             if (userAddedFoodItems.isNotEmpty()) {
                 Button(
                     onClick = {
-                        // 업로드 버튼 클릭 시 수행할 액션
+                        viewModel.uploadSelectedItems(selectedFoodPostItem)
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                     modifier = Modifier
@@ -234,7 +235,17 @@ fun FoodAdditionScreen(navController: NavHostController) {
                                 .weight(1f)
                         )
                         // 선택 유무
-                        SwitchWithIconExample()
+                        SwitchWithIconExample(
+                            checked = selectedFoodPostItem.contains(foodItem),
+                            foodItem = foodItem,
+                            onCheckedChange = { isChecked ->
+                                if (isChecked) {
+                                    selectedFoodPostItem.add(foodItem)
+                                } else {
+                                    selectedFoodPostItem.remove(foodItem)
+                                }
+                            }
+                        )
 
 //                        // 삭제 버튼
                         CancelButtonExample(onClick = {
@@ -458,20 +469,23 @@ fun FoodAdditionScreen(navController: NavHostController) {
 
 @Composable
 // 음식 선택 유무
-fun SwitchWithIconExample() {
-    var checked by remember { mutableStateOf(true) }
-
+fun SwitchWithIconExample(
+    checked: Boolean,
+    foodItem: FoodAddInfo,
+    onCheckedChange: (Boolean) -> Unit
+) {
     Switch(
         checked = checked,
         onCheckedChange = {
-            checked = it
+            onCheckedChange(it)
+            Log.d("SwitchWithIconExample", "Item: ${foodItem.name}, Checked: $it")
         },
         thumbContent = if (checked) {
             {
                 Icon(
                     imageVector = Icons.Filled.Check,
                     contentDescription = null,
-                    modifier = Modifier.size(SwitchDefaults.IconSize),
+                    modifier = Modifier.size(SwitchDefaults.IconSize)
                 )
             }
         } else {

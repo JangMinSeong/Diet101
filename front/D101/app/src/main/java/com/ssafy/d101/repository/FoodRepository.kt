@@ -69,4 +69,11 @@ class FoodRepository @Inject constructor(private val foodService: FoodService) {
             Log.e("FoodRepository", "업데이트 할 아이템 없음.")
         }
     }
+
+    // 선택된 음식 아이템 업로드
+    suspend fun uploadSelectedItems(selectedPostItems: List<FoodAddInfo>) {
+        selectedPostItems.forEach { selectedPostItems ->
+            addUserAddedFoodItem(selectedPostItems)
+        }
+    }
 }
