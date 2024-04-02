@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.ssafy.d101.api.DietService
 import com.ssafy.d101.api.UserService
 import com.ssafy.d101.model.AnalysisDiet
@@ -20,6 +21,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
@@ -95,9 +98,14 @@ class DietViewModel @Inject constructor(
 
     suspend fun saveMeal() {
         val file = modelRepository.prepareImageForUpload(modelRepository.context.value!!).getOrThrow()
-        val createMealReq = CreateMealReq(getDietType(), getCurrentDate(), getTakeReqList())
+
+        val createMealReq = CreateMealReq(Dunchfast.BREAKFAST, getCurrentDate(), dietRepository.takeReqList.value!!)
+        val gson = Gson()
+        val createMealReqJson = gson.toJson(createMealReq)
+        val createMealReqBody = createMealReqJson.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+
         viewModelScope.launch {
-            dietRepository.saveMeal(file, createMealReq)
+            dietRepository.saveMeal(file, createMealReqBody)
         }
     }
 

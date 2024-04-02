@@ -43,6 +43,7 @@ import com.ssafy.d101.ui.view.components.DailyHorizontalBar
 import com.ssafy.d101.viewmodel.DietViewModel
 import com.ssafy.d101.viewmodel.FoodSearchViewModel
 import com.ssafy.d101.viewmodel.ModelViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun FoodListResultScreen(navController: NavHostController) {
@@ -54,6 +55,8 @@ fun FoodListResultScreen(navController: NavHostController) {
 
     val dietViewModel : DietViewModel = hiltViewModel()
     val intakeReqs = yoloResult?.let { createIntakeReqList(uploadedFoodItems, it) } ?: emptyList()
+
+    val scope = rememberCoroutineScope()
 
     Box(
         modifier = Modifier
@@ -104,7 +107,10 @@ fun FoodListResultScreen(navController: NavHostController) {
                 onClick = {
                     if (intakeReqs != null) {
                         dietViewModel.setTakeReqList(intakeReqs)
-                        navController.navigate("dietAiAnalysisResult")
+                        scope.launch {
+                            dietViewModel.saveMeal()
+                        }
+//                        navController.navigate("dietAiAnalysisResultScreen")
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
