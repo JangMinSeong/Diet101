@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ssafy.d101.model.Dunchfast
 import com.ssafy.d101.viewmodel.DietViewModel
 
 @Composable
@@ -26,13 +27,15 @@ fun DietAiAnalysisResult(navController: NavController) {
 
     val isClicked = remember { mutableStateOf(false) }
     LaunchedEffect(isClicked) {
-        if (isClicked.value)
+        if (isClicked.value) {
             dietViewModel.saveMeal()
+        }
     }
 
     Button(
         onClick = {
             isClicked.value = true
+            navController.navigate("home")
         },
         colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
         modifier = Modifier
