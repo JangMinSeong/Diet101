@@ -1,5 +1,6 @@
 package com.ssafy.d101.ui.view.screens
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -54,15 +55,14 @@ import com.ssafy.d101.viewmodel.ModelViewModel
 @Composable
 fun FoodListResultScreen(navController: NavHostController) {
     val foodViewModel : FoodSearchViewModel = hiltViewModel()
-    val uploadedFoodItems by foodViewModel.userAddedFoodItems.collectAsState()
+    val uploadedFoodItems by foodViewModel.uploadedPostItems.collectAsState()
 
     val modelViewModel : ModelViewModel = hiltViewModel()
     val yoloResult by  modelViewModel.getYoloResponse().collectAsState()
 
     val dietViewModel : DietViewModel = hiltViewModel()
     val intakeReqs = yoloResult?.let { createIntakeReqList(uploadedFoodItems, it) } ?: emptyList()
-    val modelViewModel : FoodSearchViewModel = hiltViewModel()
-    val uploadedFoodItems by modelViewModel.uploadedPostItems.collectAsState()
+
     var selectedMeal by remember { mutableStateOf<String?>(null) }
     // 사용자가 항목을 선택하거나 선택을 취소하는 로직
     val onMealSelected: (String) -> Unit = { meal ->
@@ -72,7 +72,7 @@ fun FoodListResultScreen(navController: NavHostController) {
     val isItemSelected: (String) -> Boolean = { it == selectedMeal }
     val scrollState = rememberScrollState()
     // 각 음식 아이템의 먹은 양을 저장하는 상태
-    val eatenAmounts = remember { mutableStateMapOf<Int, String>() }
+    val eatenAmounts = remember { mutableStateMapOf<Long, String>() }
 
     Box(
         modifier = Modifier
@@ -91,7 +91,6 @@ fun FoodListResultScreen(navController: NavHostController) {
                 .clickable {}
         )
 
-        // 페이지 번호, 음식 이름, 이전 버튼, 다음 버튼, 현재 이미지, 음식 직접 등록 버튼 컬럼
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
@@ -118,18 +117,16 @@ fun FoodListResultScreen(navController: NavHostController) {
                     .background(Color.Gray)
                     .padding(vertical = 45.dp)
             )
+
             // 업로드된 음식 목록 표시
-            LazyColumn {
-                items(intakeReqs) { foodItem ->
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(300.dp)
                     .padding(start = 8.dp, end = 8.dp, bottom = 20.dp)
             ) {
-                items(uploadedFoodItems) { foodItem ->
+                items(intakeReqs) { foodItem ->
                     var eatenAmount by remember { mutableStateOf("1.0") }
-
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -143,11 +140,9 @@ fun FoodListResultScreen(navController: NavHostController) {
                                 .weight(1f)
                                 .padding(start = 5.dp),
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.weight(1f)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "${foodItem.calorie}kcal")
-
+//                        Text(text = "${foodItem.kcal}kcal")
 
                         Column(
                             modifier = Modifier,
@@ -165,7 +160,7 @@ fun FoodListResultScreen(navController: NavHostController) {
                                 value = eatenAmount,
                                 onValueChange = { newValue ->
                                     eatenAmount = newValue
-                                    eatenAmounts[foodItem.id] = newValue
+                                    eatenAmounts[foodItem.food_id] = newValue
                                 },
                                 modifier = Modifier
                                     .width(100.dp)
@@ -184,10 +179,10 @@ fun FoodListResultScreen(navController: NavHostController) {
             // 먹은 양 수정 완료
             Button(
                 onClick = {
-                    uploadedFoodItems.forEach { item ->
-                        val newEatenAmount = eatenAmounts[item.id]?.toDoubleOrNull() ?: 1.0
-                        val updatedItem = item.copy(eatenAmount = newEatenAmount)
-                        modelViewModel.updateEatenAmount(updatedItem)
+                    intakeReqs.forEach { item ->
+                        val newEatenAmount = eatenAmounts[item.food_id]?.toDoubleOrNull() ?: 1.0
+                        val updatedItem = item.copy(amount = newEatenAmount)
+//                        foodViewModel.updateEatenAmount(updatedItem)
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF12369)),
@@ -208,24 +203,25 @@ fun FoodListResultScreen(navController: NavHostController) {
             Text("분류", fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier
                 .align(Alignment.Start)
                 .padding(start = 35.dp, top = 10.dp))
-                    listOf("아침", "아점", "점심", "점저", "저녁", "야식", "간식", "음료", "주류").chunked(3).forEach { chunk ->
-                        Row(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-                            chunk.forEach { meal ->
-                                OutlinedButton(
-                                    onClick = { onMealSelected(meal) },
-                                    border = BorderStroke(if (isItemSelected(meal)) 4.dp else 1.dp, Color.Black),
-                                    modifier = Modifier
-                                        .width(90.dp)
-                                ) {
-                                    Text(meal, fontWeight = FontWeight.Bold, color = if (isItemSelected(meal)) Color.Black else Color.Black)
-                                }
-                            }
+            listOf("아침", "아점", "점심", "점저", "저녁", "야식", "간식", "음료", "주류").chunked(3).forEach { chunk ->
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
+                    chunk.forEach { meal ->
+                        OutlinedButton(
+                            onClick = { onMealSelected(meal) },
+                            border = BorderStroke(if (isItemSelected(meal)) 4.dp else 1.dp, Color.Black),
+                            modifier = Modifier
+                                .width(90.dp)
+                        ) {
+                            Text(meal, fontWeight = FontWeight.Bold, color = if (isItemSelected(meal)) Color.Black else Color.Black)
                         }
                     }
+                }
+            }
 
             Spacer(modifier = Modifier.padding(20.dp))
+
             // 식단 분석 하러 가기 버튼
             Button(
                 onClick = {
@@ -234,7 +230,6 @@ fun FoodListResultScreen(navController: NavHostController) {
                         navController.navigate("dietAiAnalysisResult")
                     }
                 },
-                onClick = { },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                 modifier = Modifier
                     .width(200.dp)
@@ -248,12 +243,11 @@ fun FoodListResultScreen(navController: NavHostController) {
                 )
             }
 
-            Spacer(modifier = Modifier.padding(20.dp))
-
+            Spacer(modifier = Modifier.padding(10.dp))
             // 식사 추가 하러 가기 버튼
             Button(
                 onClick = {
-                          navController.navigate("foodAddition")
+                    navController.navigate("foodAddition")
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF090552)),
                 modifier = Modifier
@@ -269,5 +263,46 @@ fun FoodListResultScreen(navController: NavHostController) {
             }
         }
     }
+}
+
+
+fun createIntakeReqList(uploadedFoodItems: List<FoodAddInfo>, yoloResult: List<YoloResponse>): List<IntakeReq> {
+    val intakeReqs = mutableListOf<IntakeReq>()
+
+    if(uploadedFoodItems.isNotEmpty()) {
+        // uploadedFoodItems로부터 IntakeReq 리스트 생성
+        uploadedFoodItems.forEach { foodItem ->
+            intakeReqs.add(
+                IntakeReq(
+                    food_id = foodItem.id.toLong(),
+                    amount = 1.0,
+                    name = foodItem.name,
+                    kcal = foodItem.calorie,
+                    carbohydrate = foodItem.carbohydrate,
+                    protein = foodItem.protein,
+                    fat = foodItem.fat
+                )
+            )
+            // yoloResponse를 사용하는 로직도 여기에 추가
+            // 예: yoloResponse.forEach { ... }
+        }
+    }
+    if(yoloResult.isNotEmpty()) {
+        yoloResult.forEach { foodItem ->
+            intakeReqs.add(
+                IntakeReq(
+                    food_id = foodItem.yoloFoodDto.id.toLong(),
+                    amount = 1.0,
+                    name = foodItem.tag,
+                    kcal = foodItem.yoloFoodDto.calorie,
+                    carbohydrate = foodItem.yoloFoodDto.carbohydrate,
+                    protein = foodItem.yoloFoodDto.protein,
+                    fat = foodItem.yoloFoodDto.fat
+                )
+            )
+        }
+    }
+
+    return intakeReqs
 }
 
