@@ -1,4 +1,4 @@
-package com.ssafy.d101.viewmodel;
+package com.ssafy.d101.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -8,8 +8,12 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.d101.api.DietService
 import com.ssafy.d101.api.UserService
 import com.ssafy.d101.model.AnalysisDiet
+import com.ssafy.d101.model.CreateMealReq
 import com.ssafy.d101.model.DietInfo
+import com.ssafy.d101.model.Dunchfast
+import com.ssafy.d101.model.IntakeReq
 import com.ssafy.d101.repository.DietRepository
+import com.ssafy.d101.repository.ModelRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +27,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DietViewModel @Inject constructor(
-    private val dietRepository: DietRepository
+    private val dietRepository: DietRepository,
+    private val modelRepository: ModelRepository
 ) : ViewModel() {
 
     fun getCurrentDate(): String {
@@ -86,5 +91,32 @@ class DietViewModel @Inject constructor(
             val result = dietRepository.getDayDiet(date).first()
             _dayDiet.value = result
         }
+    }
+
+    suspend fun saveMeal() {
+        val file = modelRepository.prepareImageForUpload(modelRepository.context.value!!).getOrThrow()
+        val createMealReq = CreateMealReq(getDietType(), getCurrentDate(), getTakeReqList())
+        viewModelScope.launch {
+            dietRepository.saveMeal(file, createMealReq)
+        }
+    }
+
+    fun setDietType(type : Dunchfast) {
+        viewModelScope.launch{
+            dietRepository.setDietType(type)
+        }
+    }
+
+    fun setTakeReqList(takeReqList : List<IntakeReq>) {
+        viewModelScope.launch{
+            dietRepository.setTakeReqList(takeReqList)
+        }
+    }
+
+    fun getTakeReqList(): List<IntakeReq> {
+        return dietRepository.takeReqList.value!!
+    }
+    fun getDietType(): Dunchfast {
+        return dietRepository.dietType.value!!
     }
 }
