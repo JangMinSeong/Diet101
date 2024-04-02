@@ -12,12 +12,27 @@ session = Session()
 metadata = MetaData()
 metadata.bind = engine
 
-food_table = Table('Food', metadata, autoload_with=engine)
-preference_table = Table('Preference', metadata, autoload_with=engine)
+food_table = Table("Food", metadata, autoload_with=engine)
+preference_table = Table("Preference", metadata, autoload_with=engine)
+
+# def getFoodListByKcal(kcal: int):
+#     query = select(food_table.c.food_id).where(food_table.c.calorie <= kcal).where(food_table.c.dbGroup == '음식')
+#     return session.execute(query).fetchall()
+
 
 def getFoodListByKcal(kcal: int):
-    query = select(food_table.c.food_id).where(food_table.c.calorie <= kcal).where(food_table.c.dbGroup == '음식')
-    return session.execute(query).fetchall()
+    session = Session()  # 요청마다 새 세션 생성
+    try:
+        query = select(food_table.c.food_id).where(food_table.c.calorie <= kcal).where(food_table.c.dbGroup == "음식")
+        result = session.execute(query).fetchall()
+        session.commit()  # 성공적으로 쿼리 실행 후 커밋
+        return result
+    except Exception as e:
+        session.rollback()  # 예외 발생 시 롤백
+        raise
+    finally:
+        session.close()  # 작업 완료 후 세션 닫기
+
 
 def getPreferenceList():
     query = select(preference_table)

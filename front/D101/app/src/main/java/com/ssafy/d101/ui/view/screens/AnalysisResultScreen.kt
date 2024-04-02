@@ -223,7 +223,7 @@ fun AnalysisResultScreen(navController: NavHostController) {
                 }
             }
             else {
-                Text(text="음식이 확인 되지 않습니다",fontSize=30.sp,fontWeight = FontWeight.Bold)
+                Text(text="음식이 확인 되지 않습니다",fontSize=20.sp,fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(20.dp))
                 Button(
                     onClick = { navController.navigate("foodAddition") },

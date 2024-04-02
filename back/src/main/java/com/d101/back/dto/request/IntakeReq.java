@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class IntakeReq {
     private Long food_id;
-    private int amount;
+    private double amount;
     private int kcal;
     private double carbohydrate;
     private double protein;

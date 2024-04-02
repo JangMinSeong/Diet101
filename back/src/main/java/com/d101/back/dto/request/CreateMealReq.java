@@ -24,7 +24,7 @@ public class CreateMealReq {
 
     public int getTotalKcal() {
         return this.intakes.stream()
-                .mapToInt(intakes -> intakes.getKcal() * intakes.getAmount())
+                .mapToInt(intakes -> (int)(intakes.getKcal() * intakes.getAmount()))
                 .sum();
     }
 

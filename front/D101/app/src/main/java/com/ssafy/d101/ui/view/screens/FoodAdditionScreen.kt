@@ -50,11 +50,13 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ssafy.d101.model.FoodAddInfo
 import com.ssafy.d101.model.FoodItem
 import com.ssafy.d101.viewmodel.FoodSearchViewModel
+import kotlinx.coroutines.launch
 
 
 @Preview(showBackground = true)
@@ -66,6 +68,7 @@ fun FoodAdditionScreen(navController: NavHostController) {
     val viewModel: FoodSearchViewModel = hiltViewModel()
     val userAddedFoodItems by viewModel.userAddedFoodItems.collectAsState()
     var selectedFoodItem by remember { mutableStateOf<FoodAddInfo?>(null)}
+    val selectedFoodPostItem = remember { mutableStateListOf<FoodAddInfo>() }  // 선택한 음식 저장할 리스트
 
     LaunchedEffect(selectedFoodItem) {
 
@@ -162,16 +165,42 @@ fun FoodAdditionScreen(navController: NavHostController) {
             }
         }
 
-        // 내가 추가한 음식
-        Text(
-            text = "내가 추가한 음식",
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .padding(top = 40.dp, bottom = 10.dp, start = 30.dp)
-                .fillMaxWidth(),
-            textAlign = TextAlign.Start,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-        )
+                .fillMaxWidth()
+                .padding(top = 40.dp, bottom = 10.dp, start = 25.dp, end = 20.dp)
+        ) {
+            Text(
+                text = "내가 추가한 음식",
+                modifier = Modifier
+                    .weight(1f), // Text를 Row의 나머지 공간을 차지하도록 설정
+                textAlign = TextAlign.Start,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+            )
+
+            if (userAddedFoodItems.isNotEmpty()) {
+                Button(
+                    onClick = {
+                        viewModel.uploadSelectedItems(selectedFoodPostItem)
+                        navController.navigate("foodResistList")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                    modifier = Modifier
+                        .height(50.dp) // 버튼 높이 설정
+                        .padding(start = 5.dp), // 텍스트와 버튼 사이의 간격
+                ) {
+                    Text(
+                        text = "업로드",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+        }
 
         // 실선
         Box(
@@ -187,7 +216,7 @@ fun FoodAdditionScreen(navController: NavHostController) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
+                    .padding(start = 20.dp, end = 20.dp, bottom = 100.dp)
                     .background(Color.White),
             ) {
                 items(userAddedFoodItems) { foodItem ->
@@ -207,7 +236,17 @@ fun FoodAdditionScreen(navController: NavHostController) {
                                 .weight(1f)
                         )
                         // 선택 유무
-//                        SwitchWithIconExample()
+                        SwitchWithIconExample(
+                            checked = selectedFoodPostItem.contains(foodItem),
+                            foodItem = foodItem,
+                            onCheckedChange = { isChecked ->
+                                if (isChecked) {
+                                    selectedFoodPostItem.add(foodItem)
+                                } else {
+                                    selectedFoodPostItem.remove(foodItem)
+                                }
+                            }
+                        )
 
 //                        // 삭제 버튼
                         CancelButtonExample(onClick = {
@@ -217,26 +256,39 @@ fun FoodAdditionScreen(navController: NavHostController) {
                     Divider(color = Color.Gray)
                 }
             }
-            // AlertDialog 로직
-            var text by remember { mutableStateOf("") } // 사용자 입력 관리 상태 변수
-            selectedFoodItem?.let { item ->
-                var eatenAmountText by remember { mutableStateOf("1.0") }
-                val eatenAmount = eatenAmountText.toDoubleOrNull() ?: 1.0
 
-                val carbohydrate = item.carbohydrate * eatenAmount
-                val protein = (item.protein) * eatenAmount
-                val fat = (item.fat) * eatenAmount
-                val calories = (carbohydrate * 4) + (protein * 4) + (fat * 9)
+            // AlertDialog 로직
+            selectedFoodItem?.let { item ->
+                var eatenAmountText by remember { mutableStateOf(item.eatenAmount.toString()) }
+                val eatenAmount = eatenAmountText.toDoubleOrNull() ?: item.eatenAmount
+
+                // 원본 아이템 정보를 기준으로 재계산
+                val originalCarbohydrate = item.carbohydrate / item.eatenAmount
+                val originalProtein = item.protein / item.eatenAmount
+                val originalFat = item.fat / item.eatenAmount
+
+                // 영양소(탄단지) 조절
+                val adjustedCarbohydrate = originalCarbohydrate * eatenAmount
+                val adjustedProtein = originalProtein * eatenAmount
+                val adjustedFat = originalFat * eatenAmount
+
+                // 총 칼로리 계산
+                val totalCalories = ((adjustedCarbohydrate * 4) + (adjustedProtein * 4) + (adjustedFat * 9)).toInt()
+
                 if (showDialog) {
                     AlertDialog(
                         onDismissRequest = { showDialog = false },
                         title = {
                             Text(
-                                text = "${item.name}"
+                                // 음식명
+                                text = item.name,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                                modifier = Modifier
+                                    .padding(top = 10.dp)
                             )
                         },
 
-                        // AlertDialog의 text 파트
                         text = {
                             Column {
                                 Text(
@@ -295,7 +347,7 @@ fun FoodAdditionScreen(navController: NavHostController) {
                                         verticalArrangement = Arrangement.Top
                                     ) {
                                         Text(
-                                            "${calories}kcal",
+                                            "${totalCalories}kcal",
                                             fontSize = 20.sp,
                                             fontWeight = FontWeight.Bold,
                                             modifier = Modifier
@@ -318,9 +370,9 @@ fun FoodAdditionScreen(navController: NavHostController) {
                                             horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            NutritionInfoFieldEditable("탄수화물", "${item.carbohydrate}g")
-                                            NutritionInfoFieldEditable("단백질", "${item.protein}g")
-                                            NutritionInfoFieldEditable("지방", "${item.fat}g")
+                                            NutritionInfoFieldRead("탄수화물", "${String.format("%.2f", adjustedCarbohydrate)}g")
+                                            NutritionInfoFieldRead("단백질", "${String.format("%.2f", adjustedProtein)}g")
+                                            NutritionInfoFieldRead("지방", "${String.format("%.2f", adjustedFat)}g")
                                         }
                                     }
                                 }
@@ -329,7 +381,24 @@ fun FoodAdditionScreen(navController: NavHostController) {
                         confirmButton = {
                             Button(
                                 onClick = {
+                                    val updatedFoodItem = item.copy(
+                                        id = item.id,
+                                        name = item.name,
+                                        manufacturer = item.manufacturer,
+                                        majorCategory = item.majorCategory,
+                                        minorCategory = item.minorCategory,
+                                        dbGroup = item.dbGroup,
+                                        portionSize = item.portionSize,
+                                        totalSize = item.totalSize,
+                                        unit = item.unit,
+                                        eatenAmount = eatenAmount.toDouble(),
+                                        calorie = totalCalories,
+                                        carbohydrate = adjustedCarbohydrate,
+                                        protein = adjustedProtein,
+                                        fat = adjustedFat
+                                    )
                                     showDialog = false
+                                    viewModel.updateFoodItem(updatedFoodItem)
                                 },
                                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                                 modifier = Modifier
@@ -401,20 +470,23 @@ fun FoodAdditionScreen(navController: NavHostController) {
 
 @Composable
 // 음식 선택 유무
-fun SwitchWithIconExample() {
-    var checked by remember { mutableStateOf(true) }
-
+fun SwitchWithIconExample(
+    checked: Boolean,
+    foodItem: FoodAddInfo,
+    onCheckedChange: (Boolean) -> Unit
+) {
     Switch(
         checked = checked,
         onCheckedChange = {
-            checked = it
+            onCheckedChange(it)
+            Log.d("SwitchWithIconExample", "Item: ${foodItem.name}, Checked: $it")
         },
         thumbContent = if (checked) {
             {
                 Icon(
                     imageVector = Icons.Filled.Check,
                     contentDescription = null,
-                    modifier = Modifier.size(SwitchDefaults.IconSize),
+                    modifier = Modifier.size(SwitchDefaults.IconSize)
                 )
             }
         } else {
@@ -454,24 +526,20 @@ fun AdditionButtonExample(onClick: () -> Unit) {
 }
 
 @Composable
-fun NutritionInfoFieldEditable(labelText: String, initialText: String) {
-    var text by remember { mutableStateOf(initialText) }
-
-    // 사용자 입력에 반응하여 텍스트 필드의 상태를 업데이트합니다.
-    val onValueChange = { newValue: String ->
-        // 'g' 문자를 제외한 숫자 부분만 추출합니다.
-        val numberPart = newValue.filter { it.isDigit() }
-        // 숫자 부분 뒤에 'g'를 붙여 새로운 텍스트를 설정합니다.
-        text = "$numberPart g"
+fun NutritionInfoFieldRead(labelText: String, text: String) {
+    Column(modifier = Modifier.padding(start = 15.dp, end = 15.dp)) {
+        Text(
+            text = labelText,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold
+        )
     }
-
-    OutlinedTextField(
-        value = text,
-        onValueChange = onValueChange,
-        label = { Text(labelText) },
-        singleLine = true,
-        modifier = Modifier.width(80.dp)
-    )
 }
 
 
