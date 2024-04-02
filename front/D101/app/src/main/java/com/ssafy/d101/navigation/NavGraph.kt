@@ -24,6 +24,7 @@ import com.ssafy.d101.ui.view.screens.LoadingScreen
 import com.ssafy.d101.ui.view.screens.LoginSuccessScreen
 import com.ssafy.d101.ui.view.screens.MyPageScreen
 import com.ssafy.d101.ui.view.screens.OCRResistScreen
+import com.ssafy.d101.ui.view.screens.OCRResultScreen
 import com.ssafy.d101.ui.view.screens.RecommendScreen
 import com.ssafy.d101.ui.view.screens.SignUpActivityLevelScreen
 import com.ssafy.d101.ui.view.screens.SignUpCompleteScreen
@@ -96,7 +97,7 @@ fun SetUpNavGraph(
         composable(Screens.AiLoading.route) { AiAnalysisScreen(navController) }
         composable(Screens.AnalysisResult.route) { AnalysisResultScreen(navController) }
         composable(Screens.OCRResist.route) { OCRResistScreen(navController)}
-
+        composable(Screens.OCRResult.route) { OCRResultScreen(navController)}
     }
 
 
