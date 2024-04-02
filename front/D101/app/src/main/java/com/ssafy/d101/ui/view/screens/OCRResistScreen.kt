@@ -65,7 +65,7 @@ import java.util.Locale
 
 @Preview(showBackground = true)
 @Composable
-fun FoodResistScreen(navController: NavHostController) {
+fun OCRResistScreen(navController: NavHostController) {
     val currentDate = remember { LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")) }
     // 선택된 항목을 추적하는 상태 변수
     var selectedMeal by remember { mutableStateOf<String?>(null) }
@@ -160,7 +160,7 @@ fun FoodResistScreen(navController: NavHostController) {
 
             // 카테고리
             Text(
-                text = "음식 등록",
+                text = "영양성분표 등록",
                 modifier = Modifier
                     .weight(2f)
                     .padding(start = 10.dp),
@@ -203,17 +203,13 @@ fun FoodResistScreen(navController: NavHostController) {
                         TextItem("카메라", R.drawable.camera) {
                             // 카메라 로직
                             showDialog = false
-                          //  launcherForCameraFood.launch(contentUri)
+                            //  launcherForCameraFood.launch(contentUri)
                             takePicture()
                         }
                         TextItem("갤러리", R.drawable.gallery) {
                             // 갤러리 아이템 클릭 시 수행할 로직
                             showDialog = false
                             launcherForGalleryFood.launch("image/*")
-                        }
-                        TextItem("내가 추가한 음식", R.drawable.minefood) {
-                            showDialog = false
-                            navController.navigate("foodAddition")
                         }
                     }
                 },
@@ -257,7 +253,7 @@ fun FoodResistScreen(navController: NavHostController) {
 
                     // 섭취한 음식 사진 타이틀
                     Text(
-                        text = "섭취한 음식 사진",
+                        text = "영양성분표 사진",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -277,35 +273,14 @@ fun FoodResistScreen(navController: NavHostController) {
                             .clickable(onClick = { showDialog = true })
                     )
 
-
-                    Text("분류", fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier
-                        .align(Alignment.Start)
-                        .padding(start = 35.dp, top = 10.dp))
-                    listOf("아침", "아점", "점심", "점저", "저녁", "야식", "간식", "음료", "주류").chunked(3).forEach { chunk ->
-                        Row(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-                            chunk.forEach { meal ->
-                                OutlinedButton(
-                                    onClick = { onMealSelected(meal) },
-                                    border = BorderStroke(if (isItemSelected(meal)) 4.dp else 1.dp, Color.Black),
-                                    modifier = Modifier
-                                        .width(90.dp)
-                                ) {
-                                    Text(meal, fontWeight = FontWeight.Bold, color = if (isItemSelected(meal)) Color.Black else Color.Black)
-                                }
-                            }
-                        }
-                    }
-
                     // "등록하기" 버튼 추가
                     Button(
                         onClick = {
                             imageUri?.let { uri ->
                                 // ViewModel을 통해 이미지 URI 설정
                                 modelViewModel.setImageUri(uri)
-                                modelViewModel.setOption(true)
                                 modelViewModel.setContext(context)
+                                modelViewModel.setOption(false)
                                 navController.navigate("ailoading")
                             }
                         },
@@ -325,32 +300,5 @@ fun FoodResistScreen(navController: NavHostController) {
             }
             Spacer(modifier = Modifier.height(56.dp))
         }
-    }
-}
-
-@Composable
-fun TextItem(text: String, @DrawableRes iconRes: Int, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Image(
-            painter = painterResource(id = iconRes),
-            contentDescription = "Icon for $text",
-            modifier = Modifier
-                .size(50.dp)
-                .padding(start = 16.dp, top = 15.dp)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(
-            text = text,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier
-                .padding(start = 8.dp, top = 15.dp)
-        )
     }
 }
