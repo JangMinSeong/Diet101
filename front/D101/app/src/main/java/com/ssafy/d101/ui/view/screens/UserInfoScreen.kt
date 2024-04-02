@@ -1,7 +1,6 @@
 package com.ssafy.d101.ui.view.screens
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -68,10 +66,15 @@ fun UserInfo() {
     val userViewModel: UserViewModel = hiltViewModel()
     val userInfo = userViewModel.getUserInfo().collectAsState()
     val userSubInfo = userViewModel.getUserSubInfo().collectAsState()
-    var height = userSubInfo.value?.height.toString()
-    var weight = userSubInfo.value?.weight.toString()
-    var activity = userSubInfo.value?.activity
-    var kcal = userSubInfo.value?.calorie.toString()
+    var height by remember { mutableStateOf(userSubInfo.value?.height.toString()) }
+    var weight by remember { mutableStateOf(userSubInfo.value?.weight.toString()) }
+    var activity by remember { mutableStateOf(userSubInfo.value?.activity) }
+    var kcal by remember { mutableStateOf(userSubInfo.value?.calorie.toString()) }
+
+//    var height = userSubInfo.value?.height.toString()
+//    var weight = userSubInfo.value?.weight.toString()
+//    var activity = userSubInfo.value?.activity
+//    var kcal = userSubInfo.value?.calorie.toString()
     val age = userInfo.value?.age ?: 0
 
     fun calculateCalories(height: Int, weight: Int): Int {
