@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.viewModelScope
 import com.ssafy.d101.api.ModelService
 import com.ssafy.d101.api.UserService
 import com.ssafy.d101.model.OCRResponse
@@ -15,6 +16,7 @@ import com.ssafy.d101.utils.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -163,6 +165,10 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
         _context.emit(context)
     }
 
+    suspend fun setYoloinfo(yoloInfo : List<YoloResponse>) {
+        _yoloInfo.emit(yoloInfo)
+    }
+
     // 비트맵의 샘플링 크기를 계산
     fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
         val (height: Int, width: Int) = options.run { outHeight to outWidth }
@@ -179,5 +185,17 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
         }
 
         return inSampleSize
+    }
+
+    fun deleteYoloResponseItem(index: Int) {
+        val updatedList = _yoloInfo.value?.toMutableList() // 현재 상태를 가변 리스트로 변환
+        if (updatedList != null) {
+            if (index in updatedList.indices) {
+                updatedList.removeAt(index) // 인덱스에 해당하는 항목 삭제
+                _yoloInfo.value = updatedList // 업데이트된 리스트로 상태 변경
+
+                Log.d("update","$updatedList")
+            }
+        }
     }
 }

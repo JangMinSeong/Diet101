@@ -1,4 +1,5 @@
 package com.ssafy.d101.ui.view.screens
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,7 +42,6 @@ fun AnalysisResultScreen(navController: NavHostController) {
     var imageIndex by remember { mutableStateOf(0) }     // 현재 이미지 인덱스
     // 자른 이미지 리스트 (임시 데이터)
     //val imageResources = listOf(R.drawable.fakefoodimage, R.drawable.image2, R.drawable.image3)
-
 
     val modelViewModel : ModelViewModel = hiltViewModel()
     val analysisResult by modelViewModel.getYoloResponse().collectAsState()
@@ -171,29 +171,80 @@ fun AnalysisResultScreen(navController: NavHostController) {
                     }
                 }
                 Spacer(modifier = Modifier.height(20.dp))
+
+                // 음식 직접 등록 버튼
+                Button(
+                    onClick = { /* TODO: 버튼 클릭 이벤트 처리 */ },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                    modifier = Modifier
+                        .width(160.dp)
+                        .height(40.dp)
+                ) {
+                    Text(
+                        text = "음식 수정하기",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                Button(
+                    onClick = {
+                        modelViewModel.deleteYoloResponseItem(imageIndex)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                    modifier = Modifier
+                        .width(160.dp)
+                        .height(40.dp)
+                ) {
+                    Text(
+                        text = "음식 삭제하기",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                Button(
+                    onClick = {
+                       //
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                    modifier = Modifier
+                        .width(160.dp)
+                        .height(40.dp)
+                ) {
+                    Text(
+                        text = "음식 등록하기",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
             else {
                 Text(text="음식이 확인 되지 않습니다",fontSize=30.sp,fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(20.dp))
-            }
-            // 음식 직접 등록 버튼
-            Button(
-                onClick = { /* TODO: 버튼 클릭 이벤트 처리 */ },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                modifier = Modifier
-                    .width(160.dp)
-                    .height(40.dp)
-            ) {
-                Text(
-                    text = "음식 직접 등록",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                )
+                Button(
+                    onClick = { navController.navigate("foodAddition") },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                    modifier = Modifier
+                        .width(160.dp)
+                        .height(40.dp)
+                ) {
+                    Text(
+                        text = "음식 직접 등록하기",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
         }
     }
 }
+
+
 
 fun calNutri(foodInfo : YoloFood) : Triple<Double,Double,Double> {
     val carb : Double = foodInfo.carbohydrate*4

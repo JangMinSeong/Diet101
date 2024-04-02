@@ -85,4 +85,12 @@ class ModelViewModel @Inject constructor(
             modelRepository.setContext(context)
         }
     }
+
+    fun deleteYoloResponseItem(index: Int) {
+        viewModelScope.launch {
+            modelRepository.deleteYoloResponseItem(index)
+        }
+    }
+
+
 }
