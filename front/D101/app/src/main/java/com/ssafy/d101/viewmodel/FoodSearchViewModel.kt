@@ -3,6 +3,7 @@ package com.ssafy.d101.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ssafy.d101.api.FoodSearchService
 import com.ssafy.d101.model.FoodAddInfo
 import com.ssafy.d101.model.FoodInfo
@@ -87,5 +88,20 @@ class FoodSearchViewModel @Inject constructor(
     // 선택된 아이템을 설정하는 함수
     fun setSelectedFoodItem(item: FoodAddInfo) {
         _selectedFoodItem.value = item
+    }
+
+    // 선택된 아이템을 업로드 하는 함수
+    fun uploadSelectedItems(selectedPostItems: List<FoodAddInfo>) {
+        viewModelScope.launch {
+            Log.d(
+                "FoodSearchViewModel",
+                "Uploading selected items: ${selectedPostItems.joinToString { it.name }}"
+            )
+
+            // 선택된 아이템들을 업로드하는 로직 (레퍼지토리 호출)
+            selectedPostItems.forEach { selectedItem ->
+                foodRepository.addUserAddedFoodItem(selectedItem)
+            }
+        }
     }
 }
