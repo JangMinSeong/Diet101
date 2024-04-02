@@ -132,16 +132,16 @@ fun FoodSearchScreen(
                     .padding(end = 8.dp)
             )
 
-            // 다시 검색하러가기
+            // 내가 추가한 음식
             Text(
                 buildAnnotatedString {
                     withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline)) {
-                        append("다시 검색하러가기")
+                        append("내가 추가한 음식")
                     }
                 },
                 modifier = Modifier.padding(start = 8.dp),
                 textAlign = TextAlign.Left,
-                fontSize = 16.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
             )
         }
@@ -231,14 +231,6 @@ fun FoodSearchScreen(
             var eatenAmountText by remember { mutableStateOf("1.0") }
             val eatenAmount = eatenAmountText.toDoubleOrNull() ?: 1.0
 
-            // 영양소(탄단지) 조절
-            val adjustedCarbohydrate = item.carbohydrate * eatenAmount
-            val adjustedProtein = item.protein * eatenAmount
-            val adjustedFat = item.fat * eatenAmount
-
-            // 총 칼로리 계산
-            val totalCalories = (adjustedCarbohydrate * 4 + adjustedProtein * 4 + adjustedFat * 9).toInt()
-
             AlertDialog(
                 onDismissRequest = { showDialog = false },
                 title = {
@@ -284,8 +276,7 @@ fun FoodSearchScreen(
                         // 먹은 양 입력 상자
                         TextField(
                             value = eatenAmountText,
-                            onValueChange = { newValue ->
-                                eatenAmountText= newValue
+                            onValueChange = {
                             },
                             modifier = Modifier
                                 .width(100.dp)
@@ -310,7 +301,7 @@ fun FoodSearchScreen(
                                 verticalArrangement = Arrangement.Top
                             ) {
                                 Text(
-                                    "${totalCalories}kcal",
+                                    "${item.calorie}kcal",
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier
@@ -333,9 +324,9 @@ fun FoodSearchScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    NutritionInfoFieldReadOnly("탄수화물", "${String.format("%.2f", adjustedCarbohydrate)}g")
-                                    NutritionInfoFieldReadOnly("단백질", "${String.format("%.2f", adjustedProtein)}g")
-                                    NutritionInfoFieldReadOnly("지방", "${String.format("%.2f", adjustedFat)}g")
+                                    NutritionInfoFieldReadOnly("탄수화물", "${item.carbohydrate}g")
+                                    NutritionInfoFieldReadOnly("단백질", "${item.protein}g")
+                                    NutritionInfoFieldReadOnly("지방", "${item.fat}g")
                                 }
                             }
                         }
@@ -356,10 +347,10 @@ fun FoodSearchScreen(
                                 totalSize = item.totalSize,
                                 unit = item.unit,
                                 eatenAmount = eatenAmount.toDouble(),
-                                calorie = totalCalories,
-                                carbohydrate = adjustedCarbohydrate,
-                                protein = adjustedProtein,
-                                fat = adjustedFat
+                                calorie = item.calorie,
+                                carbohydrate = item.carbohydrate,
+                                protein = item.protein,
+                                fat = item.fat
                             )
                             viewModel.addUserAddedFoodItem(foodAddInfo)
                             showDialog = false
