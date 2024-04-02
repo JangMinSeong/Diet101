@@ -173,7 +173,7 @@ fun AnalysisResultScreen(navController: NavHostController) {
                 Spacer(modifier = Modifier.height(20.dp))
             }
             else {
-                Text(text="음식이 확인 되지 않습니다",fontSize=30.sp,fontWeight = FontWeight.Bold)
+                Text(text="음식이 확인 되지 않습니다",fontSize=20.sp,fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(20.dp))
             }
             // 음식 직접 등록 버튼
