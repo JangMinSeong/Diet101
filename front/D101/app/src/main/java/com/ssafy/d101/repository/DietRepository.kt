@@ -68,7 +68,6 @@ class DietRepository @Inject constructor(private val dietService: DietService) {
         return try {
             val response = dietService.saveMeal(file, createMealReq)
             if (response.isSuccessful) {
-
                 Result.success(true)
             } else {
                 Log.e("Diet", "Failed to ")
