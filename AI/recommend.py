@@ -10,10 +10,9 @@ def getRecommendFoodList(kcal: int, user_id: int):
     preferences_pd = pd.DataFrame(preferences, columns=['food_id','user_id','weight'])
     foods_pd = pd.DataFrame(foods, columns=['food_id'])
 
-    preferences_foods = pd.merge(preferences_pd, foods_pd, on="food_id")
+    preferences_foods = pd.merge(preferences_pd, foods_pd, on="food_id", how='right')
     preferences_matrix = preferences_foods.pivot_table(index='user_id', columns='food_id', values='weight', fill_value=0)
     preferences_matrix_T = preferences_matrix.T
-
     # 유사도 행렬
     item_sim = cosine_similarity(preferences_matrix_T, preferences_matrix_T)
     item_sim_df = pd.DataFrame(item_sim, index=preferences_matrix_T.index, columns=preferences_matrix_T.index)

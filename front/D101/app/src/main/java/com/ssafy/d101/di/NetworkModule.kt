@@ -3,6 +3,7 @@ package com.ssafy.d101.di
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.ssafy.d101.api.AllergyService
 import com.ssafy.d101.api.DietService
 import com.ssafy.d101.api.FoodSearchService
 import com.ssafy.d101.api.FoodService
@@ -99,4 +100,8 @@ object NetworkModule {
     fun provideOCRlService(retrofit: Retrofit): OCRService =
         retrofit.create(OCRService::class.java)
 
+    @Provides
+    @Singleton
+    fun provideAllergyService(retrofit: Retrofit): AllergyService =
+        retrofit.create(AllergyService::class.java)
 }

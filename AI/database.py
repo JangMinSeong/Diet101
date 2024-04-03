@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, MetaData, Table, select
+from sqlalchemy import create_engine, MetaData, Table, select, and_
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 import os
@@ -23,7 +23,12 @@ preference_table = Table("Preference", metadata, autoload_with=engine)
 def getFoodListByKcal(kcal: int):
     session = Session()  # 요청마다 새 세션 생성
     try:
-        query = select(food_table.c.food_id).where(food_table.c.calorie <= kcal).where(food_table.c.dbGroup == "음식")
+        query = select(food_table.c.food_id).where(and_(
+        food_table.c.calorie > (kcal-100),
+        food_table.c.calorie < (kcal+100),
+        food_table.c.dbGroup == "음식"
+    )
+)
         result = session.execute(query).fetchall()
         session.commit()  # 성공적으로 쿼리 실행 후 커밋
         return result
