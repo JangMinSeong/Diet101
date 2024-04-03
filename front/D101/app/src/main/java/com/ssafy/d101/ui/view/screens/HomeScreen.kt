@@ -300,7 +300,9 @@ fun MainContents(dailyOCRNutrient: DailyNutrient?,dailyNutrient: DailyNutrient?,
             Spacer(modifier = Modifier.padding(16.dp))
             Text(text = "식단")
             Divider(Modifier.padding(top = 16.dp, bottom = 16.dp))
+            Log.i("HomeScreen", "dayDiet: $dayDiet")
             dayDiet?.forEach() {
+                Log.i("HomeScreen", "DietInfo: $it")
                 FoodDetailScreen(dietInfo = it)
                 Spacer(modifier = Modifier.height(10.dp))
             }

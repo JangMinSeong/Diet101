@@ -1,5 +1,6 @@
 package com.ssafy.d101.ui.view.components
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.ssafy.d101.R
 import com.ssafy.d101.model.AnalysisDiet
 import com.ssafy.d101.model.DietInfo
@@ -37,6 +39,7 @@ import com.ssafy.d101.model.IntakeInfo
 
 @Composable
 fun FoodDetailScreen(dietInfo: DietInfo) {
+    Log.i("FoodDetailScreen", "DietInfo: $dietInfo")
     var totalCarbsCalorie = 0.0
     var totalProteinCalorie = 0.0
     var totalFatCalorie = 0.0
@@ -84,7 +87,7 @@ fun FoodDetailScreen(dietInfo: DietInfo) {
             .width(500.dp)
             .height(250.dp),
         shape = RoundedCornerShape(12.dp),
-        color = Color(0xFFDACCB4),
+        color = Color(0xffEBE9D5),
         shadowElevation = 4.dp
     ) {
         Column {
@@ -125,16 +128,22 @@ fun FoodDetailScreen(dietInfo: DietInfo) {
                             .padding(start = 20.dp, bottom = 5.dp)
                     )
                 } else {
+                    if (dietInfo.image.isNotEmpty()) {
+                        Log.i("FoodDetailScreen", "Image URL: ${dietInfo.image}")
+                        Image(painter = rememberAsyncImagePainter(model = dietInfo.image), contentDescription = "Diet Image", Modifier.width(100.dp).height(100.dp))
+                    }
                     // 이미지 리소스 ID를 찾을 수 없는 경우, 예를 들어 기본 이미지를 표시할 수 있습니다.
-                    Image(
-                        painter = painterResource(id = R.drawable.restaurant), // default_image는 기본 이미지 리소스의 ID
-                        contentDescription = "기본 이미지",
-                        modifier = Modifier
-                            .weight(4f)
-                            .fillMaxHeight()
-                            .clip(RoundedCornerShape(8.dp))
-                            .padding(start = 20.dp, bottom = 5.dp)
-                    )
+                    else {
+                        Image(
+                            painter = painterResource(id = R.drawable.restaurant), // default_image는 기본 이미지 리소스의 ID
+                            contentDescription = "기본 이미지",
+                            modifier = Modifier
+                                .weight(4f)
+                                .fillMaxHeight()
+                                .clip(RoundedCornerShape(8.dp))
+                                .padding(start = 20.dp, bottom = 5.dp)
+                        )
+                    }
                 }
                 Column(
                     modifier = Modifier
