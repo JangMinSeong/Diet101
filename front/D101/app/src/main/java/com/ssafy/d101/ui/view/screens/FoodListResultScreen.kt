@@ -61,7 +61,12 @@ fun FoodListResultScreen(navController: NavHostController) {
     val yoloResult by  modelViewModel.getYoloResponse().collectAsState()
 
     val dietViewModel : DietViewModel = hiltViewModel()
-    val intakeReqs = yoloResult?.let { createIntakeReqList(uploadedFoodItems, it) } ?: emptyList()
+    val intakeReqs = remember { mutableStateOf<List<IntakeReq>>(emptyList()) }
+
+    // 컴포저블이 처음 구성될 때 한 번만 실행
+    LaunchedEffect(true) {
+        intakeReqs.value = createIntakeReqList(uploadedFoodItems, yoloResult ?: emptyList())
+    }
 
     var selectedMeal by remember { mutableStateOf<String?>(null) }
     // 사용자가 항목을 선택하거나 선택을 취소하는 로직
@@ -72,7 +77,8 @@ fun FoodListResultScreen(navController: NavHostController) {
     val isItemSelected: (String) -> Boolean = { it == selectedMeal }
     val scrollState = rememberScrollState()
     // 각 음식 아이템의 먹은 양을 저장하는 상태
-    val eatenAmounts = remember { mutableStateMapOf<Long, String>() }
+//    val eatenAmounts = remember { mutableStateMapOf<Long, String>() }
+    var eatenAmounts = remember { mutableStateMapOf<Long, Double>() }
 
     Box(
         modifier = Modifier
@@ -125,7 +131,7 @@ fun FoodListResultScreen(navController: NavHostController) {
                     .height(300.dp)
                     .padding(start = 8.dp, end = 8.dp, bottom = 20.dp)
             ) {
-                items(intakeReqs) { foodItem ->
+                items(uploadedFoodItems) { foodItem ->
                     var eatenAmount by remember { mutableStateOf("1.0") }
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -160,7 +166,9 @@ fun FoodListResultScreen(navController: NavHostController) {
                                 value = eatenAmount,
                                 onValueChange = { newValue ->
                                     eatenAmount = newValue
-                                    eatenAmounts[foodItem.food_id] = newValue
+//                                    eatenAmounts[foodItem.food_id] = newValue
+                                    eatenAmounts[foodItem.id.toLong()] = newValue.toDoubleOrNull() ?: 1.0
+                                    //여기야
                                 },
                                 modifier = Modifier
                                     .width(100.dp)
@@ -179,11 +187,15 @@ fun FoodListResultScreen(navController: NavHostController) {
             // 먹은 양 수정 완료
             Button(
                 onClick = {
-                    intakeReqs.forEach { item ->
-                        val newEatenAmount = eatenAmounts[item.food_id]?.toDoubleOrNull() ?: 1.0
-                        val updatedItem = item.copy(amount = newEatenAmount)
-//                        foodViewModel.updateEatenAmount(updatedItem)
-                    }
+//                    intakeReqs.forEach { item ->
+//                        var newEatenAmount = 1.0
+//                        if (eatenAmounts[item.food_id] != null){
+//                            newEatenAmount = eatenAmounts[item.food_id]!!.toDouble()
+//                        }
+//
+//                        val updatedItem = item.copy(amount = newEatenAmount)
+////                        foodViewModel.updateEatenAmount(updatedItem)
+//                    }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF12369)),
                 modifier = Modifier
@@ -225,10 +237,22 @@ fun FoodListResultScreen(navController: NavHostController) {
             // 식단 분석 하러 가기 버튼
             Button(
                 onClick = {
-                    if (intakeReqs != null) {
-                        dietViewModel.setTakeReqList(intakeReqs)
-                        navController.navigate("dietAiAnalysisResult")
+                    val updatedIntakeReqs = intakeReqs.value.map { intakeReq ->
+                        intakeReq.copy(
+                            amount = eatenAmounts[intakeReq.food_id] ?: intakeReq.amount
+                        )
                     }
+
+                    // 로그를 통해 업데이트된 먹은 양 체크
+                    Log.d("식단 분석 버튼","시작")
+                    updatedIntakeReqs.forEach { intakeReq ->
+                        Log.d("먹은량 체크", "${intakeReq.name} => ${intakeReq.amount}")
+                    }
+
+                    dietViewModel.setTakeReqList(updatedIntakeReqs)
+                    Log.d("in Result screen","$updatedIntakeReqs")
+                    navController.navigate("dietAiAnalysisResult")
+
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                 modifier = Modifier
@@ -283,9 +307,12 @@ fun createIntakeReqList(uploadedFoodItems: List<FoodAddInfo>, yoloResult: List<Y
                     fat = foodItem.fat
                 )
             )
+            Log.d("createIntakeReqList작동","${foodItem.name}")
             // yoloResponse를 사용하는 로직도 여기에 추가
             // 예: yoloResponse.forEach { ... }
         }
+    } else {
+        Log.d("uploadedFoodItems 비었다!","ㅇㅇ")
     }
     if(yoloResult.isNotEmpty()) {
         yoloResult.forEach { foodItem ->
@@ -305,4 +332,3 @@ fun createIntakeReqList(uploadedFoodItems: List<FoodAddInfo>, yoloResult: List<Y
 
     return intakeReqs
 }
-

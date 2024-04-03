@@ -100,7 +100,7 @@ fun SetUpNavGraph(
         composable(Screens.AnalysisResult.route) { AnalysisResultScreen(navController) }
         composable(Screens.OCRResist.route) { OCRResistScreen(navController)}
         composable(Screens.FoodResistList.route) { FoodListResultScreen(navController)}
-//        composable(Screens.DietAiAnalysisResult.route) { DietAiAnalysisResultScreen(navController)}
+        composable(Screens.DietAiAnalysisResult.route) { DietAiAnalysisResultScreen(navController)}
     }
 
 

@@ -113,6 +113,8 @@ class DietViewModel @Inject constructor(
         }
     }
 
+    fun getTakeReqs() = dietRepository.takeReqList
+
     fun getTakeReqList(): List<IntakeReq> {
         return dietRepository.takeReqList.value!!
     }
