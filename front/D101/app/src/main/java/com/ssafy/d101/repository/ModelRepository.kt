@@ -3,8 +3,11 @@ package com.ssafy.d101.repository
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.util.Log
+import androidx.core.content.ContextCompat
+import com.ssafy.d101.R
 import com.ssafy.d101.api.ModelService
 import com.ssafy.d101.model.OCRResponse
 import com.ssafy.d101.model.YoloResponse
@@ -15,6 +18,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
+import java.io.FileOutputStream
 import javax.inject.Inject
 
 class ModelRepository @Inject constructor(private val modelService: ModelService) {
@@ -220,5 +224,18 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
                 Log.e("ModelViewModel", "Invalid index for updating food item.")
             }
         }
+    }
+
+    fun convertDrawableToFile(): MultipartBody.Part {
+        val context = context.value!!
+        val drawableId = R.drawable.gallery
+        val drawable = ContextCompat.getDrawable(context, drawableId) as? BitmapDrawable
+        val bitmap = drawable?.bitmap
+        val file = File(context.cacheDir, "gallery")
+        FileOutputStream(file).use { out ->
+            bitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
+        }
+        val requestFile = file.asRequestBody("image/png".toMediaTypeOrNull())
+        return MultipartBody.Part.createFormData("default image", file.name, requestFile)
     }
 }

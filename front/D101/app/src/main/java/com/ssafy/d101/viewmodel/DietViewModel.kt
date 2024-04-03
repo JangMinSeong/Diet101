@@ -140,8 +140,10 @@ class DietViewModel @Inject constructor(
 
     suspend fun saveMeal() {
 //        val file = modelRepository.prepareImageForUpload(modelRepository.context.value!!).getOrThrow()
-        val file = modelRepository.temp.value!!
-
+        var file = modelRepository.temp.value
+        if (file == null) {
+            file = modelRepository.convertDrawableToFile()
+        }
         val createMealReq = CreateMealReq(getDunchfastToString(dietRepository.dietType.value!!), dietRepository.dietDate.value!!, dietRepository.takeReqList.value!!)
         val gson = Gson()
         val createMealReqJson = gson.toJson(createMealReq)
