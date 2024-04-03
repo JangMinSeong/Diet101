@@ -60,7 +60,8 @@ import com.ssafy.d101.model.DietInfo
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.Locale
-
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 fun generateTitles(): Triple<String, String, String> {
     val today = LocalDate.now()
     val month = today.month.value
@@ -91,6 +92,8 @@ fun DietAnalysis(navController: NavController
     val userInfo by userViewModel.getUserInfo().collectAsState()
     val userSubInfo by userViewModel.getUserSubInfo().collectAsState()
 
+    val scrollState = rememberScrollState()
+
     LaunchedEffect(Unit) {
         dietViewModel.analysisDiet()
     }
@@ -114,7 +117,8 @@ fun DietAnalysis(navController: NavController
         .fillMaxWidth()
         .fillMaxHeight()
         .background(Ivory)
-        .padding(16.dp),
+        .padding(16.dp)
+        .verticalScroll(scrollState),
 
         contentAlignment = Alignment.Center // 가운데 정렬을 위해 추가
     ) {
