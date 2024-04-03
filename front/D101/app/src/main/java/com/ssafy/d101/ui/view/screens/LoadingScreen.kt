@@ -52,7 +52,7 @@ fun LoadingScreen(navController: NavHostController) {
                 if (result.isSuccess) {
                     val userSubInfo = result.getOrNull()
                     if (userSubInfo?.height == 0 || userSubInfo?.weight == 0 || userSubInfo?.calorie == 0) {
-                        delay(500)
+                        delay(1000)
                         // SubInfo가 없다면 입력 화면으로 이동
                         navController.navigate(Screens.Height.route) {
                             popUpTo(navController.graph.startDestinationId) {
@@ -62,7 +62,7 @@ fun LoadingScreen(navController: NavHostController) {
                     } else {
                         // SubInfo가 있다면 홈 화면으로 이동
                         Log.i("LoadingScreen", "userSubInfo: $userSubInfo")
-                        delay(500)
+                        delay(1000)
                         if (userSubInfo != null) {
                             userViewModel.setUserSubInfo()
                         }
@@ -94,7 +94,7 @@ fun LoadingScreen(navController: NavHostController) {
         Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
             AnimatedVisibility(
                 visible = !loginChecked,
-                exit = fadeOut(animationSpec = tween(1000))
+                exit = fadeOut(animationSpec = tween(2000))
             ) {
                 Image(
                     modifier = Modifier
@@ -104,7 +104,8 @@ fun LoadingScreen(navController: NavHostController) {
                     contentDescription = "App Icon"
                 )
             }
-            CircularProgressIndicator()
+            if (!loginChecked)
+                CircularProgressIndicator()
         }
     }
 
