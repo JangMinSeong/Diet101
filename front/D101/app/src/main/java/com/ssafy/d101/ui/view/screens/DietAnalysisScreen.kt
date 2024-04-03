@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -80,8 +82,7 @@ fun generateTitles(): Triple<String, String, String> {
 }
 
 @Composable
-fun DietAnalysis(navController: NavController
-) {
+fun DietAnalysis(navController: NavController) {
     val (dateTitle, weekTitle, monthTitle) = generateTitles()
     val userViewModel :UserViewModel = hiltViewModel()
     val dietViewModel :DietViewModel = hiltViewModel()
@@ -90,6 +91,8 @@ fun DietAnalysis(navController: NavController
 
     val userInfo by userViewModel.getUserInfo().collectAsState()
     val userSubInfo by userViewModel.getUserSubInfo().collectAsState()
+
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
         dietViewModel.analysisDiet()
@@ -128,85 +131,39 @@ fun DietAnalysis(navController: NavController
             contentAlignment = Alignment.Center // 가운데 정렬을 위해 추가
         )
         {
-            Column {
-                Image(
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .size(30.dp)
-                        .clickable {
-                            navController.popBackStack()
-                        },
-                    painter = painterResource(R.drawable.xbutton),
-                    contentDescription = "xBtn"
-                )
-                Text(
-                    title,
-                    color = Color(0xFF416C50),
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-                Spacer(modifier = Modifier.size(10.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    // 오늘의 내 식단 분석 버튼
-                    TextButton(onClick = { selectedAnalysis = "today" }) {
-                        Text(
-                            "오늘의 내 식단 분석",
-                            color = if (selectedAnalysis == "today") Color.Black else Color.Gray
-                        )
-                    }
-
-                    // 세로선
-                    Divider(
-                        color = Color(0xFF416C50),
+            Column(modifier = Modifier
+                .verticalScroll(scrollState)
+            ) {
+                Column {
+                    Image(
                         modifier = Modifier
-                            .height(40.dp)
-                            .width(3.dp)
-                            .padding(vertical = 10.dp)
+                            .align(Alignment.End)
+                            .size(30.dp)
+                            .clickable {
+                                navController.popBackStack()
+                            },
+                        painter = painterResource(R.drawable.xbutton),
+                        contentDescription = "xBtn"
                     )
+                    Text(
+                        title,
+                        color = Color(0xFF416C50),
+                        style = MaterialTheme.typography.headlineMedium,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                    Spacer(modifier = Modifier.size(10.dp))
 
-                    // 과거의 내 식단 분석 버튼
-                    TextButton(onClick = { selectedAnalysis = "past" }) {
-                        Text(
-                            "과거의 내 식단 분석",
-                            color = if (selectedAnalysis == "past") Color.Black else Color.Gray
-                        )
-                    }
-                }
-                
-                when(selectedAnalysis) {
-                    "today" -> {
-                        Spacer(modifier = Modifier.size(15.dp))
-                        var userGender : Int
-                        if(userInfo?.gender == "MALE") userGender = 1
-                        else userGender = 2
-
-                        val dailyCal = analysisDiet?.let{ calculateTotalCalories(it) }
-                        if(userSubInfo != null && dailyCal != null)
-                            CustomSemiCirclePieChart(consumedKcal = dailyCal, totalKcal = userSubInfo!!.calorie, gender = userGender)
-                        Spacer(modifier = Modifier.size(15.dp))
-
-                        val nutri = analysisDiet?.let { calculateDailyNutrientRatios(it) }
-                        if (nutri != null) {
-                            DailyHorizontalBar(carbsPercentage = nutri.first, proteinPercentage = nutri.second, fatsPercentage = nutri.third)
-                        }
-
-                    }
-                }
-                
-                if (selectedAnalysis == "past") {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start
+                        horizontalArrangement = Arrangement.Center
                     ) {
                         // 오늘의 내 식단 분석 버튼
-                        TextButton(onClick = { selectedTimeline = "weekly" }) {
-                            Text("주간", color = if (selectedTimeline == "weekly") Color.Black else Color.Gray)
+                        TextButton(onClick = { selectedAnalysis = "today" }) {
+                            Text(
+                                "오늘의 내 식단 분석",
+                                color = if (selectedAnalysis == "today") Color.Black else Color.Gray
+                            )
                         }
 
                         // 세로선
@@ -219,64 +176,114 @@ fun DietAnalysis(navController: NavController
                         )
 
                         // 과거의 내 식단 분석 버튼
-                        TextButton(onClick = {
-                            selectedTimeline = "monthly"
-                        }) {
-                            Text("월간", color = if (selectedTimeline == "monthly") Color.Black else Color.Gray)
-                        }
-
-                        // 월간 선택 시 "내 월간 랭킹 보기" 버튼 추가
-                        if (selectedTimeline == "monthly") {
-                            Spacer(Modifier.width(50.dp)) // 버튼 사이의 간격
-
-                            TextButton(onClick = {
-                                // 클릭 시 selectedMonthOption을 토글
-                                selectedMonthOption = if (selectedMonthOption == "diet") "ranking" else "diet"
-                            }) {
-                                Text(
-                                    text = if (selectedMonthOption == "diet") "내 식단 랭킹 보기" else "월간 식단 분석 보기",
-                                    color = Color.Red
-                                )
-                            }
+                        TextButton(onClick = { selectedAnalysis = "past" }) {
+                            Text(
+                                "과거의 내 식단 분석",
+                                color = if (selectedAnalysis == "past") Color.Black else Color.Gray
+                            )
                         }
                     }
 
-                    when (selectedAnalysis) {
-                        "past" -> {
-                            when (selectedTimeline) {
-                                "weekly" -> {
-                                    //주간 식단 분석
-                                    if(analysisDiet != null) {
-                                        WeeklyNutritionChart(
-                                            weeklyData = generateWeeklyData(analysisDiet!!.weeklyDiet),
-                                            title = "WEEKLY"
-                                        )
-                                        Spacer(modifier = Modifier.size(7.dp))
+                    when(selectedAnalysis) {
+                        "today" -> {
+                            Spacer(modifier = Modifier.size(15.dp))
+                            var userGender : Int
+                            if(userInfo?.gender == "MALE") userGender = 1
+                            else userGender = 2
 
-                                        WeekLeaderboardScreen(
-                                            data = generateWeekRankingItem(analysisDiet!!.weeklyDiet)
-                                        )
-                                        Spacer(modifier = Modifier.size(6.dp))
-                                    }
+                            val dailyCal = analysisDiet?.let{ calculateTotalCalories(it) }
+                            if(userSubInfo != null && dailyCal != null)
+                                CustomSemiCirclePieChart(consumedKcal = dailyCal, totalKcal = userSubInfo!!.calorie, gender = userGender)
+                            Spacer(modifier = Modifier.size(15.dp))
+
+                            val nutri = analysisDiet?.let { calculateDailyNutrientRatios(it) }
+                            if (nutri != null) {
+                                DailyHorizontalBar(carbsPercentage = nutri.first, proteinPercentage = nutri.second, fatsPercentage = nutri.third)
+                            }
+
+                        }
+                    }
+
+                    if (selectedAnalysis == "past") {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            // 오늘의 내 식단 분석 버튼
+                            TextButton(onClick = { selectedTimeline = "weekly" }) {
+                                Text("주간", color = if (selectedTimeline == "weekly") Color.Black else Color.Gray)
+                            }
+
+                            // 세로선
+                            Divider(
+                                color = Color(0xFF416C50),
+                                modifier = Modifier
+                                    .height(40.dp)
+                                    .width(3.dp)
+                                    .padding(vertical = 10.dp)
+                            )
+
+                            // 과거의 내 식단 분석 버튼
+                            TextButton(onClick = {
+                                selectedTimeline = "monthly"
+                            }) {
+                                Text("월간", color = if (selectedTimeline == "monthly") Color.Black else Color.Gray)
+                            }
+
+                            // 월간 선택 시 "내 월간 랭킹 보기" 버튼 추가
+                            if (selectedTimeline == "monthly") {
+                                Spacer(Modifier.width(50.dp)) // 버튼 사이의 간격
+
+                                TextButton(onClick = {
+                                    // 클릭 시 selectedMonthOption을 토글
+                                    selectedMonthOption = if (selectedMonthOption == "diet") "ranking" else "diet"
+                                }) {
+                                    Text(
+                                        text = if (selectedMonthOption == "diet") "내 식단 랭킹 보기" else "월간 식단 분석 보기",
+                                        color = Color.Red
+                                    )
                                 }
+                            }
+                        }
 
-                                "monthly" -> {
-                                    when(selectedMonthOption) {
-                                        "diet" -> {
-                                            //월간 식단 분석
-                                            if(analysisDiet != null) {
-                                                MonthlyNutritionChartHorizontal(
-                                                    monthlyData = generateMonthlyNutritionData(analysisDiet!!.annualNutrients),
-                                                            title = "MONTHLY"
-                                                )
-                                            }
+                        when (selectedAnalysis) {
+                            "past" -> {
+                                when (selectedTimeline) {
+                                    "weekly" -> {
+                                        //주간 식단 분석
+                                        if(analysisDiet != null) {
+                                            WeeklyNutritionChart(
+                                                weeklyData = generateWeeklyData(analysisDiet!!.weeklyDiet),
+                                                title = "WEEKLY"
+                                            )
+                                            Spacer(modifier = Modifier.size(7.dp))
+
+                                            WeekLeaderboardScreen(
+                                                data = generateWeekRankingItem(analysisDiet!!.weeklyDiet)
+                                            )
+                                            Spacer(modifier = Modifier.size(6.dp))
                                         }
-                                        "ranking" -> {
-                                            // 월간 랭킹
-                                            if(analysisDiet != null) {
-                                                MonthLeaderboardScreen(
-                                                    data = generateMonthRankingItem(analysisDiet!!.totalRank)
-                                                )
+                                    }
+
+                                    "monthly" -> {
+                                        when(selectedMonthOption) {
+                                            "diet" -> {
+                                                //월간 식단 분석
+                                                if(analysisDiet != null) {
+                                                    MonthlyNutritionChartHorizontal(
+                                                        monthlyData = generateMonthlyNutritionData(analysisDiet!!.annualNutrients),
+                                                        title = "MONTHLY"
+                                                    )
+                                                }
+                                            }
+                                            "ranking" -> {
+                                                // 월간 랭킹
+                                                if(analysisDiet != null) {
+                                                    MonthLeaderboardScreen(
+                                                        data = generateMonthRankingItem(analysisDiet!!.totalRank)
+                                                    )
+                                                }
                                             }
                                         }
                                     }
@@ -285,6 +292,7 @@ fun DietAnalysis(navController: NavController
                         }
                     }
                 }
+                Spacer(modifier = Modifier.height(50.dp))
             }
         }
     }
