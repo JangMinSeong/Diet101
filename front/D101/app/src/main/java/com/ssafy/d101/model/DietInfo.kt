@@ -6,7 +6,7 @@ enum class Dunchfast {
 
 data class IntakeInfo (
     val food : FoodInfo,
-    val amount : Int
+    val amount : Double,
 )
 
 data class DietInfo(

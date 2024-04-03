@@ -36,7 +36,7 @@ public class CreateMealReq {
 
     public double getTotalProtein() {
         return this.intakes.stream()
-                .mapToDouble(intake -> intake.getProtein() * intake.getProtein())
+                .mapToDouble(intake -> intake.getProtein() * intake.getAmount())
                 .sum();
     }
 

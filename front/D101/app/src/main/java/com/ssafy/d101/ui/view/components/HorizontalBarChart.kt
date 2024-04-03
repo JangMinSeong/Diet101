@@ -181,7 +181,7 @@ fun MonthlyNutritionChartHorizontal(
             monthlyData = monthlyData,
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight()
+                .height(735.dp)
                 .padding(16.dp)
         )
     }

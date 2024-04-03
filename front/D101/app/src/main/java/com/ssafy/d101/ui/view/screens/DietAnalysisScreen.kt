@@ -1,5 +1,6 @@
 package com.ssafy.d101.ui.view.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,7 +36,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ssafy.d101.R
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.view.components.BarItem
@@ -52,7 +52,6 @@ import com.ssafy.d101.viewmodel.DietViewModel
 import com.ssafy.d101.viewmodel.UserViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -60,8 +59,6 @@ import com.ssafy.d101.model.AnalysisDiet
 import com.ssafy.d101.model.CalAnnualNutrient
 import com.ssafy.d101.model.DietInfo
 import java.time.temporal.TemporalAdjusters
-import java.time.temporal.WeekFields
-import java.util.Locale
 
 fun generateTitles(): Triple<String, String, String> {
     val today = LocalDate.now()
@@ -118,7 +115,6 @@ fun DietAnalysis(navController: NavController) {
         .fillMaxHeight()
         .background(Ivory)
         .padding(16.dp),
-
         contentAlignment = Alignment.Center // 가운데 정렬을 위해 추가
     ) {
         Box(
@@ -131,10 +127,7 @@ fun DietAnalysis(navController: NavController) {
             contentAlignment = Alignment.Center // 가운데 정렬을 위해 추가
         )
         {
-            Column(modifier = Modifier
-                .verticalScroll(scrollState)
-            ) {
-                Column {
+                Column(modifier = Modifier.verticalScroll(scrollState)) {
                     Image(
                         modifier = Modifier
                             .align(Alignment.End)
@@ -291,10 +284,9 @@ fun DietAnalysis(navController: NavController) {
                             }
                         }
                     }
+                    Spacer(modifier = Modifier.height(50.dp))
                 }
-                Spacer(modifier = Modifier.height(50.dp))
             }
-        }
     }
 }
 
@@ -327,7 +319,7 @@ fun generateMonthRankingItem(totalRank: List<String>): MonthRankingItem {
 
 fun generateWeeklyData(weeklyDiet: List<DietInfo>): StackedBarItem {
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-    val weekData = MutableList(7) { listOf(0f, 0f, 0f) } // 일주일 동안의 데이터 초기화
+    val weekData = MutableList(7) { mutableListOf(0f, 0f, 0f) } // 일주일 동안의 데이터 초기화
     val dayOfWeekIndex = mapOf(
         "MONDAY" to 0,
         "TUESDAY" to 1,
@@ -347,18 +339,30 @@ fun generateWeeklyData(weeklyDiet: List<DietInfo>): StackedBarItem {
         var totalFat = 0f
 
         dietInfo.intake.forEach { intakeInfo ->
-            val intakeAmount = intakeInfo.amount / intakeInfo.food.portionSize.toDouble()
-            totalCarbs += (intakeInfo.food.carbohydrate * intakeAmount).toFloat() * 4 // 탄수화물 칼로리 계산
-            totalProtein += (intakeInfo.food.protein * intakeAmount).toFloat() * 4 // 단백질 칼로리 계산
-            totalFat += (intakeInfo.food.fat * intakeAmount).toFloat() * 9 // 지방 칼로리 계산
+            val intakeAmount = intakeInfo.amount
+
+            val carbsCalories = intakeInfo.food.carbohydrate * intakeAmount * 4f
+            val proteinCalories = intakeInfo.food.protein * intakeAmount * 4f
+            val fatCalories = intakeInfo.food.fat * intakeAmount * 9f
+
+            weekData[dayIndex][0] += carbsCalories.toFloat()
+            weekData[dayIndex][1] += proteinCalories.toFloat()
+            weekData[dayIndex][2] += fatCalories.toFloat()
         }
-
-        weekData[dayIndex] = listOf(totalCarbs, totalProtein, totalFat)
     }
-
-    val maxValue = weekData.flatten().maxOrNull() ?: 0f
-
-    return StackedBarItem(data = weekData, maxValue = maxValue)
+    Log.d("weekData", "$weekData")
+    val calculatedData = weekData.map { list ->
+        listOf(
+            list[0]+ // 탄수화물
+            list[1]+ // 단백질
+            list[2]  // 지방
+        )
+    }
+    Log.d("calResult","$calculatedData")
+    val maxValue = calculatedData.flatten().maxOrNull() ?: 0f
+    val roundedMaxValue = Math.ceil(maxValue / 100.0) * 100
+    Log.d("roundMaxValue","$roundedMaxValue")
+    return StackedBarItem(data = weekData, maxValue = roundedMaxValue.toFloat())
 }
 
 fun generateMonthlyNutritionData(annualNutrients: List<CalAnnualNutrient>): BarItem {
