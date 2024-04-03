@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ssafy.d101.model.DailyNutrient
 import com.ssafy.d101.model.DietInfo
 import com.ssafy.d101.ui.theme.Ivory
@@ -59,6 +60,13 @@ fun HomeScreen (navController: NavHostController) {
     val dayDiet by dietViewModel.dayDiet.collectAsState()
 
     val dailyNutrient by dietViewModel.dailyNutrient.collectAsState()
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    
+    LaunchedEffect(currentRoute) {
+        dietViewModel.loadDayDiet(date = selectedDate.toString())
+    }
 
     LaunchedEffect(selectedDate) {
         dietViewModel.loadDayDiet(date = selectedDate.toString())
@@ -136,8 +144,12 @@ fun MainContents(dailyNutrient: DailyNutrient?, selectedDate: LocalDate, dayDiet
             Divider(Modifier.padding(top = 16.dp, bottom = 16.dp))
         }
         item {
-            Card(Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xffd9d8b7))
+            Card(
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 6.dp
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xffEBE9D5))
             ) {
                 Column(
                     Modifier

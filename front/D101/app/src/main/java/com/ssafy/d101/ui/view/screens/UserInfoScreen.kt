@@ -21,6 +21,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -48,6 +49,7 @@ import coil.compose.AsyncImage
 import com.ssafy.d101.model.UserSubInfo
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
+import com.ssafy.d101.ui.theme.fontFamily
 import com.ssafy.d101.ui.view.components.BackHeader
 import com.ssafy.d101.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
@@ -106,10 +108,11 @@ fun UserInfo(navController: NavController) {
                         fontWeight = FontWeight.Bold,
                         fontSize = 23.sp,
                         shadow = Shadow(
-                            color = Color.Gray,
+                            color = Color.LightGray,
                             offset = Offset(10f, 10f),
                             blurRadius = 8f
-                        )
+                        ),
+                        fontFamily = MaterialTheme.typography.bodyMedium.fontFamily
                     )
 
                 )
@@ -132,7 +135,8 @@ fun UserInfo(navController: NavController) {
                     text = "저장", style = TextStyle(
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
-                        color = Color.White // 색상도 설정할 수 있음
+                        color = Color.White, // 색상도 설정할 수 있음
+                        fontFamily = fontFamily
                     )
                 )
             }
@@ -248,5 +252,6 @@ fun UserInfoPreview() {
 val titleTextStyle = TextStyle(
     fontWeight = FontWeight.Bold,
     fontSize = 18.sp,
-    color = Color.Black // 색상도 설정할 수 있음
+    color = Color.Black, // 색상도 설정할 수 있음,
+    fontFamily = fontFamily
 )
