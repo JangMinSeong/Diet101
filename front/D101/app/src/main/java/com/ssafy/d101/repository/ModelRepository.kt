@@ -117,7 +117,7 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
             val options = BitmapFactory.Options().apply {
                 inJustDecodeBounds = true // 실제 Bitmap을 생성하지 않고, 이미지의 크기 정보만을 로드
                 BitmapFactory.decodeStream(inputStream, null, this)
-                inSampleSize = calculateInSampleSize(this, 800, 800) // 원하는 최대 너비와 높이
+                inSampleSize = calculateInSampleSize(this, 1200, 1200) // 원하는 최대 너비와 높이
                 inJustDecodeBounds = false // Bitmap을 실제로 로드
             }
             inputStream.close()
@@ -154,7 +154,10 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
             Result.failure(e)
         }
     }
-
+    suspend fun initResult() {
+        _yoloInfo.emit(null)
+        _ocrInfo.emit(null)
+    }
     suspend fun setOption(option : Boolean) {
         _option.emit(option)
     }
@@ -178,7 +181,6 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
             val halfHeight: Int = height / 2
             val halfWidth: Int = width / 2
 
-            // 샘플링 사이즈를 계산. 이 값은 2의 거듭제곱이어야 합니다.
             while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
                 inSampleSize *= 2
             }

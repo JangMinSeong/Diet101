@@ -20,6 +20,7 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -40,6 +41,9 @@ object NetworkModule {
         OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
             .authenticator(authAuthenticator)
+            .readTimeout(30, TimeUnit.SECONDS) // 읽기 타임아웃
+            .connectTimeout(30, TimeUnit.SECONDS) // 연결 타임아웃
+            .writeTimeout(30, TimeUnit.SECONDS) // 쓰기 타임아웃
             .build()
 
     private val gson : Gson = GsonBuilder().setLenient().create()
