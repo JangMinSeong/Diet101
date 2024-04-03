@@ -44,6 +44,7 @@ import com.ssafy.d101.model.DailyNutrient
 import com.ssafy.d101.model.DietInfo
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.view.components.CalendarApp
+import com.ssafy.d101.ui.view.components.FoodDetailScreen
 import com.ssafy.d101.ui.view.components.FoodItemCard
 import com.ssafy.d101.viewmodel.CalendarViewModel
 import com.ssafy.d101.viewmodel.DietViewModel
@@ -289,10 +290,9 @@ fun MainContents(dailyNutrient: DailyNutrient?, selectedDate: LocalDate, dayDiet
             Spacer(modifier = Modifier.padding(16.dp))
             Text(text = "식단")
             Divider(Modifier.padding(top = 16.dp, bottom = 16.dp))
-            dayDiet?.forEach() {IntakeInfos ->
-                IntakeInfos.intake.forEach() {intake ->
-                    FoodItemCard(foodInfo = intake.food)
-                }
+            dayDiet?.forEach() {
+                FoodDetailScreen(dietInfo = it)
+                Spacer(modifier = Modifier.height(10.dp))
             }
         }
     }
