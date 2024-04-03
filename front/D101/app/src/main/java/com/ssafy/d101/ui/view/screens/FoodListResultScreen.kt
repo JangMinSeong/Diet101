@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.Arrangement
@@ -37,22 +36,16 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.ssafy.d101.model.Dunchfast
 import com.ssafy.d101.model.FoodAddInfo
 import com.ssafy.d101.model.IntakeReq
-import com.ssafy.d101.model.YoloFood
 import com.ssafy.d101.model.YoloResponse
-import com.ssafy.d101.ui.view.components.CroppedImagesDisplay
-import com.ssafy.d101.ui.view.components.DailyHorizontalBar
 import com.ssafy.d101.viewmodel.DietViewModel
 import com.ssafy.d101.viewmodel.FoodSearchViewModel
 import com.ssafy.d101.viewmodel.ModelViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun FoodListResultScreen(navController: NavHostController) {
@@ -78,9 +71,7 @@ fun FoodListResultScreen(navController: NavHostController) {
     val scrollState = rememberScrollState()
     // 각 음식 아이템의 먹은 양을 저장하는 상태
 //    val eatenAmounts = remember { mutableStateMapOf<Long, String>() }
-    var eatenAmounts = remember { mutableStateMapOf<Long, Double>() }
-
-    val scope = rememberCoroutineScope()
+    val eatenAmounts = remember { mutableStateMapOf<Long, Double>() }
 
     Box(
         modifier = Modifier
@@ -246,10 +237,6 @@ fun FoodListResultScreen(navController: NavHostController) {
                         Log.d("in Result screen","$updatedIntakeReqs, $dunchfastType")
 
                         navController.navigate("dietAiAnalysisResult")
-
-                        scope.launch {
-                            dietViewModel.saveMeal()
-                        }
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
@@ -316,7 +303,7 @@ fun createIntakeReqList(uploadedFoodItems: List<FoodAddInfo>, yoloResult: List<Y
         yoloResult.forEach { foodItem ->
             intakeReqs.add(
                 IntakeReq(
-                    food_id = foodItem.yoloFoodDto.id.toLong(),
+                    food_id = foodItem.yoloFoodDto.food_id,
                     amount = 1.0,
                     name = foodItem.tag,
                     kcal = foodItem.yoloFoodDto.calorie,
