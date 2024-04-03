@@ -63,15 +63,14 @@ fun FoodDetailScreen(dietInfo: DietInfo) {
 
     val firstIntakeInfo = dietInfo.intake.firstOrNull()
 
-    // 첫 번째 intake에서 정보를 추출
     val foodName = firstIntakeInfo?.food?.name ?: "음식 정보 없음"
     val foodCarbs = firstIntakeInfo?.food?.carbohydrate ?: 0.0
     val foodProtein = firstIntakeInfo?.food?.protein ?: 0.0
     val foodFat = firstIntakeInfo?.food?.fat ?: 0.0
 
-    val carbcalories = foodCarbs * 4
-    val proteinCalories = foodProtein * 4
-    val fatCalories = foodFat * 9
+    val carbcalories = String.format("%.1f", foodCarbs * 4)
+    val proteinCalories = String.format("%.1f", foodProtein * 4)
+    val fatCalories = String.format("%.1f", foodFat * 9)
 
     val context = LocalContext.current
     val resourceId = context.resources.getIdentifier(
