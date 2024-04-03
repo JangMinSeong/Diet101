@@ -38,7 +38,7 @@ data class AnalysisDiet(
 )
 
 data class CreateMealReq(
-    val type: Dunchfast,
+    val type: String,
     val time: String,
     val intakes: List<IntakeReq>
 )
