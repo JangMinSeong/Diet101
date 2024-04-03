@@ -1,4 +1,4 @@
-package com.ssafy.d101.ui.view.components
+ package com.ssafy.d101.ui.view.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
