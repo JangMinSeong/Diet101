@@ -26,6 +26,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,27 +44,32 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.ssafy.d101.ui.theme.Green
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
 import com.ssafy.d101.ui.view.components.BackHeader
+import com.ssafy.d101.viewmodel.UserViewModel
+
 
 @Composable
 fun BMIScreen(navController: NavHostController) {
+    val viewModel: UserViewModel = hiltViewModel()
+    val username by viewModel.username.observeAsState("")
     Column( modifier = Modifier // 백그라운드
         .fillMaxSize()
         .background(Ivory)
     ) {
          BackHeader("BMI 측정", navController)
-        CheckBMI()
+        CheckBMI(username = username)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun CheckBMI() {
+fun CheckBMI(username: String) {
 
     var gender by remember { mutableStateOf("male") }
     var height by remember { mutableStateOf("") }
@@ -150,7 +156,7 @@ fun CheckBMI() {
                         .padding(10.dp, 20.dp)
                 ) {
                     var text = buildAnnotatedString {
-                        append("보근 님의 신체 질량 지수(BMI)는")
+                        append("${username}님의 신체 질량 지수(BMI)는")
                         withStyle(style = SpanStyle(color = Color.Red, fontSize = 18.sp)) {
                             append(bmiResult!!)
                         }

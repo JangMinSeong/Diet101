@@ -2,12 +2,14 @@ package com.ssafy.d101.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.ssafy.d101.model.UserSubInfo
 import com.ssafy.d101.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,6 +23,7 @@ class UserViewModel @Inject constructor(
     private val _weight = MutableStateFlow<Int?>(null)
     private val _activityLevel = MutableStateFlow<Int?>(null)
     private val _calorie = MutableStateFlow<Int?>(null)
+    val username = userRepository.userInfo.map { it?.username.orEmpty() }.asLiveData()
 
     init {
         initializeUserSubInfo()
