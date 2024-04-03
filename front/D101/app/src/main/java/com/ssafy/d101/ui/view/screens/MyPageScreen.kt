@@ -181,10 +181,11 @@ fun MyMenu(navController: NavController) {
                     color = Color.Black,
                     fontSize = 15.sp,
                     shadow = Shadow(
-                        color = Color.Gray,
+                        color = Color.LightGray,
                         offset = Offset(10f,10f),
                         blurRadius = 8f
-                    )
+                    ),
+                    fontFamily = MaterialTheme.typography.bodyMedium.fontFamily
                 )
             )
             SettingItem("BMI 측정하기", navController, "bmi")
@@ -195,10 +196,11 @@ fun MyMenu(navController: NavController) {
                     color = Color.Black,
                     fontSize = 15.sp,
                     shadow = Shadow(
-                        color = Color.Gray,
+                        color = Color.LightGray,
                         offset = Offset(10f,10f),
                         blurRadius = 8f
-                    )
+                    ),
+                    fontFamily = MaterialTheme.typography.bodyMedium.fontFamily
                 )
             )
             SettingItem("음식 추천", navController, "recommend")

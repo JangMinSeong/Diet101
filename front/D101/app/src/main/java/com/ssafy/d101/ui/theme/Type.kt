@@ -6,7 +6,6 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.googlefonts.GoogleFont
-import androidx.compose.ui.unit.sp
 import com.ssafy.d101.R
 
 val provider = GoogleFont.Provider(
@@ -18,10 +17,14 @@ val provider = GoogleFont.Provider(
 val nanumgothic = GoogleFont("Nanum Square")
 
 val fontFamily = FontFamily(
-    Font(R.font.nanum_gothic, FontWeight.Normal),
-    Font(R.font.nanum_gothic_bold, FontWeight.Bold),
-    Font(R.font.nanum_gothic_light, FontWeight.Light),
-    Font(R.font.nanum_gothic_extra_bold, FontWeight.ExtraBold),
+    Font(R.font.hanbit, FontWeight.Normal),
+    Font(R.font.hanbit, FontWeight.Bold),
+    Font(R.font.hanbit, FontWeight.Light),
+    Font(R.font.hanbit, FontWeight.ExtraBold),
+    Font(R.font.hanbit, FontWeight.Black),
+    Font(R.font.hanbit, FontWeight.ExtraLight),
+    Font(R.font.hanbit, FontWeight.Thin),
+    Font(R.font.hanbit, FontWeight.SemiBold)
 )
 
 // Set of Material typography styles to start with
