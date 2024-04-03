@@ -11,6 +11,6 @@ public class CalAnnualNutrient {
     private int month;
     private int totalCalorie;
     private double totalCarbohydrate;
-    private double totalProtein;
     private double totalFat;
+    private double totalProtein;
 }

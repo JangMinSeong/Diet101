@@ -167,8 +167,8 @@ public class DietService {
 						((Number) row[0]).intValue(), // month
 						((Number) row[1]).intValue(), // totalCalorie
 						((Number) row[2]).doubleValue(), // totalCarbohydrate
-						((Number) row[4]).doubleValue(), // totalFat
-						((Number) row[3]).doubleValue()  // totalProtein
+						((Number) row[3]).doubleValue(), // totalFat
+						((Number) row[4]).doubleValue()  // totalProtein
 				))
 				.collect(Collectors.toList()));
 
