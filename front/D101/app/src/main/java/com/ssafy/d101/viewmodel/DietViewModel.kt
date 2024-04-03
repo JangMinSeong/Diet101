@@ -123,11 +123,26 @@ class DietViewModel @Inject constructor(
         }
     }
 
+    private fun getDunchfastToString(dunchfast: Dunchfast): String {
+        return when(dunchfast) {
+            Dunchfast.BREAKFAST -> "BREAKFAST"
+            Dunchfast.BRUNCH -> "BRUNCH"
+            Dunchfast.LUNCH -> "LUNCH"
+            Dunchfast.LINNER -> "LINNER"
+            Dunchfast.DINNER -> "DINNER"
+            Dunchfast.MIDNIGHT -> "NIGHT"
+            Dunchfast.SNACK -> "SNACK"
+            Dunchfast.DRINK -> "BEVERAGE"
+            Dunchfast.ALCOHOL -> "ALCOHOL"
+            else -> "BREAKFAST" // 선택한 항목이 매핑되지 않는 경우 아침으로 고정
+        }
+    }
+
     suspend fun saveMeal() {
 //        val file = modelRepository.prepareImageForUpload(modelRepository.context.value!!).getOrThrow()
         val file = modelRepository.temp.value!!
 
-        val createMealReq = CreateMealReq(dietRepository.dietType.value!!, getCurrentDate(), dietRepository.takeReqList.value!!)
+        val createMealReq = CreateMealReq(getDunchfastToString(dietRepository.dietType.value!!), getCurrentDate(), dietRepository.takeReqList.value!!)
         val gson = Gson()
         val createMealReqJson = gson.toJson(createMealReq)
         val createMealReqBody = createMealReqJson.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
