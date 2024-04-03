@@ -35,3 +35,10 @@ data class FoodResponse(
     val protein: Double,
     val fat: Double,
     )
+
+data class FoodDetailInfo(
+    val carbohydrate: Float,
+    val protein: Float,
+    val fat: Float,
+    val calorie: Float
+)

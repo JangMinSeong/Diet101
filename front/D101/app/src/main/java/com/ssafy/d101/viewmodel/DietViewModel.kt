@@ -1,5 +1,6 @@
 package com.ssafy.d101.viewmodel
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.util.Log
@@ -146,21 +147,12 @@ class DietViewModel @Inject constructor(
         }
     }
 
-    suspend fun saveMeal() {
+    suspend fun saveMeal(context: Context) {
 //        val file = modelRepository.prepareImageForUpload(modelRepository.context.value!!).getOrThrow()
         var MultipartBodyFile = modelRepository.temp.value
         if (MultipartBodyFile == null) {
-            val context = modelRepository.context.value!!
-            val drawableId = R.drawable.gallery
-            val drawable = ContextCompat.getDrawable(context, drawableId) as? BitmapDrawable
-            val bitmap = drawable?.bitmap
-            val file = File(context.cacheDir, "gallery")
-            FileOutputStream(file).use { out ->
-                bitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
-            }
-            val requestFile = file.asRequestBody("image/png".toMediaTypeOrNull())
-            val multipartFile = MultipartBody.Part.createFormData("default image", file.name, requestFile)
-            MultipartBodyFile = modelRepository.convertDrawableToFile()
+            MultipartBodyFile = modelRepository.convertDrawableToFile(context)
+            Log.e("DietViewModel", "MultipartBodyFile: ${MultipartBodyFile}")
         }
         val createMealReq = CreateMealReq(getDunchfastToString(dietRepository.dietType.value!!), dietRepository.dietDate.value!!, dietRepository.takeReqList.value!!)
         val gson = Gson()
