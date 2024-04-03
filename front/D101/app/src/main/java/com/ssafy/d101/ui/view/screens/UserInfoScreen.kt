@@ -27,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -44,10 +45,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.ssafy.d101.model.UserSubInfo
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
 import com.ssafy.d101.ui.view.components.BackHeader
 import com.ssafy.d101.viewmodel.UserViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun UserInfoScreen(navController: NavController) {
@@ -56,13 +59,13 @@ fun UserInfoScreen(navController: NavController) {
         .background(Ivory)
     ) {
         BackHeader("마이페이지", navController)
-        UserInfo()
+        UserInfo(navController)
     }
 }
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun UserInfo() {
+fun UserInfo(navController: NavController) {
     val userViewModel: UserViewModel = hiltViewModel()
     val userInfo = userViewModel.getUserInfo().collectAsState()
     val userSubInfo = userViewModel.getUserSubInfo().collectAsState()
@@ -71,11 +74,9 @@ fun UserInfo() {
     var activity by remember { mutableStateOf(userSubInfo.value?.activity) }
     var kcal by remember { mutableStateOf(userSubInfo.value?.calorie.toString()) }
 
-//    var height = userSubInfo.value?.height.toString()
-//    var weight = userSubInfo.value?.weight.toString()
-//    var activity = userSubInfo.value?.activity
-//    var kcal = userSubInfo.value?.calorie.toString()
     val age = userInfo.value?.age ?: 0
+
+    val scope = rememberCoroutineScope()
 
     fun calculateCalories(height: Int, weight: Int): Int {
         val bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
@@ -114,7 +115,12 @@ fun UserInfo() {
                 )
             }
             Button(
-                onClick = {/*TODO*/ },
+                onClick = {
+                    scope.launch {
+                        userViewModel.fixUserSubInfo(UserSubInfo(activity!!, kcal.toInt(), height.toInt(), weight.toInt()))
+                        navController.navigate("myPage")
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFB6B284), // 버튼 배경색
                     contentColor = Color.White // 버튼 텍스트색
@@ -235,7 +241,6 @@ fun InputField(value: String, onValueChange: (String) -> Unit) {
 @Composable
 fun UserInfoPreview() {
     val navController = rememberNavController()
-    val userViewModel: UserViewModel = hiltViewModel()
 
     UserInfoScreen(navController = navController)
 }

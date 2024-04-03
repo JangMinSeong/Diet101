@@ -1,5 +1,6 @@
 package com.ssafy.d101.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.ssafy.d101.model.CalendarModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,7 @@ class CalendarViewModel @Inject constructor() : ViewModel() {
     val calendarModel = _calendarModel.asStateFlow()
 
     init {
+        Log.i("CalendarViewModel", "selectedDate: ${_selectedDate.value}")
         updateSelectedDate(_selectedDate.value)
     }
 
