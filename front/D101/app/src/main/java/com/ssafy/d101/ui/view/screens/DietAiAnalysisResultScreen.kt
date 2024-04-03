@@ -217,7 +217,7 @@ fun DietAiAnalysisResultScreen(navController: NavHostController) {
                         dietViewModel.setDietDate(selectedDate)
 
                         scope.launch {
-                            dietViewModel.saveMeal()
+                            dietViewModel.saveMeal(context)
                         }
                         navController.navigate("home")
                     },
