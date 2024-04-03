@@ -3,27 +3,22 @@ package com.ssafy.d101.repository
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.util.Log
-import androidx.lifecycle.viewModelScope
+import androidx.core.content.ContextCompat
+import com.ssafy.d101.R
 import com.ssafy.d101.api.ModelService
-import com.ssafy.d101.api.UserService
 import com.ssafy.d101.model.OCRResponse
-import com.ssafy.d101.model.UserInfo
-import com.ssafy.d101.model.UserSubInfo
 import com.ssafy.d101.model.YoloResponse
-import com.ssafy.d101.utils.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import okhttp3.MediaType
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
+import java.io.FileOutputStream
 import javax.inject.Inject
 
 class ModelRepository @Inject constructor(private val modelService: ModelService) {
@@ -41,6 +36,9 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
 
     private val _context = MutableStateFlow<Context?>(null)
     val context = _context.asStateFlow()
+
+    private val _temp = MutableStateFlow<MultipartBody.Part?>(null)
+    val temp = _temp.asStateFlow()
 
     suspend fun transferImageToYolo(context: Context) : StateFlow<List<YoloResponse>?> {
         val result = transferImageToYoloFromBack(context)
@@ -84,6 +82,8 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
 
             val response = modelService.checkCal(body)
 
+            _temp.emit(body)
+
             if (response.isSuccessful) {
                 _yoloInfo.emit(response.body())
                 Result.success(response.body()!!)
@@ -117,7 +117,7 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
             val options = BitmapFactory.Options().apply {
                 inJustDecodeBounds = true // 실제 Bitmap을 생성하지 않고, 이미지의 크기 정보만을 로드
                 BitmapFactory.decodeStream(inputStream, null, this)
-                inSampleSize = calculateInSampleSize(this, 800, 800) // 원하는 최대 너비와 높이
+                inSampleSize = calculateInSampleSize(this, 1200, 1200) // 원하는 최대 너비와 높이
                 inJustDecodeBounds = false // Bitmap을 실제로 로드
             }
             inputStream.close()
@@ -140,6 +140,8 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
 
             val response = modelService.checkOCR(body)
 
+            tempFile.delete()
+
             if (response.isSuccessful) {
                 _ocrInfo.emit(response.body())
                 Result.success(response.body()!!)
@@ -152,7 +154,10 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
             Result.failure(e)
         }
     }
-
+    suspend fun initResult() {
+        _yoloInfo.emit(null)
+        _ocrInfo.emit(null)
+    }
     suspend fun setOption(option : Boolean) {
         _option.emit(option)
     }
@@ -176,7 +181,6 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
             val halfHeight: Int = height / 2
             val halfWidth: Int = width / 2
 
-            // 샘플링 사이즈를 계산. 이 값은 2의 거듭제곱이어야 합니다.
             while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
                 inSampleSize *= 2
             }
@@ -224,43 +228,15 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
         }
     }
 
-    suspend fun prepareImageForUpload(context: Context): Result<MultipartBody.Part> {
-        return try {
-            // 이미지 스트림을 열어 이미지 크기를 줄이기 위한 설정
-            val imageUri = imageUri.value ?: return Result.failure(Exception("Image Uri is null"))
-            val inputStream = context.contentResolver.openInputStream(imageUri) ?: return Result.failure(Exception("Failed to open image stream"))
-
-            val options = BitmapFactory.Options().apply {
-                inJustDecodeBounds = true
-                BitmapFactory.decodeStream(inputStream, null, this)
-                inSampleSize = calculateInSampleSize(this, 800, 800)
-                inJustDecodeBounds = false
-            }
-            inputStream.close()
-
-            // 크기가 조정된 Bitmap 로드
-            val resizedInputStream = context.contentResolver.openInputStream(imageUri) ?: return Result.failure(Exception("Failed to open image stream again"))
-            val bitmap = BitmapFactory.decodeStream(resizedInputStream, null, options)
-            resizedInputStream.close()
-
-            // Bitmap을 임시 파일로 저장
-            val tempFile = File.createTempFile("upload", ".jpg", context.cacheDir).apply {
-                outputStream().use { out ->
-                    bitmap?.compress(Bitmap.CompressFormat.JPEG, 85, out)
-                }
-            }
-
-            // MultipartBody.Part 객체 생성
-            val contentType = "image/jpeg".toMediaTypeOrNull()
-            val requestFile = tempFile.asRequestBody(contentType)
-            val body = MultipartBody.Part.createFormData("file", tempFile.name, requestFile)
-
-            tempFile.delete() // 임시 파일 삭제
-
-            Result.success(body)
-        } catch (e: Exception) {
-            Log.e("Model", "Exception during preparing image for upload", e)
-            Result.failure(e)
+    fun convertDrawableToFile(context: Context): MultipartBody.Part {
+        val drawableId = R.drawable.gallery
+        val drawable = ContextCompat.getDrawable(context, drawableId) as? BitmapDrawable
+        val bitmap = drawable?.bitmap
+        val file = File(context.cacheDir, "gallery.png")
+        FileOutputStream(file).use { out ->
+            bitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
         }
+        val requestFile = file.asRequestBody("image/png".toMediaTypeOrNull())
+        return MultipartBody.Part.createFormData("file", file.name, requestFile)
     }
 }

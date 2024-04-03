@@ -67,15 +67,14 @@ fun RecommendScreen(navController: NavHostController) {
     val dietViewModel: DietViewModel = hiltViewModel()
     val userViewModel: UserViewModel = hiltViewModel()
     val foodViewModel: FoodViewModel = hiltViewModel()
+    val user by userViewModel.getUserSubInfo().collectAsState()
     val diets by dietViewModel.dayDiet.collectAsState()
     val foods by foodViewModel.recommendFood.collectAsState()
     var rest by remember {mutableIntStateOf(0)}
     var ggini by remember {mutableIntStateOf(1)}
-
-    val goal=2316
+    val goal=user!!.calorie
     LaunchedEffect(Unit) {
         dietViewModel.loadDayDiet(dietViewModel.getCurrentDate())
-//        foodViewModel.loadRecommendFoods(rest.toString())
     }
     Log.i("diets", diets.toString())
     LaunchedEffect(diets) {

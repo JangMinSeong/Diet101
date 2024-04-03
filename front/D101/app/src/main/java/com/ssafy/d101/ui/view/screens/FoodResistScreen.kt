@@ -128,6 +128,10 @@ fun FoodResistScreen(navController: NavHostController) {
         }
     }
 
+    LaunchedEffect(Unit) {
+        modelViewModel.setInit()
+    }
+
     // 화면 전체
     Column(
         modifier = Modifier

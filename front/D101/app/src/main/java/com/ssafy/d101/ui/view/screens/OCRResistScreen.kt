@@ -63,7 +63,6 @@ import java.util.Date
 import java.util.Locale
 
 
-@Preview(showBackground = true)
 @Composable
 fun OCRResistScreen(navController: NavHostController) {
     val currentDate = remember { LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")) }
@@ -130,6 +129,10 @@ fun OCRResistScreen(navController: NavHostController) {
         contentUri?.let { uri ->
             launcherForCameraFood.launch(uri)
         }
+    }
+
+    LaunchedEffect(Unit) {
+        modelViewModel.setInit()
     }
 
     // 화면 전체

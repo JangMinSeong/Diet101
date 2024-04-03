@@ -1,4 +1,4 @@
-package com.ssafy.d101.ui.view.components
+ package com.ssafy.d101.ui.view.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -47,7 +47,8 @@ fun CustomSemiCirclePieChart(consumedKcal: Int, totalKcal: Int, gender : Int) {
                 )
 
                 // Draw consumed arc
-                val consumedPercentage = (consumedKcal.toFloat() / totalKcal) * 180f
+                var consumedPercentage = (consumedKcal.toFloat() / totalKcal) * 180f
+                if(totalKcal < consumedKcal.toFloat()) consumedPercentage = 180f
                 drawArc(
                     color = Color.Cyan,
                     startAngle = 180f,
@@ -62,25 +63,33 @@ fun CustomSemiCirclePieChart(consumedKcal: Int, totalKcal: Int, gender : Int) {
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Row() {
-                Text("${consumedKcal} /", fontSize = 20.sp)
-                Text( " ${totalKcal} kcal", fontSize = 20.sp, color = Color.Blue)
+                Text(
+                    text = "${consumedKcal} /",
+                    fontSize = 20.sp,
+                    color = if (consumedKcal > totalKcal) Color.Red else Color.Black
+                )
+                Text(" ${totalKcal} kcal", fontSize = 20.sp, color = Color.Blue)
             }
 
-            val charImage = when(gender) {
-                1 -> R.drawable.male // 남
-                2 -> R.drawable.female // 여
-                else -> 0
+            val charImage = when (gender) {
+                1 -> R.drawable.male // 남자
+                2 -> R.drawable.female // 여자
+                else -> R.drawable.male // 기본값
             }
             Spacer(modifier = Modifier.height(30.dp))
 
-            Image( modifier = Modifier.size(110.dp),
+            Image(
+                modifier = Modifier.size(110.dp),
                 painter = painterResource(id = charImage),
                 contentDescription = "캐릭터" // 접근성을 위한 이미지 설명
             )
             Spacer(modifier = Modifier.height(10.dp))
             Row() {
-                Text((totalKcal - consumedKcal).toString() + " kcal ", fontSize = 14.sp, color=Color.Magenta)
-                Text( "남았어요", fontSize = 14.sp, color = Color.Black)
+                val remainingKcal = totalKcal - consumedKcal
+                Row() {
+                    Text(text = if(remainingKcal < 0) "${remainingKcal*(-1)} kcal " else "${remainingKcal} kcal ", fontSize = 14.sp, color=Color.Magenta)
+                    Text(text = if(remainingKcal < 0) "더 먹었어요" else "남았어요", fontSize = 14.sp, color = Color.Black)
+                }
             }
         }
     }
@@ -89,5 +98,5 @@ fun CustomSemiCirclePieChart(consumedKcal: Int, totalKcal: Int, gender : Int) {
 @Composable
 @Preview(showBackground = true)
 fun PreviewCustomSemiCirclePieChart() {
-    CustomSemiCirclePieChart(consumedKcal = 900, totalKcal = 1500, gender = 1)
+    CustomSemiCirclePieChart(consumedKcal = 1800, totalKcal = 1500, gender = 1)
 }

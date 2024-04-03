@@ -53,9 +53,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ssafy.d101.R
+import com.ssafy.d101.api.AllergyService
+import com.ssafy.d101.repository.AllergyRepository
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
 import com.ssafy.d101.ui.view.components.BackHeader
+import com.ssafy.d101.viewmodel.AllergyViewModel
 
 @Composable
 fun AllergyScreen(navController: NavHostController) {
@@ -104,7 +107,7 @@ fun SearchAllergy() {
     )
 
     var selectedIndex by remember { mutableIntStateOf(0) }
-    var myAllergy by remember { mutableStateOf(mutableListOf(0, 1, 7, 8, 9, 10, 11)) }
+    var myAllergy by remember { mutableStateOf(mutableListOf<Int>()) }
 
      Row(modifier = Modifier.padding(20.dp,20.dp,0.dp,10.dp)) {
         Icon(
@@ -267,10 +270,3 @@ val allergyText = buildAnnotatedString {
         append("식약처 지정 19종")
     }
 }
-
-//@Preview(showSystemUi = true)
-//@Composable
-//fun previewTest(){
-//    val navController = rememberNavController()
-//    AllergyScreen(navController = navController)
-//}
