@@ -33,7 +33,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ssafy.d101.viewmodel.ModelViewModel
 
-@Preview(showBackground = true)
 @Composable
 fun AiAnalysisScreen(navController: NavController) {
     val modelViewModel : ModelViewModel = hiltViewModel()
@@ -70,9 +69,9 @@ fun AiAnalysisScreen(navController: NavController) {
         if(option == false) {
             Log.d("in loading", "$analysisOCRResult")
             analysisOCRResult?.let {
-                Log.d("in loading", "aaaaa")
-                ////TODO : ocr 수정페이지로 이동
-                // navController.navigate("")
+                Log.d("in loading", analysisOCRResult.toString())
+                //TODO : ocr 수정페이지로 이동
+                 navController.navigate("ocrResult")
             }
         }
     }

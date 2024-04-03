@@ -1,12 +1,12 @@
 package com.ssafy.d101.model
 
 enum class Dunchfast {
-    BREAKFAST, BRUNCH, LUNCH, LINNER, DINNER
+    BREAKFAST, BRUNCH, LUNCH, LINNER, DINNER, MIDNIGHT, SNACK, DRINK, ALCOHOL
 }
 
 data class IntakeInfo (
     val food : FoodInfo,
-    val amount : Int
+    val amount : Double,
 )
 
 data class DietInfo(
@@ -38,7 +38,7 @@ data class AnalysisDiet(
 )
 
 data class CreateMealReq(
-    val type: Dunchfast,
+    val type: String,
     val time: String,
     val intakes: List<IntakeReq>
 )
@@ -51,4 +51,11 @@ data class IntakeReq(
     val carbohydrate: Double,
     val protein: Double,
     val fat: Double
+)
+
+data class DailyNutrient(
+    val totalCalorie: Int,
+    val totalCarbohydrate: Double,
+    val totalProtein: Double,
+    val totalFat: Double
 )
