@@ -118,8 +118,16 @@ class DietViewModel @Inject constructor(
         }
     }
 
+    fun setDietDate(dietDate: LocalDate) {
+        viewModelScope.launch {
+            dietRepository.setDietDate(dietDate)
+        }
+    }
+
     fun getTakeReqs() = dietRepository.takeReqList
     fun getType() = dietRepository.dietType
+
+    fun getDietDate() = dietRepository.dietDate
 
     fun getTakeReqList(): List<IntakeReq> {
         return dietRepository.takeReqList.value!!

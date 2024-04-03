@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Date
 import javax.inject.Inject
 
 class DietRepository @Inject constructor(private val dietService: DietService) {
@@ -26,6 +29,9 @@ class DietRepository @Inject constructor(private val dietService: DietService) {
 
     private val _takeReqList = MutableStateFlow<List<IntakeReq>?>(null)
     val takeReqList = _takeReqList.asStateFlow()
+
+    private val _dietDate = MutableStateFlow<String?> (null)
+    val dietDate = _dietDate.asStateFlow()
 
     suspend fun getDayDiet(date: String): StateFlow<List<DietInfo>?> {
         val result = getDayDietFromBack(date)
@@ -93,5 +99,9 @@ class DietRepository @Inject constructor(private val dietService: DietService) {
 
     suspend fun setTakeReqList(takeReqList : List<IntakeReq>) {
         _takeReqList.emit(takeReqList)
+    }
+
+    suspend fun setDietDate(dietDate: LocalDate) {
+        _dietDate.emit(dietDate.format(DateTimeFormatter.ISO_LOCAL_DATE))
     }
 }

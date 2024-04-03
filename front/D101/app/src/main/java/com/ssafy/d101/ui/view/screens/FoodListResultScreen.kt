@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.Arrangement
@@ -36,16 +37,22 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.ssafy.d101.model.Dunchfast
 import com.ssafy.d101.model.FoodAddInfo
 import com.ssafy.d101.model.IntakeReq
+import com.ssafy.d101.model.YoloFood
 import com.ssafy.d101.model.YoloResponse
+import com.ssafy.d101.ui.view.components.CroppedImagesDisplay
+import com.ssafy.d101.ui.view.components.DailyHorizontalBar
 import com.ssafy.d101.viewmodel.DietViewModel
 import com.ssafy.d101.viewmodel.FoodSearchViewModel
 import com.ssafy.d101.viewmodel.ModelViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun FoodListResultScreen(navController: NavHostController) {
@@ -56,12 +63,7 @@ fun FoodListResultScreen(navController: NavHostController) {
     val yoloResult by  modelViewModel.getYoloResponse().collectAsState()
 
     val dietViewModel : DietViewModel = hiltViewModel()
-    val intakeReqs = remember { mutableStateOf<List<IntakeReq>>(emptyList()) }
-
-    // 컴포저블이 처음 구성될 때 한 번만 실행
-    LaunchedEffect(true) {
-        intakeReqs.value = createIntakeReqList(uploadedFoodItems, yoloResult ?: emptyList())
-    }
+    val intakeReqs = yoloResult?.let { createIntakeReqList(uploadedFoodItems, it) } ?: emptyList()
 
     var selectedMeal by remember { mutableStateOf<String?>(null) }
     var dunchfastType by remember {mutableStateOf<Dunchfast?>(Dunchfast.BREAKFAST)}
@@ -244,6 +246,10 @@ fun FoodListResultScreen(navController: NavHostController) {
                         Log.d("in Result screen","$updatedIntakeReqs, $dunchfastType")
 
                         navController.navigate("dietAiAnalysisResult")
+
+                        scope.launch {
+                            dietViewModel.saveMeal()
+                        }
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
@@ -299,15 +305,18 @@ fun createIntakeReqList(uploadedFoodItems: List<FoodAddInfo>, yoloResult: List<Y
                     fat = foodItem.fat
                 )
             )
+            Log.d("createIntakeReqList작동","${foodItem.name}")
             // yoloResponse를 사용하는 로직도 여기에 추가
             // 예: yoloResponse.forEach { ... }
         }
+    } else {
+        Log.d("uploadedFoodItems 비었다!","ㅇㅇ")
     }
     if(yoloResult.isNotEmpty()) {
         yoloResult.forEach { foodItem ->
             intakeReqs.add(
                 IntakeReq(
-                    food_id = foodItem.yoloFoodDto.food_id.toLong(),
+                    food_id = foodItem.yoloFoodDto.id.toLong(),
                     amount = 1.0,
                     name = foodItem.tag,
                     kcal = foodItem.yoloFoodDto.calorie,
