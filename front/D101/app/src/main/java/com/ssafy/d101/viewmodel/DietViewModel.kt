@@ -130,9 +130,9 @@ class DietViewModel @Inject constructor(
             Dunchfast.LUNCH -> "LUNCH"
             Dunchfast.LINNER -> "LINNER"
             Dunchfast.DINNER -> "DINNER"
-            Dunchfast.MIDNIGHT -> "NIGHT"
+            Dunchfast.NIGHT -> "NIGHT"
             Dunchfast.SNACK -> "SNACK"
-            Dunchfast.DRINK -> "BEVERAGE"
+            Dunchfast.BEVERAGE -> "BEVERAGE"
             Dunchfast.ALCOHOL -> "ALCOHOL"
             else -> "BREAKFAST" // 선택한 항목이 매핑되지 않는 경우 아침으로 고정
         }

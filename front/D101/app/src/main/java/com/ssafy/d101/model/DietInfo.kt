@@ -1,7 +1,7 @@
 package com.ssafy.d101.model
 
 enum class Dunchfast {
-    BREAKFAST, BRUNCH, LUNCH, LINNER, DINNER, MIDNIGHT, SNACK, DRINK, ALCOHOL
+    BREAKFAST, BRUNCH, LUNCH, LINNER, DINNER, NIGHT, SNACK, BEVERAGE, ALCOHOL
 }
 
 data class IntakeInfo (
