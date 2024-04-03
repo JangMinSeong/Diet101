@@ -3,7 +3,6 @@ package com.ssafy.d101.repository
 import android.util.Log
 import com.ssafy.d101.api.DietService
 import com.ssafy.d101.model.AnalysisDiet
-import com.ssafy.d101.model.CreateMealReq
 import com.ssafy.d101.model.DietInfo
 import com.ssafy.d101.model.Dunchfast
 import com.ssafy.d101.model.IntakeReq
@@ -73,14 +72,14 @@ class DietRepository @Inject constructor(private val dietService: DietService) {
         }
     }
 
-    suspend fun saveMeal(file: MultipartBody.Part, createMealReq: RequestBody): Result<Boolean> {
+    suspend fun saveMeal(file: MultipartBody.Part, createMealReq: RequestBody): Result<Any> {
         return try {
             val response = dietService.saveMeal(file, createMealReq)
             if (response.isSuccessful) {
                 Result.success(true)
             } else {
-                Log.e("Diet", "Failed to ")
-                Result.success(false)
+                Log.e("Diet", "Failed to get response - ${response}")
+                Result.failure(Exception("${response}"))
             }
         } catch (e: Exception) {
             Log.e("Diet", "Exception during ", e)

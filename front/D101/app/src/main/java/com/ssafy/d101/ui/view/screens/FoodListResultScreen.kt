@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.Arrangement
@@ -37,22 +36,16 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.ssafy.d101.model.Dunchfast
 import com.ssafy.d101.model.FoodAddInfo
 import com.ssafy.d101.model.IntakeReq
-import com.ssafy.d101.model.YoloFood
 import com.ssafy.d101.model.YoloResponse
-import com.ssafy.d101.ui.view.components.CroppedImagesDisplay
-import com.ssafy.d101.ui.view.components.DailyHorizontalBar
 import com.ssafy.d101.viewmodel.DietViewModel
 import com.ssafy.d101.viewmodel.FoodSearchViewModel
 import com.ssafy.d101.viewmodel.ModelViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun FoodListResultScreen(navController: NavHostController) {
@@ -138,7 +131,7 @@ fun FoodListResultScreen(navController: NavHostController) {
                     .height(300.dp)
                     .padding(start = 8.dp, end = 8.dp, bottom = 20.dp)
             ) {
-                items(uploadedFoodItems) { foodItem ->
+                items(intakeReqs) { foodItem ->
                     var eatenAmount by remember { mutableStateOf("1.0") }
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -173,8 +166,7 @@ fun FoodListResultScreen(navController: NavHostController) {
                                 value = eatenAmount,
                                 onValueChange = { newValue ->
                                     eatenAmount = newValue
-//                                    eatenAmounts[foodItem.food_id] = newValue
-                                    eatenAmounts[foodItem.id.toLong()] = newValue.toDoubleOrNull() ?: 1.0
+                                    eatenAmounts[foodItem.food_id] = newValue.toDoubleOrNull() ?: 1.0
                                     //여기야
                                 },
                                 modifier = Modifier
@@ -191,7 +183,28 @@ fun FoodListResultScreen(navController: NavHostController) {
                 }
             }
 
-            Spacer(modifier = Modifier.padding(top = 15.dp, bottom = 40.dp))
+//            // 먹은 양 수정 완료
+//            Button(
+//                onClick = {
+//                    intakeReqs.forEach { item ->
+//                        val newEatenAmount = eatenAmounts[item.food_id]?.toDoubleOrNull() ?: 1.0
+//                        val updatedItem = item.copy(amount = newEatenAmount)
+//                    //    foodViewModel.updateEatenAmount(updatedItem)
+//                    }
+//                },
+//                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF12369)),
+//                modifier = Modifier
+//                    .width(200.dp)
+//                    .height(40.dp)
+//            ) {
+//                Text(
+//                    text = "먹은 양 수정 완료",
+//                    color = Color.White,
+//                    fontSize = 16.sp,
+//                    fontWeight = FontWeight.Bold,
+//                )
+//            }
+//            Spacer(modifier = Modifier.padding(top = 15.dp, bottom = 40.dp))
 
 
             Text("분류", fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier
@@ -219,25 +232,18 @@ fun FoodListResultScreen(navController: NavHostController) {
             // 식단 분석 하러 가기 버튼
             Button(
                 onClick = {
-                    val updatedIntakeReqs = intakeReqs.value.map { intakeReq ->
-                        intakeReq.copy(
-                            amount = eatenAmounts[intakeReq.food_id] ?: intakeReq.amount
-                        )
-                    }
-                    dunchfastType?.let { dietViewModel.setDietType(it) }
-                    dietViewModel.setTakeReqList(updatedIntakeReqs)
-                    Log.d("in Result screen","$updatedIntakeReqs, $dunchfastType")
+                    if (intakeReqs != null) {
+                        // intakeReqs 업데이트
+                        val updatedIntakeReqs = intakeReqs.map { intakeReq ->
+                            intakeReq.copy(
+                                amount = eatenAmounts[intakeReq.food_id] ?: intakeReq.amount
+                            )
+                        }
+                        dunchfastType?.let { dietViewModel.setDietType(it) }
+                        dietViewModel.setTakeReqList(updatedIntakeReqs)
+                        Log.d("in Result screen","$updatedIntakeReqs, $dunchfastType")
 
-                    navController.navigate("dietAiAnalysisResult")
-
-                    scope.launch {
-                        dietViewModel.saveMeal()
-                    }
-
-                    // 로그를 통해 업데이트된 먹은 양 체크
-                    Log.d("식단 분석 버튼","시작")
-                    updatedIntakeReqs.forEach { intakeReq ->
-                        Log.d("먹은량 체크", "${intakeReq.name} => ${intakeReq.amount}")
+                        navController.navigate("dietAiAnalysisResult")
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
@@ -293,18 +299,15 @@ fun createIntakeReqList(uploadedFoodItems: List<FoodAddInfo>, yoloResult: List<Y
                     fat = foodItem.fat
                 )
             )
-            Log.d("createIntakeReqList작동","${foodItem.name}")
             // yoloResponse를 사용하는 로직도 여기에 추가
             // 예: yoloResponse.forEach { ... }
         }
-    } else {
-        Log.d("uploadedFoodItems 비었다!","ㅇㅇ")
     }
     if(yoloResult.isNotEmpty()) {
         yoloResult.forEach { foodItem ->
             intakeReqs.add(
                 IntakeReq(
-                    food_id = foodItem.yoloFoodDto.id.toLong(),
+                    food_id = foodItem.yoloFoodDto.food_id.toLong(),
                     amount = 1.0,
                     name = foodItem.tag,
                     kcal = foodItem.yoloFoodDto.calorie,

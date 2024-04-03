@@ -4,8 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
-import com.ssafy.d101.api.DietService
-import com.ssafy.d101.api.UserService
 import com.ssafy.d101.model.AnalysisDiet
 import com.ssafy.d101.model.CreateMealReq
 import com.ssafy.d101.model.DietInfo
@@ -14,6 +12,7 @@ import com.ssafy.d101.model.IntakeReq
 import com.ssafy.d101.repository.DietRepository
 import com.ssafy.d101.repository.ModelRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -95,14 +94,14 @@ class DietViewModel @Inject constructor(
     }
 
     suspend fun saveMeal() {
-        val file = modelRepository.prepareImageForUpload(modelRepository.context.value!!).getOrThrow()
+//        val file = modelRepository.prepareImageForUpload(modelRepository.context.value!!).getOrThrow()
+        val file = modelRepository.temp.value!!
 
         val createMealReq = CreateMealReq(dietRepository.dietType.value!!, getCurrentDate(), dietRepository.takeReqList.value!!)
         val gson = Gson()
         val createMealReqJson = gson.toJson(createMealReq)
         val createMealReqBody = createMealReqJson.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
-
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             dietRepository.saveMeal(file, createMealReqBody)
         }
     }
