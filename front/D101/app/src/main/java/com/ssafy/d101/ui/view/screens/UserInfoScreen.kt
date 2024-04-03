@@ -45,6 +45,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.ssafy.d101.model.UserSubInfo
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.theme.White
 import com.ssafy.d101.ui.view.components.BackHeader
@@ -58,13 +59,13 @@ fun UserInfoScreen(navController: NavController) {
         .background(Ivory)
     ) {
         BackHeader("마이페이지", navController)
-        UserInfo()
+        UserInfo(navController)
     }
 }
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun UserInfo() {
+fun UserInfo(navController: NavController) {
     val userViewModel: UserViewModel = hiltViewModel()
     val userInfo = userViewModel.getUserInfo().collectAsState()
     val userSubInfo = userViewModel.getUserSubInfo().collectAsState()
@@ -116,7 +117,8 @@ fun UserInfo() {
             Button(
                 onClick = {
                     scope.launch {
-                        userViewModel.setUserSubInfo()
+                        userViewModel.fixUserSubInfo(UserSubInfo(activity!!, kcal.toInt(), height.toInt(), weight.toInt()))
+                        navController.navigate("myPage")
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
@@ -239,7 +241,6 @@ fun InputField(value: String, onValueChange: (String) -> Unit) {
 @Composable
 fun UserInfoPreview() {
     val navController = rememberNavController()
-    val userViewModel: UserViewModel = hiltViewModel()
 
     UserInfoScreen(navController = navController)
 }
