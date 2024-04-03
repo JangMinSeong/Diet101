@@ -36,7 +36,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -193,7 +192,7 @@ fun MainContents(dailyNutrient: DailyNutrient?) {
                                     strokeWidth = barHeight
                                 )
                             }
-                            Text(text = "${recommendedCarbohydrate}g / ${recommendedCalorie?.div(10)}g", modifier = Modifier.align(Alignment.Center))
+                            Text(text = "${dailyNutrient?.totalCarbohydrate?.toInt()}g / ${recommendedCarbohydrate}g", modifier = Modifier.align(Alignment.Center))
                         }
 
                     }
@@ -221,7 +220,7 @@ fun MainContents(dailyNutrient: DailyNutrient?) {
                                     strokeWidth = barHeight
                                 )
                             }
-                            Text(text = "${recommendedProtein}g / ${recommendedCalorie?.div(10)}g", modifier = Modifier.align(Alignment.Center))
+                            Text(text = "${dailyNutrient?.totalProtein?.toInt()}g / ${recommendedProtein}g", modifier = Modifier.align(Alignment.Center))
                         }
 
                     }
@@ -249,7 +248,7 @@ fun MainContents(dailyNutrient: DailyNutrient?) {
                                     strokeWidth = barHeight
                                 )
                             }
-                            Text(text = "${recommendedFat}g / ${recommendedCalorie?.div(45)}g", modifier = Modifier.align(Alignment.Center))
+                            Text(text = "${dailyNutrient?.totalFat?.toInt()}g / ${recommendedFat}g", modifier = Modifier.align(Alignment.Center))
                         }
 
                     }
@@ -261,47 +260,7 @@ fun MainContents(dailyNutrient: DailyNutrient?) {
             Spacer(modifier = Modifier.padding(16.dp))
             Text(text = "식단")
             Divider(Modifier.padding(top = 16.dp, bottom = 16.dp))
-        }
-    }
-}
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun NutritionGrid() {
-    Column(Modifier.width(300.dp)) {
-        Row() {
-            NutritionCell("")
-            NutritionCell("목표량")
-            NutritionCell("섭취량")
         }
-        Row() {
-            NutritionCell("탄수화물")
-            NutritionCell("150g")
-            NutritionCell("100g")
-        }
-        Row() {
-            NutritionCell("단백질")
-            NutritionCell("90g")
-            NutritionCell("40g")
-        }
-        Row() {
-            NutritionCell("지방")
-            NutritionCell("24g")
-            NutritionCell("12g")
-        }
-        Row() {
-            NutritionCell("열량")
-            NutritionCell("2000kcal")
-            NutritionCell("1408kcal")
-        }
-    }
-}
-
-@Composable
-fun NutritionCell(text: String) {
-    Box(modifier = Modifier
-        .width(60.dp)
-        .height(30.dp)) {
-        Text(text = text, modifier = Modifier.align(Alignment.Center))
     }
 }
