@@ -184,11 +184,12 @@ fun MainContents(dailyNutrient: DailyNutrient?) {
                             }
                             Canvas(modifier = Modifier.fillMaxWidth()) {
                                 val barHeight = 70F
+                                val factor = ((dailyNutrient?.totalCarbohydrate ?: 0.0) / (recommendedCarbohydrate?.toDouble() ?: 1.0)).coerceAtMost(1.0)
                                 drawLine(
                                     color = Color(0xffde9f3d),
                                     cap = StrokeCap.Round,
                                     start = Offset(100F, 23F),
-                                    end = Offset(100F + animatedValue.value * 2, 23F),
+                                    end = Offset(100F + (size.width - 180F) * animatedValue.value * factor.toFloat(), 23F),
                                     strokeWidth = barHeight
                                 )
                             }
@@ -212,11 +213,12 @@ fun MainContents(dailyNutrient: DailyNutrient?) {
                             }
                             Canvas(modifier = Modifier.fillMaxWidth()) {
                                 val barHeight = 70F
+                                val factor = ((dailyNutrient?.totalProtein ?: 0.0) / (recommendedProtein?.toDouble() ?: 1.0)).coerceAtMost(1.0)
                                 drawLine(
                                     cap = StrokeCap.Round,
                                     color = Color(0xffde9f3d),
                                     start = Offset(100F, 23F),
-                                    end = Offset(100F + animatedValue.value, 23F),
+                                    end = Offset(100F + (size.width - 180F) * animatedValue.value * factor.toFloat(), 23F),
                                     strokeWidth = barHeight
                                 )
                             }
@@ -234,17 +236,19 @@ fun MainContents(dailyNutrient: DailyNutrient?) {
                                     cap = StrokeCap.Round,
                                     color = Ivory,
                                     start = Offset(100F, 23F),
-                                    end = Offset(size.width - 80F, 23F),
+                                    end = Offset(100F + (size.width - 180F), 23F),
                                     strokeWidth = barHeight
                                 )
                             }
                             Canvas(modifier = Modifier.fillMaxWidth()) {
                                 val barHeight = 70F
+                                val factor = ((dailyNutrient?.totalFat ?: 0.0) / (recommendedFat?.toDouble() ?: 1.0)).coerceAtMost(1.0)
+
                                 drawLine(
                                     cap = StrokeCap.Round,
                                     color = Color(0xffde9f3d),
                                     start = Offset(100F, 23F),
-                                    end = Offset(100F + animatedValue.value * 1.4F, 23F),
+                                    end = Offset(100F + (size.width - 180F) * animatedValue.value * factor.toFloat(), 23F),
                                     strokeWidth = barHeight
                                 )
                             }
