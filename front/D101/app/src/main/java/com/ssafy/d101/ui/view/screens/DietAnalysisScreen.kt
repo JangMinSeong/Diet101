@@ -368,22 +368,30 @@ fun generateWeeklyData(weeklyDiet: List<DietInfo>): StackedBarItem {
 fun generateMonthlyNutritionData(annualNutrients: List<CalAnnualNutrient>): BarItem {
     // 1월부터 12월까지 모든 달의 데이터를 저장할 리스트 초기화
     val monthlyData = MutableList(12) { listOf(0f, 0f, 0f) }
+    val monthlyCalories = MutableList(12) { 0f }
 
     // annualNutrients에서 각 달의 데이터를 처리
     annualNutrients.forEach { nutrient ->
+        val monthIndex = nutrient.month - 1
         // 영양소 데이터를 리스트로 변환하여 해당 달에 저장
-        // 달의 인덱스는 0부터 시작하므로, month - 1을 인덱스로 사용
-        monthlyData[nutrient.month - 1] = listOf(
-            nutrient.totalCarbohydrate.toFloat(),
-            nutrient.totalProtein.toFloat(),
-            nutrient.totalFat.toFloat()
-        )
+        val carbs = nutrient.totalCarbohydrate.toFloat()
+        val protein = nutrient.totalProtein.toFloat()
+        val fats = nutrient.totalFat.toFloat()
+        // 각 영양소별 칼로리 계산
+        val carbsCalories = carbs * 4
+        val proteinCalories = protein * 4
+        val fatsCalories = fats * 9
+        // 칼로리 데이터 저장
+        monthlyData[monthIndex] = listOf(carbsCalories, proteinCalories, fatsCalories)
+        // 달별 총 칼로리 계산하여 저장
+        monthlyCalories[monthIndex] = carbsCalories + proteinCalories + fatsCalories
     }
 
     // 모든 데이터 중 최대값을 계산
-    val maxValue = monthlyData.flatten().maxOrNull() ?: 0f
+    val maxValue = monthlyCalories.maxOrNull() ?: 0f
+    val roundedMaxValue = Math.ceil(maxValue / 100.0) * 100
 
-    return BarItem(data = monthlyData, maxValue = maxValue)
+    return BarItem(data = monthlyData, maxValue = roundedMaxValue.toFloat())
 }
 
 fun calculateDailyNutrientRatios(analysisDiet: AnalysisDiet): Triple<Float, Float, Float> {
