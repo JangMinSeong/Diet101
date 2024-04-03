@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.ssafy.d101.model.Dunchfast
 import com.ssafy.d101.model.FoodAddInfo
 import com.ssafy.d101.model.IntakeReq
 import com.ssafy.d101.model.YoloFood
@@ -51,6 +52,7 @@ import com.ssafy.d101.ui.view.components.DailyHorizontalBar
 import com.ssafy.d101.viewmodel.DietViewModel
 import com.ssafy.d101.viewmodel.FoodSearchViewModel
 import com.ssafy.d101.viewmodel.ModelViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun FoodListResultScreen(navController: NavHostController) {
@@ -61,18 +63,29 @@ fun FoodListResultScreen(navController: NavHostController) {
     val yoloResult by  modelViewModel.getYoloResponse().collectAsState()
 
     val dietViewModel : DietViewModel = hiltViewModel()
-    val intakeReqs = yoloResult?.let { createIntakeReqList(uploadedFoodItems, it) } ?: emptyList()
+    val intakeReqs = remember { mutableStateOf<List<IntakeReq>>(emptyList()) }
+
+    // 컴포저블이 처음 구성될 때 한 번만 실행
+    LaunchedEffect(true) {
+        intakeReqs.value = createIntakeReqList(uploadedFoodItems, yoloResult ?: emptyList())
+    }
 
     var selectedMeal by remember { mutableStateOf<String?>(null) }
+    var dunchfastType by remember {mutableStateOf<Dunchfast?>(Dunchfast.BREAKFAST)}
+
     // 사용자가 항목을 선택하거나 선택을 취소하는 로직
     val onMealSelected: (String) -> Unit = { meal ->
+        dunchfastType = getDunchfastType(meal)
         selectedMeal = if (selectedMeal == meal) null else meal
     }
     // 선택된 항목이 있는지 확인하는 함수
     val isItemSelected: (String) -> Boolean = { it == selectedMeal }
     val scrollState = rememberScrollState()
     // 각 음식 아이템의 먹은 양을 저장하는 상태
-    val eatenAmounts = remember { mutableStateMapOf<Long, String>() }
+//    val eatenAmounts = remember { mutableStateMapOf<Long, String>() }
+    var eatenAmounts = remember { mutableStateMapOf<Long, Double>() }
+
+    val scope = rememberCoroutineScope()
 
     Box(
         modifier = Modifier
@@ -125,7 +138,7 @@ fun FoodListResultScreen(navController: NavHostController) {
                     .height(300.dp)
                     .padding(start = 8.dp, end = 8.dp, bottom = 20.dp)
             ) {
-                items(intakeReqs) { foodItem ->
+                items(uploadedFoodItems) { foodItem ->
                     var eatenAmount by remember { mutableStateOf("1.0") }
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -160,7 +173,9 @@ fun FoodListResultScreen(navController: NavHostController) {
                                 value = eatenAmount,
                                 onValueChange = { newValue ->
                                     eatenAmount = newValue
-                                    eatenAmounts[foodItem.food_id] = newValue
+//                                    eatenAmounts[foodItem.food_id] = newValue
+                                    eatenAmounts[foodItem.id.toLong()] = newValue.toDoubleOrNull() ?: 1.0
+                                    //여기야
                                 },
                                 modifier = Modifier
                                     .width(100.dp)
@@ -176,27 +191,6 @@ fun FoodListResultScreen(navController: NavHostController) {
                 }
             }
 
-            // 먹은 양 수정 완료
-            Button(
-                onClick = {
-                    intakeReqs.forEach { item ->
-                        val newEatenAmount = eatenAmounts[item.food_id]?.toDoubleOrNull() ?: 1.0
-                        val updatedItem = item.copy(amount = newEatenAmount)
-//                        foodViewModel.updateEatenAmount(updatedItem)
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF12369)),
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(40.dp)
-            ) {
-                Text(
-                    text = "먹은 양 수정 완료",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
             Spacer(modifier = Modifier.padding(top = 15.dp, bottom = 40.dp))
 
 
@@ -225,9 +219,25 @@ fun FoodListResultScreen(navController: NavHostController) {
             // 식단 분석 하러 가기 버튼
             Button(
                 onClick = {
-                    if (intakeReqs != null) {
-                        dietViewModel.setTakeReqList(intakeReqs)
-                        navController.navigate("dietAiAnalysisResult")
+                    val updatedIntakeReqs = intakeReqs.value.map { intakeReq ->
+                        intakeReq.copy(
+                            amount = eatenAmounts[intakeReq.food_id] ?: intakeReq.amount
+                        )
+                    }
+                    dunchfastType?.let { dietViewModel.setDietType(it) }
+                    dietViewModel.setTakeReqList(updatedIntakeReqs)
+                    Log.d("in Result screen","$updatedIntakeReqs, $dunchfastType")
+
+                    navController.navigate("dietAiAnalysisResult")
+
+                    scope.launch {
+                        dietViewModel.saveMeal()
+                    }
+
+                    // 로그를 통해 업데이트된 먹은 양 체크
+                    Log.d("식단 분석 버튼","시작")
+                    updatedIntakeReqs.forEach { intakeReq ->
+                        Log.d("먹은량 체크", "${intakeReq.name} => ${intakeReq.amount}")
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
@@ -283,9 +293,12 @@ fun createIntakeReqList(uploadedFoodItems: List<FoodAddInfo>, yoloResult: List<Y
                     fat = foodItem.fat
                 )
             )
+            Log.d("createIntakeReqList작동","${foodItem.name}")
             // yoloResponse를 사용하는 로직도 여기에 추가
             // 예: yoloResponse.forEach { ... }
         }
+    } else {
+        Log.d("uploadedFoodItems 비었다!","ㅇㅇ")
     }
     if(yoloResult.isNotEmpty()) {
         yoloResult.forEach { foodItem ->
@@ -304,4 +317,19 @@ fun createIntakeReqList(uploadedFoodItems: List<FoodAddInfo>, yoloResult: List<Y
     }
 
     return intakeReqs
+}
+
+fun getDunchfastType(selectedMeal: String): Dunchfast {
+    return when(selectedMeal) {
+        "아침" -> Dunchfast.BREAKFAST
+        "아점" -> Dunchfast.BRUNCH
+        "점심" -> Dunchfast.LUNCH
+        "점저" -> Dunchfast.LINNER
+        "저녁" -> Dunchfast.DINNER
+        "야식" -> Dunchfast.MIDNIGHT
+        "간식" -> Dunchfast.SNACK
+        "음료" -> Dunchfast.DRINK
+        "주류" -> Dunchfast.ALCOHOL
+        else -> Dunchfast.BREAKFAST // 선택한 항목이 매핑되지 않는 경우 아침으로 고정
+    }
 }

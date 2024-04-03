@@ -91,6 +91,13 @@ class FoodSearchViewModel @Inject constructor(
     }
 
     // 먹은 양 입력 값에 따라 업데이트하는 함수
+//    fun updateEatenAmount(updateFoodAddInfo: FoodAddInfo) {
+//        viewModelScope.launch {
+//            foodRepository.updateEatenAmount(updateFoodAddInfo)
+//            Log.d("UpdateEatenAmount", "Updated: $updateFoodAddInfo")
+//        }
+//    }
+
     fun updateEatenAmount(updateFoodAddInfo: FoodAddInfo) {
         viewModelScope.launch {
             foodRepository.updateEatenAmount(updateFoodAddInfo)
