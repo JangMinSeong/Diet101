@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,6 +38,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -44,6 +46,8 @@ import com.ssafy.d101.model.DailyNutrient
 import com.ssafy.d101.model.DietInfo
 import com.ssafy.d101.model.OCRInfo
 import com.ssafy.d101.ui.theme.Ivory
+import com.ssafy.d101.ui.theme.Typography
+import com.ssafy.d101.ui.theme.fontFamily
 import com.ssafy.d101.ui.view.components.CalendarApp
 import com.ssafy.d101.ui.view.components.FoodDetailScreen
 import com.ssafy.d101.ui.view.components.FoodItemCard
@@ -105,7 +109,14 @@ fun HomeScreen (navController: NavHostController) {
             if (!selectedDate.isAfter(LocalDate.now())) {
                 MainContents(dailyOCRNutrient, dailyNutrient, selectedDate, dayDiet, dayOCR)
             } else {
-                Text(text = "Back to the future")
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "미래의 날짜는 조회할 수 없습니다.",
+                        style = Typography.titleLarge,
+                        fontSize = 20.sp,
+                        fontFamily = fontFamily
+                    )
+                }
             }
         }
     }
