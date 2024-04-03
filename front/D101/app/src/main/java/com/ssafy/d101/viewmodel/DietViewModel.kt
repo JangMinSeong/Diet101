@@ -4,8 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
-import com.ssafy.d101.api.DietService
-import com.ssafy.d101.api.UserService
 import com.ssafy.d101.model.AnalysisDiet
 import com.ssafy.d101.model.CreateMealReq
 import com.ssafy.d101.model.DietInfo
@@ -119,8 +117,16 @@ class DietViewModel @Inject constructor(
         }
     }
 
+    fun setDietDate(dietDate: LocalDate) {
+        viewModelScope.launch {
+            dietRepository.setDietDate(dietDate)
+        }
+    }
+
     fun getTakeReqs() = dietRepository.takeReqList
     fun getType() = dietRepository.dietType
+
+    fun getDietDate() = dietRepository.dietDate
 
     fun getTakeReqList(): List<IntakeReq> {
         return dietRepository.takeReqList.value!!
