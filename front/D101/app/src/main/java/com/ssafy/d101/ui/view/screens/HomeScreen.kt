@@ -42,12 +42,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ssafy.d101.model.DailyNutrient
 import com.ssafy.d101.model.DietInfo
+import com.ssafy.d101.model.OCRInfo
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.view.components.CalendarApp
 import com.ssafy.d101.ui.view.components.FoodDetailScreen
 import com.ssafy.d101.ui.view.components.FoodItemCard
 import com.ssafy.d101.viewmodel.CalendarViewModel
 import com.ssafy.d101.viewmodel.DietViewModel
+import com.ssafy.d101.viewmodel.OCRViewModel
 import com.ssafy.d101.viewmodel.UserViewModel
 import java.time.LocalDate
 
@@ -57,30 +59,38 @@ fun HomeScreen (navController: NavHostController) {
 
     val dietViewModel: DietViewModel = hiltViewModel()
     val calendarViewModel: CalendarViewModel = hiltViewModel()
+    val ocrViewModel: OCRViewModel = hiltViewModel()
     val selectedDate by calendarViewModel.selectedDate.collectAsState()
     val dayDiet by dietViewModel.dayDiet.collectAsState()
-
+    val dayOCR by ocrViewModel.dayOCR.collectAsState()
     val dailyNutrient by dietViewModel.dailyNutrient.collectAsState()
-
+    val dailyOCRNutrient by ocrViewModel.dailyOCRNutrient.collectAsState()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     
     LaunchedEffect(currentRoute) {
         dietViewModel.loadDayDiet(date = selectedDate.toString())
+        ocrViewModel.loaDayOCR(date = selectedDate.toString())
     }
 
     LaunchedEffect(selectedDate) {
         dietViewModel.loadDayDiet(date = selectedDate.toString())
+        ocrViewModel.loaDayOCR(date = selectedDate.toString())
         Log.i("HomeScreen", "selectedDate: $selectedDate")
     }
 
     LaunchedEffect(Unit) {
         dietViewModel.loadDayDiet(date = LocalDate.now().toString())
+        ocrViewModel.loaDayOCR(date = LocalDate.now().toString())
     }
 
     LaunchedEffect(dayDiet) {
         dietViewModel.refreshDailyNutrient()
         Log.i("HomeScreen", "dayDiet: $dayDiet")
+    }
+
+    LaunchedEffect(dayOCR) {
+        ocrViewModel.refreshDailyOCRNutrient()
     }
 
     Box(
@@ -93,7 +103,7 @@ fun HomeScreen (navController: NavHostController) {
             CalendarApp(modifier = Modifier, calendarViewModel)
             Spacer(modifier = Modifier.padding(top = 16.dp))
             if (!selectedDate.isAfter(LocalDate.now())) {
-                MainContents(dailyNutrient, selectedDate, dayDiet)
+                MainContents(dailyOCRNutrient, dailyNutrient, selectedDate, dayDiet, dayOCR)
             } else {
                 Text(text = "Back to the future")
             }
@@ -102,7 +112,7 @@ fun HomeScreen (navController: NavHostController) {
 }
 
 @Composable
-fun MainContents(dailyNutrient: DailyNutrient?, selectedDate: LocalDate, dayDiet: List<DietInfo>?) {
+fun MainContents(dailyOCRNutrient: DailyNutrient?,dailyNutrient: DailyNutrient?, selectedDate: LocalDate, dayDiet: List<DietInfo>?, dayOCR: List<OCRInfo>?) {
     val animatedValue = remember { Animatable(0f) }
 
     val userViewModel: UserViewModel = hiltViewModel()
@@ -185,14 +195,14 @@ fun MainContents(dailyNutrient: DailyNutrient?, selectedDate: LocalDate, dayDiet
                                     end = Offset.Infinite,
                                 ),
                                 startAngle = -90F,
-                                sweepAngle = animatedValue.value * 360F * (dailyNutrient?.totalCalorie?.toFloat() ?: 0F) / recommendedCalorie!!,
+                                sweepAngle = animatedValue.value * 360F * ((dailyNutrient?.totalCalorie?.toFloat() ?: 0F)+(dailyOCRNutrient?.totalCalorie?.toFloat() ?: 0F)) / recommendedCalorie!!,
                                 useCenter = false,
                                 topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
                                 size = sizeArc,
                                 style = Stroke(width = 70F, cap = StrokeCap.Round)
                             )
                         }
-                        Text(text = "${dailyNutrient?.totalCalorie}   /\n$recommendedCalorie kcal", modifier = Modifier.align(Alignment.Center))
+                        Text(text = "${(dailyNutrient?.totalCalorie?.toInt() ?: 0) + (dailyOCRNutrient?.totalCalorie?.toInt()?:0)}   /\n$recommendedCalorie kcal", modifier = Modifier.align(Alignment.Center))
                     }
                     Spacer(modifier = Modifier.padding(16.dp))
                     Row {
@@ -210,7 +220,7 @@ fun MainContents(dailyNutrient: DailyNutrient?, selectedDate: LocalDate, dayDiet
                             }
                             Canvas(modifier = Modifier.fillMaxWidth()) {
                                 val barHeight = 70F
-                                val factor = ((dailyNutrient?.totalCarbohydrate ?: 0.0) / (recommendedCarbohydrate?.toDouble() ?: 1.0)).coerceAtMost(1.0)
+                                val factor = (((dailyNutrient?.totalCarbohydrate ?: 0.0)+(dailyOCRNutrient?.totalCarbohydrate ?:0.0)) / (recommendedCarbohydrate?.toDouble() ?: 1.0)).coerceAtMost(1.0)
                                 drawLine(
                                     color = Color(0xffde9f3d),
                                     cap = StrokeCap.Round,
@@ -219,7 +229,7 @@ fun MainContents(dailyNutrient: DailyNutrient?, selectedDate: LocalDate, dayDiet
                                     strokeWidth = barHeight
                                 )
                             }
-                            Text(text = "${dailyNutrient?.totalCarbohydrate?.toInt()}g / ${recommendedCarbohydrate}g", modifier = Modifier.align(Alignment.Center))
+                            Text(text = "${(dailyNutrient?.totalCarbohydrate?.toInt() ?: 0) + (dailyOCRNutrient?.totalCarbohydrate?.toInt()?:0)}g / ${recommendedCarbohydrate}g", modifier = Modifier.align(Alignment.Center))
                         }
 
                     }
@@ -239,7 +249,7 @@ fun MainContents(dailyNutrient: DailyNutrient?, selectedDate: LocalDate, dayDiet
                             }
                             Canvas(modifier = Modifier.fillMaxWidth()) {
                                 val barHeight = 70F
-                                val factor = ((dailyNutrient?.totalProtein ?: 0.0) / (recommendedProtein?.toDouble() ?: 1.0)).coerceAtMost(1.0)
+                                val factor = (((dailyNutrient?.totalProtein ?: 0.0)+(dailyOCRNutrient?.totalProtein ?:0.0)) / (recommendedProtein?.toDouble() ?: 1.0)).coerceAtMost(1.0)
                                 drawLine(
                                     cap = StrokeCap.Round,
                                     color = Color(0xffde9f3d),
@@ -248,7 +258,7 @@ fun MainContents(dailyNutrient: DailyNutrient?, selectedDate: LocalDate, dayDiet
                                     strokeWidth = barHeight
                                 )
                             }
-                            Text(text = "${dailyNutrient?.totalProtein?.toInt()}g / ${recommendedProtein}g", modifier = Modifier.align(Alignment.Center))
+                            Text(text = "${(dailyNutrient?.totalProtein?.toInt() ?: 0) + (dailyOCRNutrient?.totalProtein?.toInt()?:0)}g / ${recommendedProtein}g", modifier = Modifier.align(Alignment.Center))
                         }
 
                     }
@@ -268,7 +278,7 @@ fun MainContents(dailyNutrient: DailyNutrient?, selectedDate: LocalDate, dayDiet
                             }
                             Canvas(modifier = Modifier.fillMaxWidth()) {
                                 val barHeight = 70F
-                                val factor = ((dailyNutrient?.totalFat ?: 0.0) / (recommendedFat?.toDouble() ?: 1.0)).coerceAtMost(1.0)
+                                val factor = (((dailyNutrient?.totalFat ?: 0.0)+(dailyOCRNutrient?.totalFat ?:0.0)) / (recommendedFat?.toDouble() ?: 1.0)).coerceAtMost(1.0)
 
                                 drawLine(
                                     cap = StrokeCap.Round,
@@ -278,7 +288,7 @@ fun MainContents(dailyNutrient: DailyNutrient?, selectedDate: LocalDate, dayDiet
                                     strokeWidth = barHeight
                                 )
                             }
-                            Text(text = "${dailyNutrient?.totalFat?.toInt()}g / ${recommendedFat}g", modifier = Modifier.align(Alignment.Center))
+                            Text(text = "${(dailyNutrient?.totalFat?.toInt() ?: 0) + (dailyOCRNutrient?.totalFat?.toInt()?:0)}g / ${recommendedFat}g", modifier = Modifier.align(Alignment.Center))
                         }
 
                     }
