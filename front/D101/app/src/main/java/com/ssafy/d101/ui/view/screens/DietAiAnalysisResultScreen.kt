@@ -162,7 +162,7 @@ fun DietAiAnalysisResultScreen(navController: NavHostController) {
 
                                 ) {
                                     if (totalNutrients != null) {
-                                        Text("${totalNutrients.totalCarbohydrates}g")
+                                        Text("${totalNutrients.totalCarbohydrates.toInt()}g")
                                     }
                                 }
                             }
@@ -180,7 +180,7 @@ fun DietAiAnalysisResultScreen(navController: NavHostController) {
 
                                 ) {
                                     if (totalNutrients != null) {
-                                        Text("${totalNutrients.totalProteins}g")
+                                        Text("${totalNutrients.totalProteins.toInt()}g")
                                     }
                                 }
                             }
@@ -200,7 +200,7 @@ fun DietAiAnalysisResultScreen(navController: NavHostController) {
 
                                 ) {
                                     if (totalNutrients != null) {
-                                        Text("${totalNutrients.totalFats}g")
+                                        Text("${totalNutrients.totalFats.toInt()}g")
                                     }
                                 }
                             }
