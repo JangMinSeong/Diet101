@@ -40,8 +40,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.ssafy.d101.model.DailyNutrient
+import com.ssafy.d101.model.DietInfo
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.view.components.CalendarApp
+import com.ssafy.d101.ui.view.components.FoodItemCard
 import com.ssafy.d101.viewmodel.CalendarViewModel
 import com.ssafy.d101.viewmodel.DietViewModel
 import com.ssafy.d101.viewmodel.UserViewModel
@@ -79,10 +81,10 @@ fun HomeScreen (navController: NavHostController) {
             .padding(16.dp)
     ) {
         Column {
-            CalendarApp(modifier = Modifier.padding(16.dp), calendarViewModel)
-            Spacer(modifier = Modifier.padding(16.dp))
+            CalendarApp(modifier = Modifier, calendarViewModel)
+            Spacer(modifier = Modifier.padding(top = 16.dp))
             if (!selectedDate.isAfter(LocalDate.now())) {
-                MainContents(dailyNutrient)
+                MainContents(dailyNutrient, selectedDate, dayDiet)
             } else {
                 Text(text = "Back to the future")
             }
@@ -91,7 +93,7 @@ fun HomeScreen (navController: NavHostController) {
 }
 
 @Composable
-fun MainContents(dailyNutrient: DailyNutrient?) {
+fun MainContents(dailyNutrient: DailyNutrient?, selectedDate: LocalDate, dayDiet: List<DietInfo>?) {
     val animatedValue = remember { Animatable(0f) }
 
     val userViewModel: UserViewModel = hiltViewModel()
@@ -111,7 +113,18 @@ fun MainContents(dailyNutrient: DailyNutrient?) {
     LaunchedEffect(Unit) {
         animatedValue.animateTo(
             targetValue = 1F,
-            animationSpec = tween(durationMillis = 1000, easing = EaseInOutQuad),
+            animationSpec = tween(durationMillis = 2000, easing = EaseInOutQuad),
+        )
+    }
+
+    LaunchedEffect(selectedDate) {
+        animatedValue.snapTo(0F)
+        animatedValue.animateTo(
+            targetValue = 1F, // 애니메이션의 최종값을 1로 설정
+            animationSpec = tween(
+                durationMillis = 2000, // 애니메이션 지속 시간을 2000ms로 설정
+                easing = EaseInOutQuad // EaseInOutQuad 이징 함수 사용
+            )
         )
     }
 
@@ -159,7 +172,7 @@ fun MainContents(dailyNutrient: DailyNutrient?) {
                                     end = Offset.Infinite,
                                 ),
                                 startAngle = -90F,
-                                sweepAngle = animatedValue.value * 360F * (dailyNutrient?.totalCalorie ?: 0) / recommendedCalorie!!,
+                                sweepAngle = animatedValue.value * 360F * (dailyNutrient?.totalCalorie?.toFloat() ?: 0F) / recommendedCalorie!!,
                                 useCenter = false,
                                 topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
                                 size = sizeArc,
@@ -264,7 +277,11 @@ fun MainContents(dailyNutrient: DailyNutrient?) {
             Spacer(modifier = Modifier.padding(16.dp))
             Text(text = "식단")
             Divider(Modifier.padding(top = 16.dp, bottom = 16.dp))
-
+            dayDiet?.forEach() {IntakeInfos ->
+                IntakeInfos.intake.forEach() {intake ->
+                    FoodItemCard(foodInfo = intake.food)
+                }
+            }
         }
     }
 }
