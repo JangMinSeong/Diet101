@@ -67,6 +67,14 @@ class UserViewModel @Inject constructor(
             activity = _activityLevel.value ?: -1,
             calorie = calculateCalories()
         )
+        Log.e("UserViewModel", "${userSubInfo}")
+        viewModelScope.launch {
+            val result = userRepository.storeUserSubInfo(userSubInfo)
+            _saveSuccess.value = result.isSuccess
+        }
+    }
+
+    suspend fun fixUserSubInfo(userSubInfo: UserSubInfo) {
         viewModelScope.launch {
             val result = userRepository.storeUserSubInfo(userSubInfo)
             _saveSuccess.value = result.isSuccess
