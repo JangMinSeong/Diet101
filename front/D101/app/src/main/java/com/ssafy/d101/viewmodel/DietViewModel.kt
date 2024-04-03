@@ -1,9 +1,13 @@
 package com.ssafy.d101.viewmodel
 
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
+import com.ssafy.d101.R
 import com.ssafy.d101.model.AnalysisDiet
 import com.ssafy.d101.model.CreateMealReq
 import com.ssafy.d101.model.DailyNutrient
@@ -20,7 +24,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
+import java.io.FileOutputStream
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
@@ -140,16 +148,26 @@ class DietViewModel @Inject constructor(
 
     suspend fun saveMeal() {
 //        val file = modelRepository.prepareImageForUpload(modelRepository.context.value!!).getOrThrow()
-        var file = modelRepository.temp.value
-        if (file == null) {
-            file = modelRepository.convertDrawableToFile()
+        var MultipartBodyFile = modelRepository.temp.value
+        if (MultipartBodyFile == null) {
+            val context = modelRepository.context.value!!
+            val drawableId = R.drawable.gallery
+            val drawable = ContextCompat.getDrawable(context, drawableId) as? BitmapDrawable
+            val bitmap = drawable?.bitmap
+            val file = File(context.cacheDir, "gallery")
+            FileOutputStream(file).use { out ->
+                bitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
+            }
+            val requestFile = file.asRequestBody("image/png".toMediaTypeOrNull())
+            val multipartFile = MultipartBody.Part.createFormData("default image", file.name, requestFile)
+            MultipartBodyFile = modelRepository.convertDrawableToFile()
         }
         val createMealReq = CreateMealReq(getDunchfastToString(dietRepository.dietType.value!!), dietRepository.dietDate.value!!, dietRepository.takeReqList.value!!)
         val gson = Gson()
         val createMealReqJson = gson.toJson(createMealReq)
         val createMealReqBody = createMealReqJson.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
         viewModelScope.launch(Dispatchers.IO) {
-            dietRepository.saveMeal(file, createMealReqBody)
+            dietRepository.saveMeal(MultipartBodyFile, createMealReqBody)
         }
     }
 
