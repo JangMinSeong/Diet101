@@ -2,12 +2,7 @@ package com.ssafy.d101.ui.view.screens
 
 import android.util.Log
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.EaseIn
-import androidx.compose.animation.core.EaseInBack
-import androidx.compose.animation.core.EaseInCirc
-import androidx.compose.animation.core.EaseInElastic
 import androidx.compose.animation.core.EaseInOutQuad
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -30,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -44,10 +40,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.ssafy.d101.model.DailyNutrient
 import com.ssafy.d101.ui.theme.Ivory
 import com.ssafy.d101.ui.view.components.CalendarApp
 import com.ssafy.d101.viewmodel.CalendarViewModel
 import com.ssafy.d101.viewmodel.DietViewModel
+import com.ssafy.d101.viewmodel.UserViewModel
 import java.time.LocalDate
 
 
@@ -57,12 +55,22 @@ fun HomeScreen (navController: NavHostController) {
     val dietViewModel: DietViewModel = hiltViewModel()
     val calendarViewModel: CalendarViewModel = hiltViewModel()
     val selectedDate by calendarViewModel.selectedDate.collectAsState()
+    val dayDiet by dietViewModel.dayDiet.collectAsState()
+
+    val dailyNutrient by dietViewModel.dailyNutrient.collectAsState()
+
     LaunchedEffect(selectedDate) {
+        dietViewModel.loadDayDiet(date = selectedDate.toString())
         Log.i("HomeScreen", "selectedDate: $selectedDate")
     }
 
     LaunchedEffect(Unit) {
-        dietViewModel.loadDayDiet(date = "2021-10-10")
+        dietViewModel.loadDayDiet(date = LocalDate.now().toString())
+    }
+
+    LaunchedEffect(dayDiet) {
+        dietViewModel.refreshDailyNutrient()
+        Log.i("HomeScreen", "dayDiet: $dayDiet")
     }
 
     Box(
@@ -75,7 +83,7 @@ fun HomeScreen (navController: NavHostController) {
             CalendarApp(modifier = Modifier.padding(16.dp), calendarViewModel)
             Spacer(modifier = Modifier.padding(16.dp))
             if (!selectedDate.isAfter(LocalDate.now())) {
-                MainContents()
+                MainContents(dailyNutrient)
             } else {
                 Text(text = "Back to the future")
             }
@@ -84,13 +92,26 @@ fun HomeScreen (navController: NavHostController) {
 }
 
 @Composable
-fun MainContents() {
+fun MainContents(dailyNutrient: DailyNutrient?) {
     val animatedValue = remember { Animatable(0f) }
+
+    val userViewModel: UserViewModel = hiltViewModel()
+
+    val recommendedCalorie by userViewModel.calorie.collectAsState()
+    val recommendedCarbohydrate by remember {
+        derivedStateOf { recommendedCalorie?.div(10) }
+    }
+    val recommendedProtein by remember {
+        derivedStateOf { recommendedCalorie?.div(10) }
+    }
+    val recommendedFat by remember {
+        derivedStateOf { recommendedCalorie?.div(45) }
+    }
 
     // 특정 값으로 색을 채우는 Animation
     LaunchedEffect(Unit) {
         animatedValue.animateTo(
-            targetValue = 200F,
+            targetValue = 1F,
             animationSpec = tween(durationMillis = 1000, easing = EaseInOutQuad),
         )
     }
@@ -139,14 +160,14 @@ fun MainContents() {
                                     end = Offset.Infinite,
                                 ),
                                 startAngle = -90F,
-                                sweepAngle = animatedValue.value,
+                                sweepAngle = animatedValue.value * 360F * (dailyNutrient?.totalCalorie ?: 0) / recommendedCalorie!!,
                                 useCenter = false,
                                 topLeft = Offset((size.width - sizeArc.width) / 2f, (size.height - sizeArc.height) / 2f),
                                 size = sizeArc,
                                 style = Stroke(width = 70F, cap = StrokeCap.Round)
                             )
                         }
-                        Text(text = "1200   /\n2000 kcal", modifier = Modifier.align(Alignment.Center))
+                        Text(text = "${dailyNutrient?.totalCalorie}   /\n$recommendedCalorie kcal", modifier = Modifier.align(Alignment.Center))
                     }
                     Spacer(modifier = Modifier.padding(16.dp))
                     Row {
@@ -172,7 +193,7 @@ fun MainContents() {
                                     strokeWidth = barHeight
                                 )
                             }
-                            Text(text = "150g / 200g", modifier = Modifier.align(Alignment.Center))
+                            Text(text = "${recommendedCarbohydrate}g / ${recommendedCalorie?.div(10)}g", modifier = Modifier.align(Alignment.Center))
                         }
 
                     }
@@ -200,7 +221,7 @@ fun MainContents() {
                                     strokeWidth = barHeight
                                 )
                             }
-                            Text(text = "150g / 200g", modifier = Modifier.align(Alignment.Center))
+                            Text(text = "${recommendedProtein}g / ${recommendedCalorie?.div(10)}g", modifier = Modifier.align(Alignment.Center))
                         }
 
                     }
@@ -228,7 +249,7 @@ fun MainContents() {
                                     strokeWidth = barHeight
                                 )
                             }
-                            Text(text = "150g / 200g", modifier = Modifier.align(Alignment.Center))
+                            Text(text = "${recommendedFat}g / ${recommendedCalorie?.div(45)}g", modifier = Modifier.align(Alignment.Center))
                         }
 
                     }
