@@ -36,3 +36,10 @@ data class AnalysisDiet(
     val annualNutrients : List<CalAnnualNutrient>,
     val totalRank : List<String>
 )
+
+data class DailyNutrient(
+    val totalCalorie: Int,
+    val totalCarbohydrate: Double,
+    val totalProtein: Double,
+    val totalFat: Double
+)
