@@ -71,7 +71,7 @@ fun FoodDetailScreen(dietInfo: DietInfo) {
 
     val carbcalories = foodCarbs * 4
     val proteinCalories = foodProtein * 4
-    val fatCalories = foodFat * 4
+    val fatCalories = foodFat * 9
 
     val context = LocalContext.current
     val resourceId = context.resources.getIdentifier(
