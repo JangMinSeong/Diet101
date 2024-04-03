@@ -56,7 +56,9 @@ fun FoodListResultScreen(navController: NavHostController) {
     val yoloResult by  modelViewModel.getYoloResponse().collectAsState()
 
     val dietViewModel : DietViewModel = hiltViewModel()
-    val intakeReqs = yoloResult?.let { createIntakeReqList(uploadedFoodItems, it) } ?: emptyList()
+    val intakeReqs = yoloResult?.let { createIntakeReqList(uploadedFoodItems, it) } ?: createIntakeReqList(uploadedFoodItems,
+        emptyList()
+    )
 
     var selectedMeal by remember { mutableStateOf<String?>(null) }
     var dunchfastType by remember {mutableStateOf<Dunchfast?>(Dunchfast.BREAKFAST)}
