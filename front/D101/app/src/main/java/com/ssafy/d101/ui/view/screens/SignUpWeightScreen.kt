@@ -23,9 +23,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.ssafy.d101.navigation.Screens
 import com.ssafy.d101.viewmodel.UserViewModel
 
@@ -44,17 +46,15 @@ fun SignUpWeightScreen(navController: NavHostController) {
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.Start
     ) {
-        TopAppBar(
-            title = {},
-            navigationIcon = {
-                IconButton(onClick = {navController.popBackStack()}) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "back")
-                }
-            }
-        )
-
         Column {
-            Spacer(Modifier.padding(16.dp))
+            TopAppBar(
+                title = {},
+                navigationIcon = {
+                    IconButton(onClick = {navController.popBackStack()}) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "back")
+                    }
+                }
+            )
             Text(
                 text = "키, 몸무게 저희만의 비밀이에요",
                 style = MaterialTheme.typography.headlineSmall
@@ -89,4 +89,11 @@ fun SignUpWeightScreen(navController: NavHostController) {
             Text(text = "다음")
         }
     }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+fun PreviewSignUpWeightScreen() {
+    val navController = rememberNavController()
+    SignUpWeightScreen(navController = navController)
 }
