@@ -327,9 +327,9 @@ fun getDunchfastType(selectedMeal: String): Dunchfast {
         "점심" -> Dunchfast.LUNCH
         "점저" -> Dunchfast.LINNER
         "저녁" -> Dunchfast.DINNER
-        "야식" -> Dunchfast.MIDNIGHT
+        "야식" -> Dunchfast.NIGHT
         "간식" -> Dunchfast.SNACK
-        "음료" -> Dunchfast.DRINK
+        "음료" -> Dunchfast.BEVERAGE
         "주류" -> Dunchfast.ALCOHOL
         else -> Dunchfast.BREAKFAST // 선택한 항목이 매핑되지 않는 경우 아침으로 고정
     }
