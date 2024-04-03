@@ -97,4 +97,10 @@ class ModelViewModel @Inject constructor(
             modelRepository.updateFoodItem(index,newName, newCarbs, newProtein, newFat, newCal)
         }
     }
+
+    fun setInit() {
+        viewModelScope.launch{
+            modelRepository.initResult()
+        }
+    }
 }

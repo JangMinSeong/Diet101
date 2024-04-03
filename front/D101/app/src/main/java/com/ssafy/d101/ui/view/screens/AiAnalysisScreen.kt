@@ -58,6 +58,7 @@ fun AiAnalysisScreen(navController: NavController) {
             context?.let {
                 modelViewModel.transferImageToOCR(it) { isSuccess ->
                     if (isSuccess) {
+
                     } else {
                     }
                 }
