@@ -219,6 +219,7 @@ fun DietAiAnalysisResultScreen(navController: NavHostController) {
                         scope.launch {
                             dietViewModel.saveMeal()
                         }
+                        navController.navigate("home")
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                     modifier = Modifier
