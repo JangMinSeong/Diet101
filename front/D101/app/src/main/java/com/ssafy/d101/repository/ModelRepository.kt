@@ -157,7 +157,6 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
     suspend fun initResult() {
         _yoloInfo.emit(null)
         _ocrInfo.emit(null)
-        _imageUri.emit(null)
         _temp.emit(null)
     }
     suspend fun setOption(option : Boolean) {
