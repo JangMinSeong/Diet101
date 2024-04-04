@@ -51,6 +51,7 @@ import com.ssafy.d101.ui.theme.fontFamily
 import com.ssafy.d101.ui.view.components.CalendarApp
 import com.ssafy.d101.ui.view.components.FoodDetailScreen
 import com.ssafy.d101.ui.view.components.FoodItemCard
+import com.ssafy.d101.ui.view.components.OCRDetailScreen
 import com.ssafy.d101.viewmodel.CalendarViewModel
 import com.ssafy.d101.viewmodel.DietViewModel
 import com.ssafy.d101.viewmodel.OCRViewModel
@@ -315,6 +316,17 @@ fun MainContents(dailyOCRNutrient: DailyNutrient?,dailyNutrient: DailyNutrient?,
             dayDiet?.forEach() {
                 Log.i("HomeScreen", "DietInfo: $it")
                 FoodDetailScreen(dietInfo = it)
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+        }
+        item {
+            Spacer(modifier = Modifier.padding(16.dp))
+            Text(text = "가공 식품")
+            Divider(Modifier.padding(top = 16.dp, bottom = 16.dp))
+            Log.i("HomeScreen", "dayDiet: $dayDiet")
+            dayOCR?.forEach() {
+                Log.i("HomeScreen", "DietInfo: $it")
+                OCRDetailScreen(dietInfo = it)
                 Spacer(modifier = Modifier.height(10.dp))
             }
         }
