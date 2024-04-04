@@ -424,13 +424,15 @@ fun calculateDailyNutrientRatios(analysisDiet: AnalysisDiet): Triple<Float, Floa
 }
 
 fun calculateTotalCalories(analysisDiet: AnalysisDiet): Int {
+//    return analysisDiet.dailyDiet.sumOf { dietInfo ->
+//        dietInfo.intake.sumOf { intakeInfo ->
+//            val foodInfo = intakeInfo.food
+//            val intakeAmount = intakeInfo.amount
+//
+//            ((foodInfo.carbohydrate * 4 + foodInfo.protein * 4 + foodInfo.fat * 9) * intakeAmount).toInt()
+//        }
     return analysisDiet.dailyDiet.sumOf { dietInfo ->
-        dietInfo.intake.sumOf { intakeInfo ->
-            val foodInfo = intakeInfo.food
-            val intakeAmount = intakeInfo.amount
-
-            ((foodInfo.carbohydrate * 4 + foodInfo.protein * 4 + foodInfo.fat * 9) * intakeAmount).toInt()
-        }
+        dietInfo.kcal
     }
 }
 

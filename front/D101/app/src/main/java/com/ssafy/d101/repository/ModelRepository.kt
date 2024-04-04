@@ -231,10 +231,10 @@ class ModelRepository @Inject constructor(private val modelService: ModelService
     }
 
     fun convertDrawableToFile(context: Context): MultipartBody.Part {
-        val drawableId = R.drawable.gallery
+        val drawableId = R.drawable.restaurant
         val drawable = ContextCompat.getDrawable(context, drawableId) as? BitmapDrawable
         val bitmap = drawable?.bitmap
-        val file = File(context.cacheDir, "gallery.png")
+        val file = File(context.cacheDir, "restaurant.png")
         FileOutputStream(file).use { out ->
             bitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
         }
