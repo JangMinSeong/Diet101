@@ -83,7 +83,41 @@ Training data와 Validation data는 80:20 비율로 나눴고 Epoch는 3155로 �
 ## 6. 서비스 아키텍처
 
 ## 7. ERD
+![erd](https://github.com/SSAFY-5959-STUDY/Algorithm/assets/78913658/543be5bb-bd57-4524-b820-8c0aea584e67)
 
 ## 8. 프로젝트 구조도
-
+### 📱 Android
+:file_folder: d101<br/>
+├── :file_folder: api<br/>
+├── :file_folder: di<br/>
+├── :file_folder: model<br/>
+├── :file_folder: navigation<br/>
+├── :file_folder: repository<br/>
+├── :file_folder: ui<br/>
+│   ├── :file_folder: theme<br/>
+│   └── :file_folder: view<br/>
+│       ├── :file_folder: components<br/>
+│       └── :file_folder: screens<br/>
+├── :file_folder: utils<br/>
+└── :file_folder: viewmodel  <br/>
+### :file_cabinet: Backend<br/>
+:file_folder: com.d101.back<br/>
+├── :file_folder: api<br/>
+├── :file_folder: config<br/>
+├── :file_folder: controller<br/>
+├── :file_folder: dto<br/>
+│   ├── :file_folder: oauth<br/>
+│   ├── :file_folder: request<br/>
+│   └── :file_folder: response<br/>
+├── :file_folder: entity<br/>
+│   ├── :file_folder: composite<br/>
+│   └── :file_folder: enums<br/>
+├── :file_folder: exception<br/>
+│   ├── :file_folder: handler<br/>
+│   └── :file_folder: response<br/>
+├── :file_folder: filter<br/>
+├── :file_folder: repository<br/>
+├── :file_folder: service<br/>
+└── :file_folder: util  <br/>
+<br/>
 ## 9. 팀원 소개
