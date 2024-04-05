@@ -93,6 +93,15 @@ Training data와 Validation data는 80:20 비율로 나눴고 Epoch는 3155로 �
 - 주간, 월간 별로 사용자가 섭취한 음식의 빈도를 통해 랭킹을 확인할 수 있습니다.
 
 ## 5. 기술 스택 정리
+Frontend: Kotlin, AndroidStudio
+
+Backend: JAVA, SpringBoot
+
+Infra: AWS EC2, S3, Jenkins, Docker
+
+DB: MariaDB
+
+AI: Python, FastAPI
 
 ## 6. 서비스 아키텍처
 
