@@ -93,17 +93,27 @@ Training data와 Validation data는 80:20 비율로 나눴고 Epoch는 3155로 �
 - 주간, 월간 별로 사용자가 섭취한 음식의 빈도를 통해 랭킹을 확인할 수 있습니다.
 
 ## 5. 기술 스택 정리
-Frontend: Kotlin, AndroidStudio
 
-Backend: JAVA, SpringBoot
+### Frontend
+  - **Kotlin** : 안드로이드 앱 개발에 주로 사용되는 정적 타입 지정 프로그래밍 언어입니다. Java와의 상호 운용성, 현대적이고 간결한 문법, 안전성을 목표로 하며, 안드로이드 공식 언어로 지원됩니다.
+  - **Jetpack Compose** : Kotlin으로 작성된 안드로이드의 모던 UI 툴킷입니다. 선언적 방식을 통해 UI를 더 간결하고 직관적으로 설계할 수 있게 해주며, 더욱 동적이고 반응적인 앱을 만들 수 있도록 돕습니다.
 
-Infra: AWS EC2, S3, Jenkins, Docker
+### Backend 
+ - **SpringBoot** : 강력한 RESTful API 개발을 위한 Java 기반 프레임워크입니다.
 
-DB: MariaDB
+### Database
+- **MariaDB** : 안정적이고 확장성 있는 데이터 관리를 위해 사용되는 오픈소스 관계형 데이터베이스 관리 시스템입니다.
 
-AI: Python, FastAPI
+### Infra
+- **Jenkins** : 지속적인 통합 및 배포를 자동화하기 위한 오픈소스 자동화 서버입니다. 코드 변경 사항이 발생할 때마다 자동으로 빌드 및 테스트를 수행하고, 성공적으로 완료되면 프로덕션 서버로 배포됩니다.
+- **Docker** : 애플리케이션을 컨테이너 내에 패키징하여 의존성 문제 없이 어디서든지 실행할 수 있도록 해주는 오픈 소스 소프트웨어 플랫폼입니다. 이를 통해 애플리케이션의 배포와 관리가 간소화됩니다.
+
+### AI
+- **FastAPI** : 현대적이고 빠른 웹 API를 구축하기 위한 Python 프레임워크입니다. 비동기 프로그래밍을 지원하며, 타입 힌트를 기반으로 한 데이터 유효성 검사와 자동 문서화 기능을 제공합니다. 
 
 ## 6. 서비스 아키텍처
+
+![리얼찐시스템아키텍처](/uploads/8fbab7270d3961a17ae513ef4f8c8889/리얼찐시스템아키텍처.jpg)
 
 ## 7. ERD
 ![erd](https://github.com/SSAFY-5959-STUDY/Algorithm/assets/78913658/543be5bb-bd57-4524-b820-8c0aea584e67)
@@ -144,3 +154,9 @@ AI: Python, FastAPI
 └── :file_folder: util  <br/>
 <br/>
 ## 9. 팀원 소개
+- 팀장 : 김보근
+- 팀원 : 김동영
+- 팀원 : 박사랑
+- 팀원 : 이주미
+- 팀원 : 장민성
+- 팀원 : 조현우
