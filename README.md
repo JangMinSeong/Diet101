@@ -14,11 +14,11 @@
 
 주요 기능으로는 과거 식단 히스토리, 음식 사진 인식, 영양성분표 인식, 섭취 가능 음식 추천 등이 있어 사용자들이 본인의 식단의 영양소 비율을 쉽게 확인할 수 있습니다.
 
-![mainPage](/uploads/c1932f9614d2a70f1723676f3e9a125e/mainPage.PNG)
+<p align="center"><img src="upload/mainPage.PNG"></p>
 
 <메인화면 식단 등록 전>
 
-![mainPageAfterResistFood](/uploads/998edcc32b5acb3530a8fbdb3c404623/mainPageAfterResistFood.PNG)
+<p align="center"><img src="upload/mainPageAfterResistFood.PNG"></p>
 
 <메인화면 식단 등록 후>
 
@@ -52,23 +52,24 @@ Training data와 Validation data는 80:20 비율로 나눴고 Epoch는 3155로 �
 
 사용자는 섭취할 음식의 사진을 통해, 해당 음식의 영양소를 확인할 수 있습니다.
 
-![flow1](/uploads/dfb12d72f6b65ead35ddeeb5424e87f0/flow1.png)
+<p align="center"><img src="upload/flow1.png"></p>
 
 - 사진에서 음식만을 인식해, 어떤 음식인지 판단합니다.
 - 결과에 오류가 있다면 사용자는 직접 수정이 가능합니다.
 
-![flow2](/uploads/9e2d7a2ceb911b9093ccaa535710e5a3/flow2.png)
+<p align="center"><img src="upload/flow2.png"></p>
 
 - 수정은 검색을 통해 음식을 찾아 업로드를 하면 식단에 추가됩니다.
 
 
-![flow3](/uploads/7817d17f22b612be6efe57c041a3504b/flow3.png)
+<p align="center"><img src="upload/flow3.png"></p>
 
 - 입력이 완료된 식단은 등록할 수 있습니다.
 - 전체 섭취한 영양소를 계산해 사용자에게 보여줍니다.
 
 2. **영양성분표 인식**  
-    ![그림1](/uploads/9892aeb2592dbebfee0e0430a5b173dc/그림1.png)
+ <p align="center"><img src="upload/ocrPage.png"></p>
+
 - 가공 식품 뒷면 영양정보 사진 분석
 - 영양 정보 텍스트 추출
 - 영양소 이름과 수치 표시
@@ -77,7 +78,7 @@ Training data와 Validation data는 80:20 비율로 나눴고 Epoch는 3155로 �
 3. **섭취 가능 음식 추천**
 
 사용자는 활동량, 성별, BMI 지수, 남은 끼니 수 및 남은 칼로리를 통해 식단을 추천받을 수 있습니다.
-![recommend](/uploads/bea9da39141b2091577a1f1b03883b60/recommend.PNG)
+<p align="center"><img src="upload/recommend.PNG"></p>
 
 - 남은 끼니 수를 등록합니다.
 - 한 끼에 원하는 칼로리를 등록합니다.
@@ -86,7 +87,7 @@ Training data와 Validation data는 80:20 비율로 나눴고 Epoch는 3155로 �
 4. **주별, 월별 식단 기록 확인**
 
 사용자는 주별, 월별 섭취한 총 칼로리 및 총 영양소 정보를 확인할 수 있습니다.
-![weeklymonthlyanalysis](/uploads/d787d2127e468eb6b8e719f547a4f6fc/weeklymonthlyanalysis.PNG)
+<p align="center"><img src="upload/weeklymonthlyanalysis.PNG"></p>
 
 - 주별 : 일주일 간 요일 별로 섭취한 탄수화물, 단백질, 지방의 총 비율을 확인할 수 있습니다.
 - 월별 : 월 별로 섭취한 탄수화물, 단백질, 지방의 총 비율을 확인할 수 있습니다.
@@ -113,10 +114,10 @@ Training data와 Validation data는 80:20 비율로 나눴고 Epoch는 3155로 �
 
 ## 6. 서비스 아키텍처
 
-![리얼찐시스템아키텍처](/uploads/8fbab7270d3961a17ae513ef4f8c8889/리얼찐시스템아키텍처.jpg)
+<p align="center"><img src="upload/Systemarchitecture.jpg"></p>
 
 ## 7. ERD
-![erd](https://github.com/SSAFY-5959-STUDY/Algorithm/assets/78913658/543be5bb-bd57-4524-b820-8c0aea584e67)
+<p align="center"><img src="upload/ERD.png"></p>
 
 ## 8. 프로젝트 구조도
 ### 📱 Android
