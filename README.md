@@ -4,7 +4,10 @@
 3. 과제 수행 결과
 4. 주요 기능
 5. 기술 스택 정리
-
+6. 서비스 아키텍처
+7. ERD
+8. 프로젝트 구조도
+9. 팀원 소개
 
 ## 1. 개요
 "D(iet) 101"은 식단 관리의 편의성을 제공하기 위한 어플리케이션입니다. 사용자들은 자신이 먹을 음식의 사진을 통해, 섭취하는 영양소의 양을 확인할 수 있습니다.
@@ -19,21 +22,38 @@
 
 <메인화면 식단 등록 후>
 
+## 2. 과제 목표
+
+## 3. 과제 수행 결과
 
 ## 4. 주요 기능
 
 1. **음식 사진 인식**
 
+사용자는 섭취할 음식의 사진을 통해, 해당 음식의 영양소를 확인할 수 있습니다.
 
-![addFoodSelection](/uploads/39657a42f55dab464408ec207f1845c2/addFoodSelection.PNG)
-![addFoodImage](/uploads/4d79b9a9c664857d72a71d4b59cfa5ff/addFoodImage.PNG)
-![aiLoadingPage](/uploads/b947f3c2f0ff2edf723583b6d3eb33f2/aiLoadingPage.PNG)
-![foodResultPage](/uploads/e56cceb7c933abbd577c2a8cc626a8fb/foodResultPage.PNG)
+![flow1](/uploads/dfb12d72f6b65ead35ddeeb5424e87f0/flow1.png)
 
-- 음식 사진에서 음식만을 인식해, 어떤 음식인지 판단합니다.
+- 사진에서 음식만을 인식해, 어떤 음식인지 판단합니다.
+- 결과에 오류가 있다면 사용자는 직접 수정이 가능합니다.
+
+![flow2](/uploads/9e2d7a2ceb911b9093ccaa535710e5a3/flow2.png)
+
+- 수정은 검색을 통해 음식을 찾아 업로드를 하면 식단에 추가됩니다.
 
 
+![flow3](/uploads/7817d17f22b612be6efe57c041a3504b/flow3.png)
+
+- 입력이 완료된 식단은 등록할 수 있습니다.
+- 전체 섭취한 영양소를 계산해 사용자에게 보여줍니다.
 
 
+## 5. 기술 스택 정리
 
-# deploy test
+## 6. 서비스 아키텍처
+
+## 7. ERD
+
+## 8. 프로젝트 구조도
+
+## 9. 팀원 소개
